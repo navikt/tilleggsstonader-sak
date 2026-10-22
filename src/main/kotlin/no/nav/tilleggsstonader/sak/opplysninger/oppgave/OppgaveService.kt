@@ -21,10 +21,8 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalHåndteresAvTSSak
@@ -55,7 +53,6 @@ class OppgaveService(
     private val cacheManager: CacheManager,
     private val personService: PersonService,
     private val klageService: KlageService,
-    private val behandlingRepository: BehandlingRepository,
     private val ytelseService: YtelseService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -223,8 +220,8 @@ class OppgaveService(
     }
 
     /**
-     * Bruker lagret flagg på behandlingen. Uten behandling slås personen opp mot ung-sak, og oppgaven
-     * opprettes ikke hvis oppslaget feiler slik at tasken kan prøves på nytt.
+     * Slår opp personen mot ung-sak. Med behandling opprettes oppgaven uten markering hvis oppslaget feiler.
+     * Uten behandling opprettes ikke oppgaven hvis oppslaget feiler, slik at tasken kan prøves på nytt.
      */
     private fun utledBehandlingstype(
         personIdent: String,
@@ -232,7 +229,7 @@ class OppgaveService(
     ): Behandlingstype? {
         val gjelderAktivitetspenger =
             if (behandlingId != null) {
-                behandlingRepository.findByIdOrThrow(behandlingId).gjelderAktivitetspenger
+                ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
             } else {
                 ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
             }

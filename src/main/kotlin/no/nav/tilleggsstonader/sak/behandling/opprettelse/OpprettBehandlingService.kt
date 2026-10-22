@@ -32,7 +32,6 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -52,7 +51,6 @@ class OpprettBehandlingService(
     private val taskService: TaskService,
     private val fagsakService: FagsakService,
     private val vedtakService: VedtakService,
-    private val ytelseService: YtelseService,
 ) {
     @Transactional
     fun opprettBehandling(request: OpprettBehandling): Behandling {
@@ -103,7 +101,6 @@ class OpprettBehandlingService(
                     kravMottatt = request.kravMottatt,
                     kategori = BehandlingKategori.NASJONAL,
                     årsakMetadata = request.årsakMetadata,
-                    gjelderAktivitetspenger = ytelseService.harAktivitetspengerIDagEllerFremITid(fagsak.hentAktivIdent()),
                 ),
             )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))

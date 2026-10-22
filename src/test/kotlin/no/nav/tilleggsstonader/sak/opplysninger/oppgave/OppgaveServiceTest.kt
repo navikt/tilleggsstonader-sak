@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -43,7 +42,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
-import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -54,7 +52,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.oppgave.PersonIdent as PersonIdentKontrakt
@@ -67,7 +64,6 @@ internal class OppgaveServiceTest {
     private val cacheManager = ConcurrentMapCacheManager()
     private val personService = mockk<PersonService>(relaxed = true)
     private val klageService = mockk<KlageService>(relaxed = true)
-    private val behandlingRepository = mockk<BehandlingRepository>()
     private val ytelseService = mockk<YtelseService>()
 
     private val oppgaveService =
@@ -79,7 +75,6 @@ internal class OppgaveServiceTest {
             cacheManager = cacheManager,
             personService = personService,
             klageService = klageService,
-            behandlingRepository = behandlingRepository,
             ytelseService = ytelseService,
         )
 
@@ -156,7 +151,7 @@ internal class OppgaveServiceTest {
     @Nested
     inner class BehandlingstypeAktivitetspenger {
         @Test
-        fun `skal sette behandlingstype aktivitetspenger når behandlingen gjelder aktivitetspenger`() {
+        fun `skal sette behandlingstype aktivitetspenger når personen har aktivitetspenger`() {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
 
@@ -166,7 +161,7 @@ internal class OppgaveServiceTest {
         }
 
         @Test
-        fun `skal ikke sette behandlingstype når behandlingen ikke gjelder aktivitetspenger`() {
+        fun `skal ikke sette behandlingstype når personen ikke har aktivitetspenger`() {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot, gjelderAktivitetspenger = false)
 
@@ -189,6 +184,17 @@ internal class OppgaveServiceTest {
             )
 
             assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Tilbakekreving.value)
+        }
+
+        @Test
+        fun `skal bruke tolerant oppslag mot ung-sak når oppgaven har behandling`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            verify(exactly = 1) { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) }
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(any()) }
         }
     }
 
@@ -236,16 +242,6 @@ internal class OppgaveServiceTest {
             assertThrows<RuntimeException> { opprettJournalføringsoppgave() }
 
             verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
-        }
-
-        @Test
-        fun `skal ikke slå opp ung-sak når oppgaven har behandling`() {
-            val slot = slot<OpprettOppgaveRequest>()
-            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
-
-            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
-
-            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(any()) }
         }
     }
 
@@ -609,8 +605,7 @@ internal class OppgaveServiceTest {
         gjelderAktivitetspenger: Boolean = false,
     ) {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
-        every { behandlingRepository.findByIdOrNull(BEHANDLING_ID) } returns
-            behandling(id = BEHANDLING_ID, gjelderAktivitetspenger = gjelderAktivitetspenger)
+        every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns gjelderAktivitetspenger
 
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
