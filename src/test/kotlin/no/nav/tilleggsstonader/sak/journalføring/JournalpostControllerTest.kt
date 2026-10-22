@@ -179,6 +179,7 @@ class JournalpostControllerTest(
                         fagsystem = Fagsystem.TILLEGGSSTONADER,
                         klageMottatt = LocalDate.now(),
                         behandlendeEnhet = oppgave.tildeltEnhetsnr!!,
+                        gjelderAktivitetspenger = true, // YtelseClientMockConfig svarer med aktiv aktivitetspenger-periode
                     ),
                 )
             }
