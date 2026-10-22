@@ -53,6 +53,18 @@ data object OvergangssstønadFlyttingTso : MålgruppeFlyttingTso {
     override val fakta: IngenFakta = IngenFakta
 }
 
+data object OpphørtOmstillingsstønadFlyttingTso : MålgruppeFlyttingTso {
+    override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.OPPHØRT_OMSTILLINGSSTØNAD_FLYTTING_TSO
+    override val vurderinger: IngenVurderinger = IngenVurderinger
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data object OpphørtOvergangsstønadFlyttingTso : MålgruppeFlyttingTso {
+    override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.OPPHØRT_OVERGANGSSTØNAD_FLYTTING_TSO
+    override val vurderinger: IngenVurderinger = IngenVurderinger
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data object IngenMålgruppeFlyttingTso : MålgruppeFlyttingTso {
     override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.INGEN_MÅLGRUPPE_FLYTTING_TSO
     override val vurderinger: IngenVurderinger = IngenVurderinger
@@ -67,7 +79,9 @@ enum class MålgruppeFlyttingTsoType(
     TypeFaktaOgVurderingFlyttingTso {
     AAP_FLYTTING_TSO(MålgruppeType.AAP),
     OMSTILLINGSSTØNAD_FLYTTING_TSO(MålgruppeType.OMSTILLINGSSTØNAD),
+    OPPHØRT_OMSTILLINGSSTØNAD_FLYTTING_TSO(MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_FLYTTING_TSO(MålgruppeType.OVERGANGSSTØNAD),
+    OPPHØRT_OVERGANGSSTØNAD_FLYTTING_TSO(MålgruppeType.OPPHØRT_OVERGANGSSTØNAD),
     NEDSATT_ARBEIDSEVNE_FLYTTING_TSO(MålgruppeType.NEDSATT_ARBEIDSEVNE),
     AKTIVITETSPENGER_FLYTTING_TSO(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_FLYTTING_TSO(MålgruppeType.UFØRETRYGD),

@@ -66,9 +66,8 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
             }
@@ -133,15 +132,13 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = førsteFlyttedato,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = førsteFlyttedato,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
                 flyttingByrå(
-                    flytteDato = andreFlyttedato,
-                    tilbud1Pris = 8000,
-                    tilbud2Pris = 3000,
+                    flyttedato = andreFlyttedato,
+                    tilbudPriser = listOf(8000, 3000),
                     erBetalingDokumentert = true,
                 )
             }
@@ -190,6 +187,10 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
         assertThat(beregningsresultat.fom).isEqualTo(førsteFlyttedato)
         assertThat(beregningsresultat.beløp).isEqualTo(5000.toBigDecimal())
         assertThat(beregningsresultat.fraTidligereVedtak).isTrue()
+        val grunnlag = beregningsresultat.grunnlag as BeregningsgrunnlagFlyttebyrå
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud.navn).isEqualTo("Syntetisk tilbud 2")
+        assertThat(beregningsresultat.beløp).isEqualTo(valgtTilbud.pris)
 
         val andelerOpphør = tilkjentYtelseRepository.findByBehandlingId(opphørId)!!.andelerTilkjentYtelse
         val andelOpphør = andelerOpphør.single()
@@ -224,9 +225,8 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
             }
@@ -239,7 +239,15 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 vilkår {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(tilbud2 = byrå.tilbud2.copy(pris = 3000)))
+                        copy(
+                            fakta =
+                                byrå.copy(
+                                    tilbud =
+                                        byrå.tilbud.mapIndexed { index, tilbud ->
+                                            if (index == 1) tilbud.copy(pris = 3000) else tilbud
+                                        },
+                                ),
+                        )
                     }
                 }
             }
@@ -255,6 +263,11 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
 
         assertThat(resultatRevurdering.beløp).isEqualTo(3000.toBigDecimal())
         assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+        val grunnlagRevurdering = resultatRevurdering.grunnlag as BeregningsgrunnlagFlyttebyrå
+        val valgtTilbud = grunnlagRevurdering.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud.navn).isEqualTo("Syntetisk tilbud 2")
+        assertThat(valgtTilbud.pris).isEqualTo(3000.toBigDecimal())
+        assertThat(resultatRevurdering.beløp).isEqualTo(valgtTilbud.pris)
 
         val andelerRevurdering =
             tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
@@ -292,9 +305,8 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = false,
                 )
             }
@@ -377,9 +389,8 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
             }
@@ -458,9 +469,8 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
             }
@@ -477,7 +487,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = behandling.id) {
                 vilkår {
                     endreFlytting {
-                        copy(flytteDato = fom.plusDays(7))
+                        copy(flyttedato = fom.plusDays(7))
                     }
                 }
             }

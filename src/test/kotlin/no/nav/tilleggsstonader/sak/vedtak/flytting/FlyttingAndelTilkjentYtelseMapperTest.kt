@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import org.assertj.core.api.Assertions.assertThat
@@ -144,7 +145,15 @@ class FlyttingAndelTilkjentYtelseMapperTest {
             BeregningsresultatFlyttevilkår(
                 fom = fom,
                 tom = fom.plusDays(10),
-                grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120"), erBetalingDokumentert),
+                grunnlag =
+                    BeregningsgrunnlagFlyttebyrå(
+                        tilbud =
+                            listOf(
+                                BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                            ),
+                        erBetalingDokumentert = erBetalingDokumentert,
+                    ),
                 beløp = BigDecimal("100"),
                 målgruppe = målgruppe,
             ),

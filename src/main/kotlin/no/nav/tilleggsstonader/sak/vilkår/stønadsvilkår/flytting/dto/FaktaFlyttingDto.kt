@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -26,9 +27,9 @@ enum class TypeFaktaFlytting {
 }
 
 data class FaktaFlyttebyråDto(
-    val tilbud1: FlyttebyråTilbudDto = FlyttebyråTilbudDto(),
-    val tilbud2: FlyttebyråTilbudDto = FlyttebyråTilbudDto(),
+    val tilbud: List<FlyttebyråTilbudDto>,
     val erBetalingDokumentert: Boolean,
+    val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTEBYRÅ
@@ -45,6 +46,7 @@ data class FaktaFlytteSelvDto(
     val bompenger: Int? = null,
     val ferge: Int? = null,
     val parkering: Int? = null,
+    val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTE_SELV

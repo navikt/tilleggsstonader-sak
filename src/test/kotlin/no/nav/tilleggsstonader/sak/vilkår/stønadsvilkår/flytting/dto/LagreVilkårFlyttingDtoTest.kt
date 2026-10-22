@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
@@ -14,9 +16,9 @@ class LagreVilkårFlyttingDtoTest {
     @Test
     fun `skal mappe ufullstendige delvilkår til domene uten å legge til svar`() {
         val fakta = FaktaFlyttingUbestemtDto("Adresse 1")
-        val domain = dto(svar = emptyMap(), fakta = fakta).tilDomain()
+        val domain = dto(svar = emptyMap(), fakta = fakta).tilDomene()
 
-        assertThat(domain.flytteDato).isEqualTo(1 januar 2026)
+        assertThat(domain.flyttedato).isEqualTo(1 januar 2026)
         assertThat(domain.svar).isEmpty()
         assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt("Adresse 1"))
     }
@@ -28,10 +30,10 @@ class LagreVilkårFlyttingDtoTest {
             dto(
                 svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to svar),
                 fakta = FaktaFlyttingUbestemtDto("Adresse 1"),
-            ).tilDomain()
+            ).tilDomene()
 
         assertThat(domain.svar).containsOnlyKeys(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)
-        assertThat(domain.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]).isEqualTo(svar.tilDomain())
+        assertThat(domain.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]).isEqualTo(svar.tilDomene())
     }
 
     @Test
@@ -40,14 +42,14 @@ class LagreVilkårFlyttingDtoTest {
             jsonMapper.readValue<LagreVilkårFlyttingDto>(
                 """
                 {
-                  "flytteDato": "2026-01-01",
+                  "flyttedato": "2026-01-01",
                   "svar": {},
                   "fakta": {"type": "FLYTTING_UBESTEMT", "adresse": "Flytteveien 1"}
                 }
                 """.trimIndent(),
             )
 
-        assertThat(dto.flytteDato).isEqualTo(1 januar 2026)
+        assertThat(dto.flyttedato).isEqualTo(1 januar 2026)
         assertThat(dto.svar).isEmpty()
         assertThat(dto.fakta).isEqualTo(FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"))
     }
@@ -59,19 +61,24 @@ class LagreVilkårFlyttingDtoTest {
                 """
                 {
                   "type": "FLYTTING_FLYTTEBYRÅ",
-                  "tilbud1": {"navn": "Flyttebyrå A"},
-                  "tilbud2": {},
+                  "tilbud": [{"navn": "Flyttebyrå A"}, {}],
                   "adresse": "Flytteveien 1",
-                  "erBetalingDokumentert": false
+                  "erBetalingDokumentert": false,
+                  "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}
                 }
                 """.trimIndent(),
             )
 
         assertThat(fakta).isEqualTo(
             FaktaFlyttebyråDto(
-                tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                tilbud =
+                    listOf(
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                        FlyttebyråTilbudDto(),
+                    ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = false,
+                nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
     }
@@ -79,13 +86,17 @@ class LagreVilkårFlyttingDtoTest {
     @Test
     fun `skal deserialisere egen kjøring uten avstand og kostnader`() {
         val fakta =
-            jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1"}""")
+            jsonMapper.readValue<FaktaFlyttingDto>(
+                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
+            )
 
-        assertThat(fakta).isEqualTo(FaktaFlytteSelvDto(adresse = "Flytteveien 1"))
+        assertThat(fakta).isEqualTo(
+            FaktaFlytteSelvDto(adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
+        )
     }
 
     @Test
-    fun `skal bevare to tilbud og valgfri begrunnelse gjennom json`() {
+    fun `skal bevare tilbud i rekkefølge og valgfri begrunnelse gjennom json`() {
         val dto =
             dto(
                 svar =
@@ -95,10 +106,14 @@ class LagreVilkårFlyttingDtoTest {
                     ),
                 fakta =
                     FaktaFlyttebyråDto(
-                        tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
-                        tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                        tilbud =
+                            listOf(
+                                FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                                FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
+                            ),
                         adresse = "Flytteveien 1",
                         erBetalingDokumentert = true,
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
 
@@ -122,6 +137,7 @@ class LagreVilkårFlyttingDtoTest {
                         ferge = null,
                         parkering = 100,
                         adresse = "Flytteveien 1",
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
 
@@ -143,8 +159,10 @@ class LagreVilkårFlyttingDtoTest {
         svar: Map<RegelId, SvarOgBegrunnelseDto>,
         fakta: FaktaFlyttingDto,
     ) = LagreVilkårFlyttingDto(
-        flytteDato = 1 januar 2026,
+        flyttedato = 1 januar 2026,
         svar = svar,
         fakta = fakta,
     )
+
+    private val nødvendigUtgiftDto = NødvendigUtgiftDto(SvarJaNei.JA, null)
 }

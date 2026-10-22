@@ -15,11 +15,11 @@ data class LagreVilkårReiseTilSamlingDto(
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaReiseTilSamlingDto,
 ) : LagreVilkår {
-    fun tilDomain() =
+    fun tilDomene() =
         LagreVilkårReiseTilSamling(
             fom = fom,
             tom = tom,
-            svar = svar.mapValues { it.value.tilDomain() },
+            svar = svar.mapValues { it.value.tilDomene() },
             fakta = fakta.mapTilFakta(reiseId = reiseId, adresse = adresse),
         )
 }

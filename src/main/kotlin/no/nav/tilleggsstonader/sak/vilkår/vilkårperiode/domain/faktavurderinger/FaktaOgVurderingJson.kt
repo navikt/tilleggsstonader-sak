@@ -166,8 +166,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = "OMSTILLINGSSTØNAD_FLYTTING_TSO",
     ),
     JsonSubTypes.Type(
+        OpphørtOmstillingsstønadFlyttingTso::class,
+        name = "OPPHØRT_OMSTILLINGSSTØNAD_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
         OvergangssstønadFlyttingTso::class,
         name = "OVERGANGSSTØNAD_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        OpphørtOvergangsstønadFlyttingTso::class,
+        name = "OPPHØRT_OVERGANGSSTØNAD_FLYTTING_TSO",
     ),
     JsonSubTypes.Type(
         NedsattArbeidsevneFlyttingTso::class,

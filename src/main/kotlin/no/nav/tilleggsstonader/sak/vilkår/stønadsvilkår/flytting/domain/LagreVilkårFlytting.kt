@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import java.time.LocalDate
 
 data class LagreVilkårFlytting(
-    val flytteDato: LocalDate,
+    val flyttedato: LocalDate,
     val svar: Map<RegelId, SvarOgBegrunnelse>,
     val fakta: FlyttingVilkårFakta,
 )

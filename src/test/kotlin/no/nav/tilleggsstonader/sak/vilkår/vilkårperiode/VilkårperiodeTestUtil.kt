@@ -34,6 +34,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevnePassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerPassAvBarn
@@ -140,6 +142,8 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadPassAvBarn
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> OpphørtOmstillingsstønadFlyttingTso
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> OpphørtOvergangsstønadFlyttingTso
             MålgruppeType.AAP ->
                 AAPPassAvBarn(
                     vurderinger =
@@ -201,6 +205,9 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadLæremidler
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
+            -> error("Opphørt stønad støttes kun for flytting TSO")
             MålgruppeType.AAP ->
                 AAPLæremidler(
                     vurderinger =

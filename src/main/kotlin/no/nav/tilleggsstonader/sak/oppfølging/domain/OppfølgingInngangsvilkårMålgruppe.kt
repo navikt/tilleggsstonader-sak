@@ -44,6 +44,8 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.INNSATT_I_FENGSEL,
             MålgruppeType.AKTIVITETSPENGER,
             MålgruppeType.UNGDOMSPROGRAMMET,
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
             -> false
         }
 

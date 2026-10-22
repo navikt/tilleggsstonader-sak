@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
 import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
@@ -15,11 +16,13 @@ object VilkårFlyttingMapper {
     fun Vilkår.mapTilVilkårFlytting(): VilkårFlytting {
         if (type != VilkårType.FLYTTING) feil("Ugyldig vilkårstype for flytting")
         val flyttefakta = fakta as? FlyttingVilkårFakta ?: feil("Fakta mangler for flytting")
+        feilHvis(fom != tom) {
+            "Forventer at fom og tom er lik for flytting"
+        }
         return VilkårFlytting(
             id = id,
             behandlingId = behandlingId,
-            fom = fom ?: feil("Forventer at fom er satt for flytting"),
-            tom = tom ?: feil("Forventer at tom er satt for flytting"),
+            flyttedato = fom ?: feil("Forventer at fom er satt for flytting"),
             resultat = resultat,
             status = status,
             delvilkårsett = delvilkårsett,
@@ -36,8 +39,8 @@ object VilkårFlyttingMapper {
             resultat = resultat,
             status = status,
             type = VilkårType.FLYTTING,
-            fom = fom,
-            tom = tom,
+            fom = flyttedato,
+            tom = flyttedato,
             erFremtidigUtgift = false,
             delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
             opphavsvilkår = opphavsvilkår,
@@ -49,7 +52,7 @@ object VilkårFlyttingMapper {
     fun VilkårFlytting.tilVilkårFlyttingDto(): VilkårFlyttingDto =
         VilkårFlyttingDto(
             id = id,
-            flytteDato = fom,
+            flyttedato = flyttedato,
             resultat = resultat,
             status = status,
             delvilkårsett = delvilkårsett.map { it.tilDto() },

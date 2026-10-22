@@ -4,13 +4,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomain
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
@@ -21,13 +23,18 @@ class FaktaFlyttingMapperTest {
         listOf(
             FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
             FaktaFlyttebyråDto(
-                tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                tilbud =
+                    listOf(
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                        FlyttebyråTilbudDto(),
+                    ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = true,
+                nødvendigUtgift = nødvendigUtgiftDto,
             ),
-            FaktaFlytteSelvDto(adresse = "Flytteveien 1"),
+            FaktaFlytteSelvDto(adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
         ).forEach { fakta ->
-            assertThat(fakta.tilDomain().tilDto()).isEqualTo(fakta)
+            assertThat(fakta.tilDomene().tilDto()).isEqualTo(fakta)
         }
     }
 
@@ -35,10 +42,14 @@ class FaktaFlyttingMapperTest {
     fun `skal bevare kostnader og tilbud gjennom lagringsformatet`() {
         listOf(
             FaktaFlyttebyråDto(
-                tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
-                tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                tilbud =
+                    listOf(
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
+                    ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = false,
+                nødvendigUtgift = nødvendigUtgiftDto,
             ),
             FaktaFlytteSelvDto(
                 avstandEnVei = 250,
@@ -47,10 +58,11 @@ class FaktaFlyttingMapperTest {
                 ferge = null,
                 parkering = 100,
                 adresse = "Flytteveien 1",
+                nødvendigUtgift = nødvendigUtgiftDto,
             ),
             FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
         ).forEach { fakta ->
-            val domain = fakta.tilDomain()
+            val domain = fakta.tilDomene()
             val json = jsonMapper.writerFor(VilkårFakta::class.java).writeValueAsString(domain)
 
             assertThat(jsonMapper.readValue<VilkårFakta>(json)).isEqualTo(domain)
@@ -59,6 +71,8 @@ class FaktaFlyttingMapperTest {
             assertThat(json).doesNotContain("reiseId", "aktivitetId")
         }
     }
+
+    private val nødvendigUtgiftDto = NødvendigUtgiftDto(SvarJaNei.JA, null)
 
     @Test
     fun `skal bevare eksisterende jsonformat for reisefakta`() {

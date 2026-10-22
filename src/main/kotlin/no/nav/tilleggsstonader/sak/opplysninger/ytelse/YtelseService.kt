@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.familie.prosessering.rest.RestTaskService.Companion.logger
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
@@ -107,6 +108,37 @@ class YtelseService(
             harAktivtVedtak = harAktivtAapVedtak,
             resultatKilde = kalletsStatus,
         )
+    }
+
+    /**
+     * Returnerer false hvis kallet mot ung-sak feiler, slik at bruker kan svare selv på om de mottar aktivitetspenger.
+     */
+    fun harAktivitetspengerIDagEllerFremITid(ident: String): Boolean {
+        val ytelser =
+            try {
+                ytelseClient.hentYtelser(
+                    YtelsePerioderRequest(
+                        ident = ident,
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusYears(1),
+                        typer = listOf(TypeYtelsePeriode.AKTIVITETSPENGER),
+                    ),
+                )
+            } catch (e: Exception) {
+                logger.warn("Kall for å hente aktivitetspenger feilet", e)
+                return false
+            }
+
+        val kallFeilet =
+            ytelser.kildeResultat.any {
+                it.type == TypeYtelsePeriode.AKTIVITETSPENGER && it.resultat == ResultatKilde.FEILET
+            }
+        if (kallFeilet) {
+            logger.warn("Henting av aktivitetspenger fra ung-sak feilet")
+            return false
+        }
+
+        return ytelser.perioder.any { it.type == TypeYtelsePeriode.AKTIVITETSPENGER }
     }
 
     fun hentYtelseForGrunnlag(

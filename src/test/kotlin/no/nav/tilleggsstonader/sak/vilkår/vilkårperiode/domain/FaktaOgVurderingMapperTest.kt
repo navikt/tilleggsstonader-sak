@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.juli
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -12,6 +13,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
@@ -25,6 +28,36 @@ import java.time.LocalDate
 
 class FaktaOgVurderingMapperTest {
     private val behandlingId = BehandlingId.random()
+
+    @Test
+    fun `opphørt stønad mappes til målgruppe uten vurderinger for flytting TSO`() {
+        val types =
+            listOf(
+                MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD to OpphørtOmstillingsstønadFlyttingTso,
+                MålgruppeType.OPPHØRT_OVERGANGSSTØNAD to OpphørtOvergangsstønadFlyttingTso,
+            )
+
+        types.forEach { (type, forventetFaktaOgVurdering) ->
+            val vilkårperiode =
+                LagreVilkårperiode(
+                    behandlingId = behandlingId,
+                    type = type,
+                    fom = 1 januar 2025,
+                    tom = 1 juli 2025,
+                    faktaOgSvar = FaktaOgSvarMålgruppeDto(),
+                )
+
+            val faktisk =
+                mapFaktaOgSvarDto(
+                    vilkårperiode = vilkårperiode,
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    fødselFaktaGrunnlag = null,
+                )
+
+            assertThat(faktisk).isEqualTo(forventetFaktaOgVurdering)
+            assertThat(faktisk.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+        }
+    }
 
     @Test
     fun `aktivitetspenger har aldersvilkårsvurdering`() {

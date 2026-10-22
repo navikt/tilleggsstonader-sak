@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -52,9 +51,9 @@ sealed interface FlyttingVilkårFakta : VilkårFakta {
 }
 
 data class FaktaFlyttebyrå(
-    val tilbud1: FlyttebyråTilbud,
-    val tilbud2: FlyttebyråTilbud,
+    val tilbud: List<FlyttebyråTilbud>,
     val erBetalingDokumentert: Boolean,
+    val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
 ) : FlyttingVilkårFakta
 
@@ -69,6 +68,7 @@ data class FaktaFlytteSelv(
     val bompenger: Int?,
     val ferge: Int?,
     val parkering: Int?,
+    val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
 ) : FlyttingVilkårFakta
 

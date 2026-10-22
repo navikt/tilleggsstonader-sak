@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.mapTilAndeler
@@ -140,8 +141,11 @@ class OpphørValideringServiceTest {
                                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 grunnlag =
                                     BeregningsgrunnlagFlyttebyrå(
-                                        tilbud1Pris = BigDecimal("100"),
-                                        tilbud2Pris = BigDecimal("120"),
+                                        tilbud =
+                                            listOf(
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                                            ),
                                         erBetalingDokumentert = true,
                                     ),
                             ),
@@ -169,8 +173,11 @@ class OpphørValideringServiceTest {
                                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 grunnlag =
                                     BeregningsgrunnlagFlyttebyrå(
-                                        tilbud1Pris = BigDecimal("100"),
-                                        tilbud2Pris = BigDecimal("120"),
+                                        tilbud =
+                                            listOf(
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                                            ),
                                         erBetalingDokumentert = true,
                                     ),
                             ),
@@ -198,8 +205,11 @@ class OpphørValideringServiceTest {
                                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 grunnlag =
                                     BeregningsgrunnlagFlyttebyrå(
-                                        tilbud1Pris = BigDecimal("100"),
-                                        tilbud2Pris = BigDecimal("120"),
+                                        tilbud =
+                                            listOf(
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                                            ),
                                         erBetalingDokumentert = true,
                                     ),
                             ),
@@ -210,8 +220,11 @@ class OpphørValideringServiceTest {
                                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 grunnlag =
                                     BeregningsgrunnlagFlyttebyrå(
-                                        tilbud1Pris = BigDecimal.ZERO,
-                                        tilbud2Pris = BigDecimal.ZERO,
+                                        tilbud =
+                                            listOf(
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                                BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                                            ),
                                         erBetalingDokumentert = true,
                                     ),
                             ),

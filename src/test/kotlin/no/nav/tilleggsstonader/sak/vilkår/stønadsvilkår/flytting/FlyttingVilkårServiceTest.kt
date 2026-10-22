@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -24,6 +25,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
@@ -34,6 +42,11 @@ class FlyttingVilkårServiceTest {
     private val vilkårService = mockk<VilkårService>()
     private val behandlingService = mockk<BehandlingService>()
     private val unleashService = mockk<UnleashService>()
+    private val vilkårperiodeService = mockk<VilkårperiodeService>()
+
+    init {
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(emptyList(), emptyList())
+    }
 
     private val flyttingVilkårService =
         FlyttingVilkårService(
@@ -41,11 +54,12 @@ class FlyttingVilkårServiceTest {
             behandlingService = behandlingService,
             vilkårService = vilkårService,
             unleashService = unleashService,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     private val nyttVilkår =
         LagreVilkårFlytting(
-            flytteDato = 1 januar 2026,
+            flyttedato = 1 januar 2026,
             svar = emptyMap(),
             fakta = FaktaFlyttingUbestemt(adresse = "Adresse 1"),
         )
@@ -53,8 +67,7 @@ class FlyttingVilkårServiceTest {
     private val eksisterendeVilkår =
         VilkårFlytting(
             behandlingId = BehandlingId.random(),
-            fom = 1 januar 2026,
-            tom = 1 januar 2026,
+            flyttedato = 1 januar 2026,
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             status = VilkårStatus.NY,
             delvilkårsett = emptyList(),
@@ -79,9 +92,130 @@ class FlyttingVilkårServiceTest {
         assertThat(resultat.behandlingId).isEqualTo(behandling.id)
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
         assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
-        assertThat(resultat.fom).isEqualTo(nyttVilkår.flytteDato)
-        assertThat(resultat.tom).isEqualTo(nyttVilkår.flytteDato)
+        assertThat(resultat.flyttedato).isEqualTo(nyttVilkår.flyttedato)
         assertThat(resultat.fakta.adresse).isEqualTo(nyttVilkår.fakta.adresse)
+        verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal avvise flytteforbindelse for enslig forsørger eller gjenlevende uten overlappende målgruppe`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
+        val annenMålgruppe =
+            målgruppe(
+                behandlingId = behandling.id,
+                fom = nyttVilkår.flyttedato,
+                tom = nyttVilkår.flyttedato,
+                faktaOgVurdering = faktaOgVurderingMålgruppe(MålgruppeType.AAP),
+            )
+        val innsendt =
+            nyttVilkår.copy(
+                svar =
+                    mapOf(
+                        RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                            SvarOgBegrunnelse(
+                                SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,
+                                begrunnelse = "Flytter for å starte i arbeid",
+                            ),
+                    ),
+            )
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        every { vilkårperiodeService.hentVilkårperioder(behandling.id) } returns
+            Vilkårperioder(listOf(annenMålgruppe), emptyList())
+        every { vilkårRepository.findByBehandlingId(behandling.id) } returns emptyList()
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                flyttingVilkårService.opprettVilkår(
+                    behandlingId = behandling.id,
+                    innsendt = innsendt,
+                )
+            }.withMessage(
+                "Du kan bare velge svaret «${SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID.beskrivelse}» " +
+                    "sammen med en målgruppeperiode for aktiv eller opphørt overgangs- eller omstillingsstønad som inneholder flyttedatoen",
+            )
+
+        verify(exactly = 0) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal avvise flytteforbindelse for enslig forsørger eller gjenlevende når målgruppeperioden ikke overlapper`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
+        val overgangsstønad =
+            målgruppe(
+                behandlingId = behandling.id,
+                fom = 2 januar 2026,
+                tom = 2 januar 2026,
+                faktaOgVurdering = faktaOgVurderingMålgruppe(MålgruppeType.OVERGANGSSTØNAD),
+            )
+        val innsendt =
+            nyttVilkår.copy(
+                svar =
+                    mapOf(
+                        RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                            SvarOgBegrunnelse(
+                                SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,
+                                begrunnelse = "Flytter for å starte i arbeid",
+                            ),
+                    ),
+            )
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        every { vilkårperiodeService.hentVilkårperioder(behandling.id) } returns
+            Vilkårperioder(listOf(overgangsstønad), emptyList())
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                flyttingVilkårService.opprettVilkår(
+                    behandlingId = behandling.id,
+                    innsendt = innsendt,
+                )
+            }.withMessage(
+                "Du kan bare velge svaret «${SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID.beskrivelse}» " +
+                    "sammen med en målgruppeperiode for aktiv eller opphørt overgangs- eller omstillingsstønad som inneholder flyttedatoen",
+            )
+
+        verify(exactly = 0) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal godta flytteforbindelse for enslig forsørger eller gjenlevende med overlappende overgangsstønad`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
+        val overgangsstønad =
+            målgruppe(
+                behandlingId = behandling.id,
+                fom = nyttVilkår.flyttedato,
+                tom = nyttVilkår.flyttedato,
+                faktaOgVurdering = faktaOgVurderingMålgruppe(MålgruppeType.OVERGANGSSTØNAD),
+            )
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        every { vilkårperiodeService.hentVilkårperioder(behandling.id) } returns
+            Vilkårperioder(listOf(overgangsstønad), emptyList())
+        every { vilkårRepository.findByBehandlingId(behandling.id) } returns emptyList()
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val resultat =
+            flyttingVilkårService.opprettVilkår(
+                behandlingId = behandling.id,
+                innsendt =
+                    nyttVilkår.copy(
+                        svar =
+                            mapOf(
+                                RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                                    SvarOgBegrunnelse(
+                                        SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,
+                                        begrunnelse = "Flytter for å starte i arbeid",
+                                    ),
+                            ),
+                    ),
+            )
+
+        assertThat(resultat.behandlingId).isEqualTo(behandling.id)
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
     }
 
@@ -90,7 +224,7 @@ class FlyttingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
         val vilkår = eksisterendeVilkår.copy(behandlingId = behandling.id, status = VilkårStatus.UENDRET)
-        val oppdatering = nyttVilkår.copy(flytteDato = 20 januar 2026)
+        val oppdatering = nyttVilkår.copy(flyttedato = 20 januar 2026)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
         every { vilkårRepository.findById(vilkår.id) } returns Optional.of(vilkår.mapTilVilkår())
@@ -106,16 +240,16 @@ class FlyttingVilkårServiceTest {
 
         assertThat(resultat.id).isEqualTo(vilkår.id)
         assertThat(resultat.status).isEqualTo(VilkårStatus.ENDRET)
-        assertThat(resultat.tom).isEqualTo(oppdatering.flytteDato)
+        assertThat(resultat.tom).isEqualTo(oppdatering.flyttedato)
         verify(exactly = 1) { vilkårRepository.update(any<Vilkår>()) }
     }
 
     @Test
-    fun `skal ikke kunne opprette vilkår med samme flytteDato periode`() {
+    fun `skal ikke kunne opprette vilkår med samme flyttedato periode`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
         val vilkår = eksisterendeVilkår.copy(behandlingId = behandling.id)
-        val overlappendeVilkår = nyttVilkår.copy(flytteDato = vilkår.fom)
+        val overlappendeVilkår = nyttVilkår.copy(flyttedato = vilkår.fom)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
         every { vilkårRepository.findByBehandlingId(behandling.id) } returns listOf(vilkår.mapTilVilkår())
@@ -136,7 +270,7 @@ class FlyttingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
         val vilkår = eksisterendeVilkår.copy(behandlingId = behandling.id)
-        val tilgrensendeVilkår = nyttVilkår.copy(flytteDato = 16 januar 2026)
+        val tilgrensendeVilkår = nyttVilkår.copy(flyttedato = 16 januar 2026)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
         every { vilkårRepository.findByBehandlingId(behandling.id) } returns listOf(vilkår.mapTilVilkår())
@@ -148,8 +282,8 @@ class FlyttingVilkårServiceTest {
                 innsendt = tilgrensendeVilkår,
             )
 
-        assertThat(resultat.fom).isEqualTo(tilgrensendeVilkår.flytteDato)
-        assertThat(resultat.tom).isEqualTo(tilgrensendeVilkår.flytteDato)
+        assertThat(resultat.fom).isEqualTo(tilgrensendeVilkår.flyttedato)
+        assertThat(resultat.tom).isEqualTo(tilgrensendeVilkår.flyttedato)
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
     }
 

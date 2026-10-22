@@ -99,7 +99,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingEgenKjøring(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
                 )
@@ -151,9 +151,8 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
             }
@@ -170,6 +169,11 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         assertThat(resultat.beløp).isEqualTo(5000.toBigDecimal())
         assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+        val grunnlag = resultat.grunnlag as BeregningsgrunnlagFlyttebyrå
+        assertThat(grunnlag.tilbud.map { it.navn }).containsExactly("Syntetisk tilbud 1", "Syntetisk tilbud 2")
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud).isEqualTo(grunnlag.tilbud[1])
+        assertThat(resultat.beløp).isEqualTo(valgtTilbud.pris)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 
@@ -203,9 +207,8 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = false,
                 )
             }

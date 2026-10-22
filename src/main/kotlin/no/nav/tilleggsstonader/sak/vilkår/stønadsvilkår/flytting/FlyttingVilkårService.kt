@@ -22,9 +22,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlytt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,13 +39,14 @@ class FlyttingVilkårService(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
     private val unleashService: UnleashService,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårFlytting> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.FLYTTING }
             .map { it.mapTilVilkårFlytting() }
-            .sortedBy { it.fom }
+            .sortedBy { it.flyttedato }
 
     fun hentOppfylteVilkårforBehandling(behandlingId: BehandlingId): List<VilkårFlytting> =
         hentVilkårForBehandling(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT }
@@ -53,6 +59,7 @@ class FlyttingVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFaktaOgSvar(innsendt)
+        validerMålgruppeOgFlyttesvar(behandlingId, innsendt)
         val vilkår = byggVilkår(behandlingId, innsendt)
         validerIngenOverlapp(behandlingId, vilkår)
         return vilkårRepository.insert(vilkår.mapTilVilkår()).mapTilVilkårFlytting()
@@ -67,6 +74,7 @@ class FlyttingVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFaktaOgSvar(innsendt)
+        validerMålgruppeOgFlyttesvar(behandlingId, innsendt)
         val eksisterende = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårFlytting()
         validerEierskapOgStatus(eksisterende, behandlingId)
         val oppdatert = byggVilkår(behandlingId, innsendt, eksisterende)
@@ -109,16 +117,14 @@ class FlyttingVilkårService(
         return eksisterende?.copy(
             resultat = samletResultat,
             status = utledStatus(eksisterende),
-            fom = innsendt.flytteDato,
-            tom = innsendt.flytteDato,
+            flyttedato = innsendt.flyttedato,
             delvilkårsett = delvilkår,
             fakta = fakta,
         ) ?: VilkårFlytting(
             behandlingId = behandlingId,
             resultat = samletResultat,
             status = VilkårStatus.NY,
-            fom = innsendt.flytteDato,
-            tom = innsendt.flytteDato,
+            flyttedato = innsendt.flyttedato,
             delvilkårsett = delvilkår,
             fakta = fakta,
         )
@@ -126,6 +132,36 @@ class FlyttingVilkårService(
 
     private fun validerFaktaOgSvar(innsendt: LagreVilkårFlytting) {
         FlyttingVilkårValidering.validerOppgitteFakta(innsendt.fakta)
+    }
+
+    private fun validerMålgruppeOgFlyttesvar(
+        behandlingId: BehandlingId,
+        innsendt: LagreVilkårFlytting,
+    ) {
+        val valgtFlytteforbindelse = innsendt.svar[RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER]?.svar
+
+        if (valgtFlytteforbindelse == SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID) {
+            val godkjenteMålgrupperForSvar =
+                vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper.filter {
+                    it.status != Vilkårstatus.SLETTET &&
+                        it.type in
+                        setOf(
+                            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+                            MålgruppeType.OMSTILLINGSSTØNAD,
+                            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
+                            MålgruppeType.OVERGANGSSTØNAD,
+                        )
+                }
+
+            val flyttedato = innsendt.flyttedato
+
+            brukerfeilHvis(
+                godkjenteMålgrupperForSvar.none { it.inneholder(flyttedato) },
+            ) {
+                "Du kan bare velge svaret «${SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID.beskrivelse}» " +
+                    "sammen med en målgruppeperiode for aktiv eller opphørt overgangs- eller omstillingsstønad som inneholder flyttedatoen"
+            }
+        }
     }
 
     private fun validerIngenOverlapp(
@@ -140,7 +176,7 @@ class FlyttingVilkårService(
                     it.type == VilkårType.FLYTTING &&
                         it.status != VilkårStatus.SLETTET &&
                         it.id != unntattVilkårId
-                }.any { nyttVilkår.overlapper(it.mapTilVilkårFlytting()) }
+                }.any { nyttVilkår.flyttedato == it.mapTilVilkårFlytting().flyttedato }
         brukerfeilHvis(overlapper) { "Flyttevilkår kan ikke ha overlappende perioder" }
     }
 
