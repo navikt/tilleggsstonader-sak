@@ -130,7 +130,7 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
         val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
         val vilkår = vilkårRepository.findByBehandlingId(behandling.id).single()
-        val avklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
+        avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
 
         assertIngenDataPåRevurdering()
 
@@ -138,12 +138,15 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
         assertVilkårPeriodeErGjenbrukt(vilkårperiode)
         assertVilkårErGjenbrukt(vilkår)
-        assertAvklarteUkerErGjenbrukt(avklartKjørtUke)
+
+        // Avklarte uker gjenbrukes ikke ved nullstilling. De blir kopiert inn til behandlingen etter rammevedtak er beregnet
+        assertThat(avklartKjørtUkeRepository.findByBehandlingId(revurdering.id)).isEmpty()
     }
 
     @Test
-    fun `avklarte kjørte uker skal tilbakestilles`() {
+    fun `avklarte kjørte uker skal tilbakestilles hvis kjørelistebehandling`() {
         opprettAvklartKjørtUke(behandling.id)
+        opprettDagligReiseVedtak(behandling.id)
 
         val avklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
         val avklartKjørtUkeRevurdering = avklartKjørtUkeRepository.insert(avklartKjørtUke.kopierTilNyBehandling(revurdering.id))
@@ -154,7 +157,9 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
             ),
         )
 
-        nullstillBehandlingService.nullstillBehandling(revurdering)
+        nullstillBehandlingService.nullstillBehandling(
+            testoppsettService.oppdater(revurdering.copy(type = BehandlingType.KJØRELISTE)),
+        )
 
         assertAvklarteUkerErGjenbrukt(avklartKjørtUke)
     }
@@ -377,5 +382,10 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     ),
             ),
         )
+    }
+
+    private fun opprettDagligReiseVedtak(behandlingId: BehandlingId) {
+        val vedtak = innvilgelse(behandlingId)
+        vedtakRepository.insert(vedtak)
     }
 }
