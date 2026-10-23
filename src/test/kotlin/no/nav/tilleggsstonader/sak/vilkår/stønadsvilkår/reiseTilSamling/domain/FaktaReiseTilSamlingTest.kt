@@ -132,6 +132,50 @@ class FaktaReiseTilSamlingTest {
     }
 
     @Nested
+    inner class Drosje {
+        private val nødvendigUtgift =
+            NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null)
+
+        private fun faktaDrosje(
+            utgifterDrosje: BigDecimal = 450.toBigDecimal(),
+            begrunnelse: String = "Drosje til samling",
+        ) = FaktaDrosje(
+            reiseId = dummyReiseId,
+            adresse = "Tiltaksveien 1",
+            nødvendigUtgift = nødvendigUtgift,
+            utgifterDrosje = utgifterDrosje,
+            begrunnelse = begrunnelse,
+        )
+
+        @Test
+        fun `skal avvise nullbeløp`() {
+            val feil = assertThrows<ApiFeil> { faktaDrosje(utgifterDrosje = BigDecimal.ZERO) }
+            assertThat(feil.message).isEqualTo("Utgifter til drosje må være større enn 0")
+        }
+
+        @Test
+        fun `skal avvise negativt beløp`() {
+            val feil = assertThrows<ApiFeil> { faktaDrosje(utgifterDrosje = BigDecimal("-1")) }
+            assertThat(feil.message).isEqualTo("Utgifter til drosje må være større enn 0")
+        }
+
+        @Test
+        fun `skal avvise blank spesifikasjon`() {
+            val feil = assertThrows<ApiFeil> { faktaDrosje(begrunnelse = "   ") }
+            assertThat(feil.message).isEqualTo("Spesifikasjon av utgift må fylles ut")
+        }
+
+        @Test
+        fun `beholder nødvendig utgift beløp og spesifikasjon`() {
+            val fakta = faktaDrosje()
+
+            assertThat(fakta.nødvendigUtgift).isEqualTo(nødvendigUtgift)
+            assertThat(fakta.utgifterDrosje).isEqualTo(450.toBigDecimal())
+            assertThat(fakta.begrunnelse).isEqualTo("Drosje til samling")
+        }
+    }
+
+    @Nested
     inner class PrivatBilDto {
         private fun dto(begrunnelse: String?) =
             FaktaReiseTilSamlingPrivatBilDto(

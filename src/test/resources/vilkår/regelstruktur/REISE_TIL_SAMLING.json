@@ -1,92 +1,122 @@
 {
-  "AVSTAND_OVER_TRETTI_KM": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [ "ER_SAMLING_OBLIGATORISK", "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL" ],
-    "svaralternativer": [ {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": "ER_SAMLING_OBLIGATORISK",
-      "svarId": "JA",
-      "tilhørendeFaktaType": null
+  "AVSTAND_OVER_TRETTI_KM" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ "ER_SAMLING_OBLIGATORISK", "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL", "KAN_REISE_MED_DROSJE", "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : "ER_SAMLING_OBLIGATORISK",
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : null
     }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : null,
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
     } ]
   },
-  "DOKUMENTERTE_UTGIFTER": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [ ],
-    "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": null,
-      "svarId": "JA",
-      "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
+  "DOKUMENTERTE_UTGIFTER" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "VALGFRI",
+      "nesteRegelId" : null,
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
     }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : null,
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
     } ]
   },
-  "ER_SAMLING_OBLIGATORISK": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [ "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL" ],
-    "svaralternativer": [ {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-      "svarId": "JA",
-      "tilhørendeFaktaType": null
+  "ER_SAMLING_OBLIGATORISK" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL", "KAN_REISE_MED_DROSJE", "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : null
     }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : null,
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
     } ]
   },
-  "HAR_UTGIFTER_TIL_REISEN": {
-    "erHovedregel": true,
-    "reglerSomMåNullstilles": [ "AVSTAND_OVER_TRETTI_KM", "ER_SAMLING_OBLIGATORISK", "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL" ],
-    "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": "AVSTAND_OVER_TRETTI_KM",
-      "svarId": "JA",
-      "tilhørendeFaktaType": null
+  "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "VALGFRI",
+      "nesteRegelId" : null,
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : "REISE_TIL_SAMLING_DROSJE"
     }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : null,
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
     } ]
   },
-  "KAN_REISE_MED_EGEN_BIL": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [ ],
-    "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": null,
-      "svarId": "JA",
-      "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL"
+  "HAR_UTGIFTER_TIL_REISEN" : {
+    "erHovedregel" : true,
+    "reglerSomMåNullstilles" : [ "AVSTAND_OVER_TRETTI_KM", "ER_SAMLING_OBLIGATORISK", "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL", "KAN_REISE_MED_DROSJE", "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "VALGFRI",
+      "nesteRegelId" : "AVSTAND_OVER_TRETTI_KM",
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : null
     }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : null,
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
     } ]
   },
-  "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [ "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL" ],
-    "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": "DOKUMENTERTE_UTGIFTER",
-      "svarId": "JA",
-      "tilhørendeFaktaType": null
+  "KAN_REISE_MED_DROSJE" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "VALGFRI",
+      "nesteRegelId" : "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE",
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : null
     }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": "KAN_REISE_MED_EGEN_BIL",
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : null,
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
+    } ]
+  },
+  "KAN_REISE_MED_EGEN_BIL" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ "KAN_REISE_MED_DROSJE", "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "VALGFRI",
+      "nesteRegelId" : null,
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : "REISE_TIL_SAMLING_PRIVAT_BIL"
+    }, {
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : "KAN_REISE_MED_DROSJE",
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
+    } ]
+  },
+  "KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL", "KAN_REISE_MED_DROSJE", "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE" ],
+    "svaralternativer" : [ {
+      "begrunnelseType" : "VALGFRI",
+      "nesteRegelId" : "DOKUMENTERTE_UTGIFTER",
+      "svarId" : "JA",
+      "tilhørendeFaktaType" : null
+    }, {
+      "begrunnelseType" : "PÅKREVD",
+      "nesteRegelId" : "KAN_REISE_MED_EGEN_BIL",
+      "svarId" : "NEI",
+      "tilhørendeFaktaType" : null
     } ]
   }
 }

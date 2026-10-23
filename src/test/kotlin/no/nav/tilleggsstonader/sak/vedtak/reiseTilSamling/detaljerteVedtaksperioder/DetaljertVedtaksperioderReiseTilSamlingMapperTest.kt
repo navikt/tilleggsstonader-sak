@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder.DetaljertVedtaksperioderReiseTilSamlingMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
@@ -151,8 +152,9 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
     private fun lagVedtak(
         offentligTransport: List<BeregningsresultatOffentligTransport> = emptyList(),
         privatBil: List<BeregningsresultatPrivatBil> = emptyList(),
+        drosje: List<BeregningsresultatDrosje> = emptyList(),
     ) = InnvilgelseReiseTilSamling(
-        beregningsresultat = BeregningsresultatReiseTilSamling(offentligTransport, privatBil),
+        beregningsresultat = BeregningsresultatReiseTilSamling(offentligTransport, privatBil, drosje),
         vedtaksperioder = emptyList(),
         beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
     )

@@ -24,7 +24,8 @@
       },
       "reiseId": "01a01909-7c2e-72dc-a318-f8c08154a603"
     } ],
-    "privatBil": [ ]
+    "privatBil": [ ],
+    "drosje": [ ]
   },
   "type": "INNVILGELSE_REISE_TIL_SAMLING",
   "vedtaksperioder": [ {

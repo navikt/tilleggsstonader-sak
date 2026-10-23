@@ -19,8 +19,10 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.validerUtgifterStrekkerSegUtenforVedtaksperiodene
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagDrosjeForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagPrivatBilForSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
@@ -30,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringSer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
@@ -120,9 +123,17 @@ class ReiseTilSamlingBeregningService(
                     vedtaksperioder,
                     brukersNavKontor,
                 )
+        val drosje =
+            gjenbrukDrosje(uendredeUtgifter, forrigeVedtak) +
+                beregnDrosje(
+                    berørteUtgifter,
+                    vedtaksperioder,
+                    brukersNavKontor,
+                )
         return BeregningsresultatReiseTilSamling(
             offentligTransport = offentligTransport,
             privatBil = privatBil,
+            drosje = drosje,
         )
     }
 
@@ -208,10 +219,36 @@ class ReiseTilSamlingBeregningService(
         }
     }
 
+    private fun gjenbrukDrosje(
+        uendredeUtgifter: List<VilkårReiseTilSamling>,
+        forrigeVedtak: InnvilgelseEllerOpphørReiseTilSamling?,
+    ): List<BeregningsresultatDrosje> {
+        val reiseIder =
+            uendredeUtgifter
+                .filter { it.fakta is FaktaDrosje }
+                .map { (it.fakta as FaktaDrosje).reiseId }
+        if (reiseIder.isEmpty()) return emptyList()
+
+        val forrigeResultater =
+            requireNotNull(forrigeVedtak) {
+                "Kan ikke gjenbruke tidligere reiser uten forrige iverksatt vedtak"
+            }.beregningsresultat.drosje
+
+        return reiseIder.map { reiseId ->
+            val forrigeResultat =
+                forrigeResultater.find { it.reiseId == reiseId }
+                    ?: feil(
+                        "Fant ikke forrige beregningsresultat for drosje med reiseId=$reiseId ved gjenbruk fra tidligere vedtak",
+                    )
+            forrigeResultat.copy(fraTidligereVedtak = true)
+        }
+    }
+
     private fun BeregningsresultatReiseTilSamling.markerAltSomFraTidligereVedtak() =
         BeregningsresultatReiseTilSamling(
             offentligTransport = offentligTransport.map { it.copy(fraTidligereVedtak = true) },
             privatBil = privatBil.map { it.copy(fraTidligereVedtak = true) },
+            drosje = drosje.map { it.copy(fraTidligereVedtak = true) },
         )
 
     private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørReiseTilSamling? =
@@ -248,6 +285,36 @@ class ReiseTilSamlingBeregningService(
                         brukersNavKontor = brukersNavKontor,
                     ),
                 beløp = fakta.utgifterOffentligTransport,
+                begrunnelse = fakta.begrunnelse,
+            )
+        }
+    }
+
+    private fun beregnDrosje(
+        utgifter: List<VilkårReiseTilSamling>,
+        vedtaksperioder: List<Vedtaksperiode>,
+        brukersNavKontor: String?,
+    ): List<BeregningsresultatDrosje> {
+        val oppfylteDrosje = utgifter.filter { it.fakta is FaktaDrosje }
+
+        return oppfylteDrosje.map { samling ->
+            val fakta = samling.fakta as FaktaDrosje
+
+            BeregningsresultatDrosje(
+                reiseId = fakta.reiseId,
+                aktivitetId = fakta.aktivitetId,
+                grunnlag =
+                    BeregningsgrunnlagDrosjeForSamling(
+                        adresse = fakta.adresse,
+                        fom = samling.fom,
+                        tom = samling.tom,
+                        vedtaksperioder =
+                            vedtaksperioder
+                                .filter { it.overlapper(samling) }
+                                .map(::VedtaksperiodeGrunnlag),
+                        brukersNavKontor = brukersNavKontor,
+                    ),
+                beløp = fakta.utgifterDrosje,
                 begrunnelse = fakta.begrunnelse,
             )
         }
