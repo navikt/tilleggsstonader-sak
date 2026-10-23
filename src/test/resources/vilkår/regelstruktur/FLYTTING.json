@@ -14,8 +14,23 @@
       "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
     } ]
   },
-  "HVILKEN_FORBINDELSE_FLYTTER_BRUKER": {
+  "HAR_UTGIFTER_TIL_FLYTTING": {
     "erHovedregel": true,
+    "reglerSomMåNullstilles": [ "HVILKEN_FORBINDELSE_FLYTTER_BRUKER", "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET", "HVORDAN_SKAL_BRUKER_FLYTTE", "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET", "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "HVILKEN_FORBINDELSE_FLYTTER_BRUKER",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "HVILKEN_FORBINDELSE_FLYTTER_BRUKER": {
+    "erHovedregel": false,
     "reglerSomMåNullstilles": [ "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET", "HVORDAN_SKAL_BRUKER_FLYTTE", "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET", "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID" ],
     "svaralternativer": [ {
       "begrunnelseType": "PÅKREVD",
