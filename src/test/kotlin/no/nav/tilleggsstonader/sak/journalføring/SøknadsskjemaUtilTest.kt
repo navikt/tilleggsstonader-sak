@@ -1,10 +1,14 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
+import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil
 import no.nav.tilleggsstonader.sak.util.SøknadReiseTilSamlingUtil
@@ -126,13 +130,27 @@ class SøknadsskjemaUtilTest {
         inner class ParsingFlytting {
             @ParameterizedTest
             @EnumSource(value = Stønadstype::class, names = ["FLYTTING_TSO", "FLYTTING_TSR"])
-            fun `Skal kunne parse flyttesøknad uten hovedytelse`(stønadstype: Stønadstype) {
+            fun `Skal kunne parse flyttesøknad`(stønadstype: Stønadstype) {
                 val skjema =
                     InnsendtSkjema(
                         ident = "12345678910",
                         mottattTidspunkt = LocalDateTime.now(),
                         språk = Språkkode.NB,
-                        skjema = SøknadsskjemaFlytting(flyttingDetaljer = null, dokumentasjon = emptyList()),
+                        skjema =
+                            SøknadsskjemaFlytting(
+                                hovedytelse =
+                                    HovedytelseAvsnitt(
+                                        hovedytelse =
+                                            EnumFlereValgFelt(
+                                                "",
+                                                listOf(VerdiFelt(Hovedytelse.AAP, "AAP")),
+                                                emptyList(),
+                                            ),
+                                        arbeidOgOpphold = null,
+                                    ),
+                                flyttingDetaljer = null,
+                                dokumentasjon = emptyList(),
+                            ),
                     )
 
                 val parsetSkjema =

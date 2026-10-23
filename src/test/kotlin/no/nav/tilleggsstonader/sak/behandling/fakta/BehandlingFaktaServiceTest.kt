@@ -5,13 +5,11 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
-import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljer
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -32,6 +30,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.Flyttetilbud
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.FlyttingDetaljer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
@@ -59,6 +59,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import java.math.BigDecimal
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument as SøknadDokument
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon as SøknadDokumentasjon
@@ -569,20 +570,24 @@ internal class BehandlingFaktaServiceTest {
     fun `skal mappe innsendte flytteopplysninger`() {
         val flyttingDetaljer =
             FlyttingDetaljer(
-                årsak =
-                    EnumFelt(
-                        label = "Hvorfor flytter du?",
-                        verdi = Flytteårsak.AKTIVITET,
-                        svarTekst = "Aktivitet",
-                        alternativer = listOf("Ny jobb", "Aktivitet"),
+                årsak = Flytteårsak.AKTIVITET,
+                flyttedato = 1 februar 2026,
+                adresse =
+                    Adresse(
+                        gyldigFraOgMed = null,
+                        adresse = "Gate 1",
+                        postnummer = "0001",
+                        poststed = "Oslo",
+                        landkode = "NOR",
                     ),
-                flyttedato = VerdiFelt(verdi = "2026-02-01", label = "Dato for flytting"),
-                førsteArbeidsdag = null,
-                adresse = null,
-                flyttemåte = null,
-                utgifterDekketPåAnnenMåte = null,
+                flyttemåte = Flyttemåte.FLYTTEBYRÅ,
+                utgifterDekketPåAnnenMåte = JaNei.NEI,
                 utgifterEgenFlytting = null,
-                flyttebyrå = null,
+                flyttetilbud =
+                    listOf(
+                        Flyttetilbud(navn = "Byrå 1", beløp = BigDecimal("1000.50")),
+                        Flyttetilbud(navn = "Byrå 2", beløp = BigDecimal("900")),
+                    ),
             )
         val søknad =
             SøknadFlytting(
@@ -616,7 +621,27 @@ internal class BehandlingFaktaServiceTest {
 
         assertThat(fakta.hovedytelse?.søknadsgrunnlag?.hovedytelse)
             .containsExactly(Hovedytelse.AKTIVITETSPENGER)
-        assertThat(fakta.flyttingDetaljer).isEqualTo(flyttingDetaljer)
+        assertThat(fakta.flyttingDetaljer).isEqualTo(
+            FaktaFlyttingDetaljer(
+                årsak = Flytteårsak.AKTIVITET,
+                flyttedato = 1 februar 2026,
+                adresse =
+                    FaktaFlytteadresse(
+                        gateadresse = "Gate 1",
+                        postnummer = "0001",
+                        poststed = "Oslo",
+                        landkode = "NOR",
+                    ),
+                flyttemåte = Flyttemåte.FLYTTEBYRÅ,
+                utgifterDekketPåAnnenMåte = JaNei.NEI,
+                utgifterEgenFlytting = null,
+                flyttetilbud =
+                    listOf(
+                        FaktaFlyttetilbud(navn = "Byrå 1", beløp = BigDecimal("1000.50")),
+                        FaktaFlyttetilbud(navn = "Byrå 2", beløp = BigDecimal("900")),
+                    ),
+            ),
+        )
         assertThat(fakta.dokumentasjon?.journalpostId).isEqualTo("journalpostId")
         assertThat(fakta.dokumentasjon?.dokumentasjon)
             .containsExactly(

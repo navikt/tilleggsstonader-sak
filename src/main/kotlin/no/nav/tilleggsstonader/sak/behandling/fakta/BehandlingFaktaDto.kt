@@ -9,7 +9,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljer
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
@@ -25,6 +26,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -115,8 +117,39 @@ data class BehandlingFaktaFlyttingDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
-    val flyttingDetaljer: FlyttingDetaljer? = null,
+    val flyttingDetaljer: FaktaFlyttingDetaljer? = null,
 ) : BehandlingFaktaDto
+
+data class FaktaFlyttingDetaljer(
+    val årsak: Flytteårsak?,
+    val flyttedato: LocalDate?,
+    val adresse: FaktaFlytteadresse?,
+    val flyttemåte: Flyttemåte?,
+    val utgifterDekketPåAnnenMåte: JaNei?,
+    val utgifterEgenFlytting: FaktaUtgifterEgenFlytting?,
+    val flyttetilbud: List<FaktaFlyttetilbud>?,
+)
+
+data class FaktaFlytteadresse(
+    val gateadresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
+    val landkode: String?,
+)
+
+data class FaktaUtgifterEgenFlytting(
+    val avstand: BigDecimal?,
+    val hengerleie: BigDecimal?,
+    val bom: BigDecimal?,
+    val parkering: BigDecimal?,
+    val ferje: BigDecimal?,
+    val annet: BigDecimal?,
+)
+
+data class FaktaFlyttetilbud(
+    val navn: String?,
+    val beløp: BigDecimal?,
+)
 
 data class FaktaAvreiseadresse(
     val skalReiseFraFolkeregistrertAdresse: JaNei,
