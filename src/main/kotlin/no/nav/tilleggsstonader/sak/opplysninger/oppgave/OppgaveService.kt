@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.DatoFormat
 import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
@@ -52,6 +53,7 @@ class OppgaveService(
     private val cacheManager: CacheManager,
     private val personService: PersonService,
     private val klageService: KlageService,
+    private val ytelseService: YtelseService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -108,14 +110,14 @@ class OppgaveService(
         finnOppgaveMetadataSak(oppgaver) + finnOppgaveMetadataKlage(oppgaver)
 
     private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
-        val oppgaveIder = oppgaver.filter { it.behandlingstype != Behandlingstype.Klage.value }.map { it.id }
+        val oppgaveIder = oppgaver.filterNot { Behandlingstype.erKlage(it.behandlingstype) }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
             oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
         }
     }
 
     private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
-        val oppgaveIder = oppgaver.filter { it.behandlingstype == Behandlingstype.Klage.value }.map { it.id }
+        val oppgaveIder = oppgaver.filter { Behandlingstype.erKlage(it.behandlingstype) }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadataKlage", oppgaveIder) {
             klageService
                 .hentBehandlingIderForOppgaveIder(oppgaveIder)
@@ -200,7 +202,7 @@ class OppgaveService(
                 oppgave,
                 enhetsnummer,
                 mappeId,
-                behandlingstype,
+                behandlingstype ?: utledBehandlingstype(personIdent, behandlingId),
             )
         val oppgave =
             OppgaveDomain(
@@ -215,6 +217,23 @@ class OppgaveService(
             )
         oppgaveRepository.insert(oppgave)
         return opprettetOppgaveId
+    }
+
+    /**
+     * Slår opp personen mot ung-sak. Med behandling opprettes oppgaven uten markering hvis oppslaget feiler.
+     * Uten behandling opprettes ikke oppgaven hvis oppslaget feiler, slik at tasken kan prøves på nytt.
+     */
+    private fun utledBehandlingstype(
+        personIdent: String,
+        behandlingId: BehandlingId?,
+    ): Behandlingstype? {
+        val gjelderAktivitetspenger =
+            if (behandlingId != null) {
+                ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
+            } else {
+                ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
+            }
+        return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
     }
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse = oppgaveClient.oppdaterOppgave(oppgave)

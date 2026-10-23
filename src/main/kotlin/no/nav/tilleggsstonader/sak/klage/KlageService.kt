@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.UUID
@@ -22,6 +23,7 @@ class KlageService(
     private val fagsakService: FagsakService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
+    private val ytelseService: YtelseService,
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -85,6 +87,7 @@ class KlageService(
                 fagsystem = Fagsystem.TILLEGGSSTONADER,
                 klageMottatt = klageMottatt,
                 behandlendeEnhet = enhetId,
+                gjelderAktivitetspenger = ytelseService.harAktivitetspengerIDagEllerFremITid(aktivIdent),
             ),
         )
     }
