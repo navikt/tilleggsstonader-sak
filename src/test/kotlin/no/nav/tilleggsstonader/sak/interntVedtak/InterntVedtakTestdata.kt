@@ -72,6 +72,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagDrosjeForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagPrivatBilForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
@@ -1141,6 +1142,23 @@ object InterntVedtakTestdata {
                                     satsBekreftet = true,
                                 ),
                             beløp = BigDecimal(380),
+                            aktivitetId = dummyAktivitetId,
+                        ),
+                    ),
+                drosje =
+                    listOf(
+                        no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje(
+                            reiseId = dummyReiseId,
+                            grunnlag =
+                                BeregningsgrunnlagDrosjeForSamling(
+                                    adresse = "Testveien 2, 1234 Testby",
+                                    fom = førsteJan,
+                                    tom = sisteFeb,
+                                    vedtaksperioder = emptyList(),
+                                    brukersNavKontor = null,
+                                ),
+                            beløp = BigDecimal(380),
+                            begrunnelse = "Begrunnelse for drosje",
                             aktivitetId = dummyAktivitetId,
                         ),
                     ),
