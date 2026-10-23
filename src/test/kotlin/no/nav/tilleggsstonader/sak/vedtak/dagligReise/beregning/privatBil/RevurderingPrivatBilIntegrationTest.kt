@@ -829,7 +829,7 @@ class RevurderingPrivatBilIntegrationTest(
     }
 
     @Test
-    fun `nullstilling av revurdering feiler etter automatisk og henlagt kjørelistebehandling`() {
+    fun `kan nullstille en revurdering i sak med privat bil, hvor forrige kjørelistebehandling er henlagt`() {
         every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -887,7 +887,6 @@ class RevurderingPrivatBilIntegrationTest(
             ) {}
 
         assertThat(kall.behandling.hent(revurderingId).steg).isEqualTo(StegType.KJØRELISTE)
-        // Feiler fordi forsøker å vurdere de avklarte ukene hentet fra henlagte behandling, men vedtak finnes ikke enda
         kall.behandling.nullstill(revurderingId)
     }
 
