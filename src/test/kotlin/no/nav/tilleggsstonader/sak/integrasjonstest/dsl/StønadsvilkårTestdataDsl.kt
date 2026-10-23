@@ -76,6 +76,7 @@ class StønadsvilkårTestdataDsl {
                 flyttedato = flyttedato,
                 svar =
                     mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                             SvarOgBegrunnelseDto(
                                 SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -112,6 +113,7 @@ class StønadsvilkårTestdataDsl {
                 flyttedato = flyttedato,
                 svar =
                     mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                             SvarOgBegrunnelseDto(
                                 SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
