@@ -79,15 +79,17 @@ object DagligReiseTestUtil {
             beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 
-    fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
-        GeneriskVedtak(
-            behandlingId = BehandlingId.random(),
-            type = TypeVedtak.INNVILGELSE,
-            data = data,
-            gitVersjon = Applikasjonsversjon.versjon,
-            tidligsteEndring = null,
-            opphørsdato = null,
-        )
+    fun innvilgelse(
+        data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise,
+        behandlingId: BehandlingId = BehandlingId.random(),
+    ) = GeneriskVedtak(
+        behandlingId = behandlingId,
+        type = TypeVedtak.INNVILGELSE,
+        data = data,
+        gitVersjon = Applikasjonsversjon.versjon,
+        tidligsteEndring = null,
+        opphørsdato = null,
+    )
 
     fun innvilgelse(
         behandlingId: BehandlingId = BehandlingId.random(),

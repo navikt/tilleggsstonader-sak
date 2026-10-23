@@ -146,6 +146,7 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `avklarte kjørte uker skal tilbakestilles hvis kjørelistebehandling`() {
         opprettAvklartKjørtUke(behandling.id)
+        opprettDagligReiseVedtak(behandling.id)
 
         val avklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
         val avklartKjørtUkeRevurdering = avklartKjørtUkeRepository.insert(avklartKjørtUke.kopierTilNyBehandling(revurdering.id))
@@ -381,5 +382,10 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     ),
             ),
         )
+    }
+
+    private fun opprettDagligReiseVedtak(behandlingId: BehandlingId) {
+        val vedtak = innvilgelse(behandlingId)
+        vedtakRepository.insert(vedtak)
     }
 }
