@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -109,5 +110,16 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
                     ?.drosje
                     ?.harTTKort,
             ).isEqualTo(JaNei.NEI)
+    }
+
+    @Test
+    fun `skal kunne opprette en behandling for flytting`() {
+        val ident = FnrGenerator.generer(1 januar 2000)
+        val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.FLYTTING_TSO))
+
+        Assertions.assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
+        val søknad = søknadService.hentSøknadFlytting(behandlingId)!!
+        Assertions.assertThat(søknad).isInstanceOf(SøknadFlytting::class.java)
+        Assertions.assertThat(søknad.data.flyttingDetaljer?.flyttetilbud).hasSize(2)
     }
 }

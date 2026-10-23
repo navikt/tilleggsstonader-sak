@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -55,6 +54,7 @@ sealed interface FlyttingVilkårFakta : VilkårFakta {
 data class FaktaFlyttebyrå(
     val tilbud: List<FlyttebyråTilbud>,
     val erBetalingDokumentert: Boolean,
+    val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
 ) : FlyttingVilkårFakta
 
@@ -69,6 +69,7 @@ data class FaktaFlytteSelv(
     val bompenger: Int?,
     val ferge: Int?,
     val parkering: Int?,
+    val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
 ) : FlyttingVilkårFakta
 
@@ -112,29 +113,39 @@ data class FaktaReiseTilSamlingUbestemt(
     override val adresse: String?,
 ) : ReiseVilkårFakta
 
+sealed interface FaktaROAH : VilkårFakta {
+    val reiseId: ReiseId
+    val aktivitetId: VilkårperiodeGlobalId
+    val typeReiseformål: TypeReiseformål
+}
+
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
-) : ReiseVilkårFakta
+    val begrunnelse: String?,
+) : FaktaROAH
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
-) : ReiseVilkårFakta
+    val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
+    val begrunnelse: String?,
+) : FaktaROAH
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
-) : ReiseVilkårFakta
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+) : FaktaROAH
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,

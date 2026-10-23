@@ -44,6 +44,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadFlyttingUtil.søknadFlytting
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
@@ -337,6 +338,27 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         val journalhendelseTasks = taskService.finnAlleTaskerMedType(JournalhendelseKafkaHåndtererTask.TYPE)
         assertThat(journalhendelseTasks).hasSize(1)
         assertThat(journalhendelseTasks.single().status).isNotEqualTo(Status.FERDIG)
+    }
+
+    @Test
+    fun `mottar flytting-søknad fra kafka, journalføres og oppretter sak`() {
+        val hendelse = journalfoeringHendelseRecord()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        mockJournalpost(brevkode = DokumentBrevkode.FLYTTING, søknad = søknadFlytting(ident = ident))
+        kjørTasksKlareForProsessering()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.FLYTTING_TSO,
+            journalpostId.toString(),
+        )
     }
 
     @Test

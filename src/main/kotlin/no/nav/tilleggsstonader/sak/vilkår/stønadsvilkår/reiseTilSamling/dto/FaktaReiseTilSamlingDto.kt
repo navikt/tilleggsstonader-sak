@@ -2,16 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaDrosje
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -49,7 +47,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
     ) = FaktaOffentligTransport(
         reiseId = reiseId,
         adresse = adresse,
-        nødvendigUtgift = nødvendigUtgift.tilDomain(),
+        nødvendigUtgift = nødvendigUtgift.tilDomene(),
         utgifterOffentligTransport = utgifterOffentligTransport,
         begrunnelse = begrunnelse,
         aktivitetId = aktivitet?.aktivitetId,
@@ -74,7 +72,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
     ) = FaktaPrivatBil(
         reiseId = reiseId,
         adresse = adresse,
-        nødvendigUtgift = nødvendigUtgift.tilDomain(),
+        nødvendigUtgift = nødvendigUtgift.tilDomene(),
         reiseavstand = reiseavstand,
         begrunnelse = begrunnelse?.ifBlank { null },
         aktivitetId = aktivitet?.aktivitetId,

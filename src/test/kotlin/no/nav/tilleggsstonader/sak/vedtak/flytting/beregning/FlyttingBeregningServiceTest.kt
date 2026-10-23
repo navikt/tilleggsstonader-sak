@@ -32,10 +32,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyr
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +46,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 class FlyttingBeregningServiceTest {
+    private val nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null)
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
     private val vedtakService = mockk<VedtakService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
@@ -80,7 +83,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlyttebyrå(
                             tilbud =
@@ -90,6 +93,7 @@ class FlyttingBeregningServiceTest {
                                 ),
                             erBetalingDokumentert = true,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -117,7 +121,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         faktaFlyttebyrå(
                             listOf(
@@ -149,7 +153,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
                             avstandEnVei = 100,
@@ -158,6 +162,7 @@ class FlyttingBeregningServiceTest {
                             ferge = 30,
                             parkering = 40,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -184,7 +189,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
                             avstandEnVei = 1,
@@ -193,6 +198,7 @@ class FlyttingBeregningServiceTest {
                             ferge = null,
                             parkering = null,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -220,8 +226,8 @@ class FlyttingBeregningServiceTest {
 
     @Test
     fun `resultater beregnes for alle vilkår og sorteres etter startdato`() {
-        val førsteVilkår = vilkår(flytteDato = 1 februar 2025)
-        val andreVilkår = vilkår(flytteDato = 1 januar 2025)
+        val førsteVilkår = vilkår(flyttedato = 1 februar 2025)
+        val andreVilkår = vilkår(flyttedato = 1 januar 2025)
         val vedtaksperioder =
             listOf(
                 vedtaksperiode(
@@ -257,7 +263,7 @@ class FlyttingBeregningServiceTest {
             )
         stubForrigeVedtak(forrigeBehandlingId, forrigeResultat)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns
-            listOf(vilkår(flytteDato = 1 februar 2025, behandlingId = revurdering.id))
+            listOf(vilkår(flyttedato = 1 februar 2025, behandlingId = revurdering.id))
 
         val resultater =
             beregningService
@@ -288,7 +294,7 @@ class FlyttingBeregningServiceTest {
             )
         stubForrigeVedtak(forrigeBehandlingId, forrigeResultat)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns
-            listOf(vilkår(flytteDato = 1 januar 2025, behandlingId = revurdering.id))
+            listOf(vilkår(flyttedato = 1 januar 2025, behandlingId = revurdering.id))
 
         val resultat =
             beregningService.beregn(
@@ -354,7 +360,7 @@ class FlyttingBeregningServiceTest {
 
         ugyldigeFakta.forEach { fakta ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
-                listOf(vilkår(flytteDato = 1 januar 2025, fakta = fakta))
+                listOf(vilkår(flyttedato = 1 januar 2025, fakta = fakta))
 
             assertThatThrownBy {
                 beregningService.beregn(
@@ -379,7 +385,7 @@ class FlyttingBeregningServiceTest {
 
         ugyldigeFakta.forEach { fakta ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
-                listOf(vilkår(flytteDato = 1 januar 2025, fakta = fakta))
+                listOf(vilkår(flyttedato = 1 januar 2025, fakta = fakta))
 
             assertThatThrownBy {
                 beregningService.beregn(
@@ -395,7 +401,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
                 ),
             )
@@ -453,14 +459,13 @@ class FlyttingBeregningServiceTest {
     }
 
     private fun vilkår(
-        flytteDato: LocalDate,
+        flyttedato: LocalDate,
         behandlingId: BehandlingId = behandling.id,
         fakta: FlyttingVilkårFakta = faktaFlyttebyrå(),
     ) = VilkårFlytting(
         id = VilkårId.random(),
         behandlingId = behandlingId,
-        fom = flytteDato,
-        tom = flytteDato,
+        flyttedato = flyttedato,
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
         delvilkårsett = emptyList(),
@@ -477,6 +482,7 @@ class FlyttingBeregningServiceTest {
         tilbud = tilbud,
         erBetalingDokumentert = true,
         adresse = "Flytteveien 1",
+        nødvendigUtgift = nødvendigUtgift,
     )
 
     private fun faktaFlytteSelv(
@@ -492,6 +498,7 @@ class FlyttingBeregningServiceTest {
         ferge = ferge,
         parkering = parkering,
         adresse = "Flytteveien 1",
+        nødvendigUtgift = nødvendigUtgift,
     )
 
     private fun resultat(

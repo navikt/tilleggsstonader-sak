@@ -37,6 +37,7 @@ class OpprettDummyBehandlingController(
     private val opprettDummySøknadBoutgifter: OpprettDummySøknadBoutgifter,
     private val opprettDummySøknadDagligReise: OpprettDummySøknadDagligReise,
     private val opprettDummySøknadReiseTilSamling: OpprettDummySøknadReiseTilSamling,
+    private val opprettDummySøknadFlytting: OpprettDummySøknadFlytting,
 ) {
     @Transactional
     @PostMapping
@@ -87,6 +88,7 @@ class OpprettDummyBehandlingController(
             -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
+            -> opprettDummySøknadFlytting.opprettDummy(fagsak, behandling)
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> logger.warn("Ikke støtte for å opprette dummy-søknad for ${fagsak.stønadstype}") // TODO

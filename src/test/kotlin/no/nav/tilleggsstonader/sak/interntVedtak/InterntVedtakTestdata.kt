@@ -83,6 +83,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -96,7 +97,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.ikkeOppfylteDelvilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTso
@@ -127,7 +127,7 @@ import java.time.Month.FEBRUARY
 import java.time.Month.JANUARY
 import java.time.temporal.ChronoUnit
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei as SvarJaNeiReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei as SvarJaNeiReiseTilSamling
 
 object InterntVedtakTestdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")

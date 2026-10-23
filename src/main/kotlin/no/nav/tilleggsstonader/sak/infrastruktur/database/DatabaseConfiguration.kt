@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDaglig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaPassAvBarn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.TilbakekrevingJson
@@ -110,6 +111,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             SkjemaDagligReiseWriter(),
             SkjemaReiseTilSamlingReader(),
             SkjemaReiseTilSamlingWriter(),
+            SkjemaFlyttingReader(),
+            SkjemaFlyttingWriter(),
             BarnMedBarnepassReader(),
             BarnMedBarnepassWriter(),
             FilTilBytearrayConverter(),
@@ -240,6 +243,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class SkjemaReiseTilSamlingReader : JsonReader<SkjemaReiseTilSamling>(SkjemaReiseTilSamling::class)
 
     class SkjemaReiseTilSamlingWriter : JsonWriter<SkjemaReiseTilSamling>()
+
+    class SkjemaFlyttingReader : JsonReader<SkjemaFlytting>(SkjemaFlytting::class)
+
+    class SkjemaFlyttingWriter : JsonWriter<SkjemaFlytting>()
 
     class BarnMedBarnepassReader : JsonReader<BarnMedBarnepass>(BarnMedBarnepass::class)
 

@@ -73,94 +73,97 @@ class JournalpostClientMockConfig {
             every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
             every { journalpostClient.oppdaterLogiskeVedlegg(any(), any()) } answers { firstArg() }
             every { journalpostClient.finnJournalposterForBruker(any()) } answers {
-                journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id } +
-                    listOf(
-                        Journalpost(
-                            "2",
-                            Journalposttype.I,
-                            journalstatus = Journalstatus.MOTTATT,
-                            tema = Tema.TSO.toString(),
-                            behandlingstema = "ab0300",
-                            tittel = "Søknad om barnetilsyn",
-                            bruker = Bruker("12345678910", BrukerIdType.FNR),
-                            avsenderMottaker = avsenderMottaker(),
-                            journalforendeEnhet = "tilleggsstonader-sak",
-                            relevanteDatoer =
-                                listOf(
-                                    RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
-                                    RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
-                                ),
-                            dokumenter =
-                                listOf(
-                                    DokumentInfo(
-                                        dokumentInfoId = "1",
-                                        tittel = "Dummy dokument 1",
-                                        logiskeVedlegg =
-                                            listOf(
-                                                LogiskVedlegg("1", "Dokumentasjon på sykdom"),
-                                                LogiskVedlegg("2", "Inntektsendring"),
-                                                LogiskVedlegg("3", "Samværsmelding"),
-                                            ),
-                                        dokumentvarianter =
-                                            listOf(
-                                                Dokumentvariant(
-                                                    variantformat = Dokumentvariantformat.ARKIV,
-                                                    saksbehandlerHarTilgang = true,
-                                                ),
-                                            ),
-                                    ),
-                                    DokumentInfo(
-                                        dokumentInfoId = "2",
-                                        tittel = "Dummy dokument 2",
-                                        dokumentvarianter =
-                                            listOf(
-                                                Dokumentvariant(
-                                                    variantformat = Dokumentvariantformat.ARKIV,
-                                                    saksbehandlerHarTilgang = true,
-                                                ),
-                                            ),
-                                    ),
-                                ),
-                        ),
-                        Journalpost(
-                            "1",
-                            Journalposttype.I,
-                            journalstatus = Journalstatus.MOTTATT,
-                            tema = Tema.TSO.toString(),
-                            behandlingstema = "ab0300",
-                            tittel = "Søknad om barnetilsyn",
-                            bruker = Bruker("12345678910", BrukerIdType.FNR),
-                            avsenderMottaker = avsenderMottaker(),
-                            journalforendeEnhet = "tilleggsstonader-sak",
-                            relevanteDatoer =
-                                listOf(
-                                    RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
-                                    RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
-                                ),
-                            dokumenter =
-                                listOf(
-                                    DokumentInfo(
-                                        dokumentInfoId = "3",
-                                        tittel = "Dummy dokument 3",
-                                        logiskeVedlegg =
-                                            listOf(
-                                                LogiskVedlegg("1", "Dokumentasjon på sykdom"),
-                                                LogiskVedlegg("2", "Inntektsendring"),
-                                                LogiskVedlegg("3", "Samværsmelding"),
-                                            ),
-                                        dokumentvarianter =
-                                            listOf(
-                                                Dokumentvariant(
-                                                    variantformat = Dokumentvariantformat.ARKIV,
-                                                    saksbehandlerHarTilgang = true,
-                                                ),
-                                            ),
-                                    ),
-                                ),
-                        ),
-                    )
+                journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id } + dummyJournalposter
             }
+            every { journalpostClient.finnJournalposterForFagsak(any(), any()) } returns dummyJournalposter
         }
+
+        private val dummyJournalposter =
+            listOf(
+                Journalpost(
+                    "2",
+                    Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = Tema.TSO.toString(),
+                    behandlingstema = "ab0300",
+                    tittel = "Søknad om barnetilsyn",
+                    bruker = Bruker("12345678910", BrukerIdType.FNR),
+                    avsenderMottaker = avsenderMottaker(),
+                    journalforendeEnhet = "tilleggsstonader-sak",
+                    relevanteDatoer =
+                        listOf(
+                            RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                            RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
+                        ),
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "1",
+                                tittel = "Dummy dokument 1",
+                                logiskeVedlegg =
+                                    listOf(
+                                        LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                                        LogiskVedlegg("2", "Inntektsendring"),
+                                        LogiskVedlegg("3", "Samværsmelding"),
+                                    ),
+                                dokumentvarianter =
+                                    listOf(
+                                        Dokumentvariant(
+                                            variantformat = Dokumentvariantformat.ARKIV,
+                                            saksbehandlerHarTilgang = true,
+                                        ),
+                                    ),
+                            ),
+                            DokumentInfo(
+                                dokumentInfoId = "2",
+                                tittel = "Dummy dokument 2",
+                                dokumentvarianter =
+                                    listOf(
+                                        Dokumentvariant(
+                                            variantformat = Dokumentvariantformat.ARKIV,
+                                            saksbehandlerHarTilgang = true,
+                                        ),
+                                    ),
+                            ),
+                        ),
+                ),
+                Journalpost(
+                    "1",
+                    Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = Tema.TSO.toString(),
+                    behandlingstema = "ab0300",
+                    tittel = "Søknad om barnetilsyn",
+                    bruker = Bruker("12345678910", BrukerIdType.FNR),
+                    avsenderMottaker = avsenderMottaker(),
+                    journalforendeEnhet = "tilleggsstonader-sak",
+                    relevanteDatoer =
+                        listOf(
+                            RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                            RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
+                        ),
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "3",
+                                tittel = "Dummy dokument 3",
+                                logiskeVedlegg =
+                                    listOf(
+                                        LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                                        LogiskVedlegg("2", "Inntektsendring"),
+                                        LogiskVedlegg("3", "Samværsmelding"),
+                                    ),
+                                dokumentvarianter =
+                                    listOf(
+                                        Dokumentvariant(
+                                            variantformat = Dokumentvariantformat.ARKIV,
+                                            saksbehandlerHarTilgang = true,
+                                        ),
+                                    ),
+                            ),
+                        ),
+                ),
+            )
 
         val journalposter = mutableMapOf<Long, Journalpost>()
         val opprettedeJournalposter = mutableListOf<ArkiverDokumentRequest>()

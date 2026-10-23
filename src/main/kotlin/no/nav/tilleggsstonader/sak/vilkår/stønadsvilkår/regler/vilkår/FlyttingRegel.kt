@@ -22,21 +22,9 @@ class FlyttingRegel :
                 FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET,
                 MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID,
                 HVORDAN_SKAL_BRUKER_FLYTTE,
-                ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE,
             ),
     ) {
     companion object {
-        private val ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE =
-            RegelSteg(
-                regelId = RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE,
-                erHovedregel = false,
-                svarMapping =
-                    jaNeiSvarRegel(
-                        hvisJa = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                        hvisNei = SluttSvarRegel.OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
-                    ),
-            )
-
         private val HVORDAN_SKAL_BRUKER_FLYTTE =
             RegelSteg(
                 regelId = RegelId.HVORDAN_SKAL_BRUKER_FLYTTE,
@@ -44,19 +32,43 @@ class FlyttingRegel :
                 svarMapping =
                     mapOf(
                         SvarId.FLYTTEBYRÅ to
-                            NesteRegel(
-                                regelId = ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE.regelId,
+                            SluttSvarRegel(
+                                resultat = Resultat.OPPFYLT,
                                 begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ,
                             ),
                         SvarId.FLYTTER_SELV to
-                            NesteRegel(
-                                regelId = ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE.regelId,
+                            SluttSvarRegel(
+                                resultat = Resultat.OPPFYLT,
                                 begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.FLYTTING_FLYTTE_SELV,
                             ),
                     ),
             )
+
+        private fun måFlytteForAktivitetRegel() =
+            RegelSteg(
+                regelId = RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET,
+                erHovedregel = false,
+                svarMapping =
+                    mapOf(
+                        SvarId.FLYTTER_TIL_AKTIVITETSSTED to
+                            NesteRegel(HVORDAN_SKAL_BRUKER_FLYTTE.regelId, BegrunnelseType.PÅKREVD),
+                        SvarId.FLYTTER_TIL_HJEMSTED to
+                            NesteRegel(HVORDAN_SKAL_BRUKER_FLYTTE.regelId, BegrunnelseType.PÅKREVD),
+                        SvarId.NEI to
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.PÅKREVD,
+                                tilhørendeFaktaType = TypeVilkårFakta.FLYTTING_UBESTEMT,
+                            ),
+                    ),
+            )
+
+        private val MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET = måFlytteForAktivitetRegel()
+        private val FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET =
+            måFlytteRegel(RegelId.FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET)
+        private val MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID = måFlytteRegel(RegelId.MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID)
 
         private fun måFlytteRegel(regelId: RegelId) =
             RegelSteg(
@@ -74,19 +86,13 @@ class FlyttingRegel :
                     ),
             )
 
-        private val MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET = måFlytteRegel(RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET)
-        private val FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET = måFlytteRegel(RegelId.FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET)
-        private val MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID = måFlytteRegel(RegelId.MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID)
-
         private val HVILKEN_FORBINDELSE_FLYTTER_BRUKER =
             RegelSteg(
                 regelId = RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER,
                 erHovedregel = true,
                 svarMapping =
                     mapOf(
-                        SvarId.FLYTTING_VED_START_AV_AKTIVITET to
-                            NesteRegel(MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET.regelId, BegrunnelseType.PÅKREVD),
-                        SvarId.FLYTTING_VED_AVSLUTTET_AKTIVITET to
+                        SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING to
                             NesteRegel(MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET.regelId, BegrunnelseType.PÅKREVD),
                         SvarId.ARBEID_ETTER_GJENNOMFØRT_AKTIVITET to
                             NesteRegel(FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET.regelId, BegrunnelseType.PÅKREVD),

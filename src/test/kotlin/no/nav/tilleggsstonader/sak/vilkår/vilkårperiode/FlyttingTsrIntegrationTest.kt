@@ -53,7 +53,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                 }
             }
             vilkår {
-                flyttingEgenKjøring(flytteDato = fom, avstandEnVei = 100, bompenger = 100)
+                flyttingEgenKjøring(flyttedato = fom, avstandEnVei = 100, bompenger = 100)
             }
             vedtak {
                 avslag()
@@ -99,7 +99,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingEgenKjøring(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
                 )
@@ -150,7 +150,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
@@ -206,7 +206,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = false,
                 )

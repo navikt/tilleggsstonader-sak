@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Vilk�
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
@@ -43,6 +44,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -65,21 +67,23 @@ class StønadsvilkårTestdataDsl {
     }
 
     fun flyttingByrå(
-        flytteDato: LocalDate,
+        flyttedato: LocalDate,
         tilbudPriser: List<Int>,
         erBetalingDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
-                flytteDato = flytteDato,
+                flyttedato = flyttedato,
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(
+                                SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
+                                "Syntetisk begrunnelse",
+                            ),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
-                            SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Syntetisk begrunnelse"),
                         RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ),
-                        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
                     ),
                 fakta =
                     FaktaFlyttebyråDto(
@@ -89,13 +93,14 @@ class StønadsvilkårTestdataDsl {
                             },
                         adresse = "Syntetisk adresse",
                         erBetalingDokumentert = erBetalingDokumentert,
+                        nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
                     ),
             )
         }
     }
 
     fun flyttingEgenKjøring(
-        flytteDato: LocalDate,
+        flyttedato: LocalDate,
         avstandEnVei: Int,
         henger: Int? = null,
         bompenger: Int? = null,
@@ -104,15 +109,17 @@ class StønadsvilkårTestdataDsl {
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
-                flytteDato = flytteDato,
+                flyttedato = flyttedato,
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(
+                                SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
+                                "Syntetisk begrunnelse",
+                            ),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
-                            SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Syntetisk begrunnelse"),
                         RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV),
-                        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
                     ),
                 fakta =
                     FaktaFlytteSelvDto(
@@ -122,6 +129,7 @@ class StønadsvilkårTestdataDsl {
                         ferge = ferge,
                         parkering = parkering,
                         adresse = "Syntetisk adresse",
+                        nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
                     ),
             )
         }
@@ -332,7 +340,7 @@ class OpprettStønadsvilkårDsl {
 
     fun offentligTransportReiseOppstartAvslutningHjemreise(
         fom: LocalDate,
-        tom: LocalDate,
+        tom: LocalDate? = null,
         typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
         hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {

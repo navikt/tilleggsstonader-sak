@@ -56,7 +56,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
 
         return reiseOppstartAvslutningHjemreiseVilkårService
             .opprettNyttVilkår(
-                nyttVilkår = lagreVilkårDto.tilDomain(),
+                nyttVilkår = lagreVilkårDto.tilDomene(),
                 behandlingId = behandlingId,
             ).tilDto()
     }
@@ -72,7 +72,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
 
         return reiseOppstartAvslutningHjemreiseVilkårService
             .oppdaterVilkår(
-                nyttVilkår = lagreVilkårDto.tilDomain(),
+                nyttVilkår = lagreVilkårDto.tilDomene(),
                 vilkårId = vilkårId,
                 behandlingId = behandlingId,
             ).tilDto()
