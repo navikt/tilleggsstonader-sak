@@ -38,6 +38,7 @@ data class ReiseMedPrivatBilDelperiode(
     val bompengerPerDag: BigDecimal?,
     val fergekostnadPerDag: BigDecimal?,
     val skalBehandlesManuelt: Boolean,
+    val begrunnelseManuellBehandling: String?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBilDelperiode> {
     override fun medPeriode(
@@ -50,6 +51,7 @@ data class ReiseMedPrivatBilDelperiode(
         bompengerPerDag = bompengerPerDag,
         fergekostnadPerDag = fergekostnadPerDag,
         skalBehandlesManuelt = skalBehandlesManuelt,
+        begrunnelseManuellBehandling = begrunnelseManuellBehandling,
     )
 }
 
@@ -81,6 +83,7 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(
                     bompengerPerDag = delperiode.bompengerPerDag,
                     fergekostnadPerDag = delperiode.fergekostnadPerDag,
                     skalBehandlesManuelt = delperiode.skalBehandlesManuelt,
+                    begrunnelseManuellBehandling = delperiode.begrunnelseManuellBehandling,
                 )
             },
         aktivitetType = aktivitetType,

@@ -79,6 +79,7 @@ object VilkårDagligReiseMapper {
                         bompengerPerDag = it.bompengerPerDag,
                         fergekostnadPerDag = it.fergekostnadPerDag,
                         skalBehandlesManuelt = it.skalBehandlesManuelt,
+                        begrunnelseManuellBehandling = it.begrunnelseManuellBehandling,
                     )
                 },
             adresse = this.adresse,

@@ -85,6 +85,7 @@ data class FaktaDagligReisePrivatBilDto(
                         bompengerPerDag = it.bompengerPerDag,
                         fergekostnadPerDag = it.fergekostnadPerDag,
                         skalBehandlesManuelt = it.skalBehandlesManuelt,
+                        begrunnelseManuellBehandling = it.begrunnelseManuellBehandling,
                     )
                 },
             adresse = adresse,
