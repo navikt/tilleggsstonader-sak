@@ -40,10 +40,10 @@ object SøknadsskjemaFlyttingMapper {
 
     private fun mapFlyttingDetaljer(detaljer: FlyttingDetaljerKontrakt) =
         FlyttingDetaljer(
-            årsak = detaljer.årsak?.verdi,
-            flyttedato = detaljer.flyttedato?.verdi?.let { LocalDate.parse(it) },
+            årsak = detaljer.årsak.verdi,
+            flyttedato = LocalDate.parse(detaljer.flyttedato.verdi),
             adresse =
-                detaljer.adresse?.let {
+                detaljer.adresse.let {
                     Adresse(
                         gyldigFraOgMed = null,
                         adresse = it.gateadresse?.verdi,
@@ -52,12 +52,12 @@ object SøknadsskjemaFlyttingMapper {
                         landkode = it.land?.verdi,
                     )
                 },
-            flyttemåte = detaljer.flyttemåte?.verdi,
-            utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte?.verdi,
+            flyttemåte = detaljer.flyttemåte.verdi,
+            utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte.verdi,
             utgifterEgenFlytting =
                 detaljer.utgifterEgenFlytting?.let {
                     UtgifterEgenFlytting(
-                        avstand = it.avstand?.verdi,
+                        avstand = it.avstand.verdi,
                         hengerleie = it.hengerleie?.verdi,
                         bom = it.bom?.verdi,
                         parkering = it.parkering?.verdi,
@@ -68,8 +68,8 @@ object SøknadsskjemaFlyttingMapper {
             flyttetilbud =
                 detaljer.flyttebyrå?.tilbud?.map {
                     Flyttetilbud(
-                        navn = it.navn?.verdi,
-                        beløp = it.beløp?.verdi,
+                        navn = it.navn.verdi,
+                        beløp = it.beløp.verdi,
                     )
                 },
         )
