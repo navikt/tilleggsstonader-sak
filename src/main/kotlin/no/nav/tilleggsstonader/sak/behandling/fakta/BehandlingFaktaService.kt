@@ -174,7 +174,7 @@ class BehandlingFaktaService(
             årsak = detaljer.årsak,
             flyttedato = detaljer.flyttedato,
             adresse =
-                detaljer.adresse?.let {
+                detaljer.adresse.let {
                     FaktaFlytteadresse(
                         gateadresse = it.adresse,
                         postnummer = it.postnummer,

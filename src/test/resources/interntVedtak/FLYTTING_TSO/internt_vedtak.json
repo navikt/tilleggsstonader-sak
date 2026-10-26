@@ -1,0 +1,217 @@
+{
+  "aktiviteter": [ ],
+  "behandling": {
+    "behandlingId": "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
+    "beslutter": "saksbeh2",
+    "eksternFagsakId": 1674,
+    "ident": "123456789012",
+    "opprettetTidspunkt": "2025-01-01T00:00:00",
+    "resultat": "INNVILGET",
+    "saksbehandler": "saksbehandler",
+    "stønadstype": "FLYTTING_TSO",
+    "vedtakstidspunkt": "2025-02-01T00:00:00",
+    "årsak": "SØKNAD"
+  },
+  "beregningsresultat": {
+    "boutgifter": null,
+    "dagligReise": null,
+    "flytting": {
+      "resultater": [ {
+        "beløp": 10000,
+        "fom": "2025-01-15",
+        "fraTidligereVedtak": true,
+        "grunnlag": {
+          "erBetalingDokumentert": true,
+          "tilbud": [ {
+            "erValgt": false,
+            "navn": "Flyttebyrå A",
+            "pris": 12000
+          }, {
+            "erValgt": true,
+            "navn": "Flyttebyrå B",
+            "pris": 10000
+          } ],
+          "type": "FLYTTEBYRÅ"
+        },
+        "målgruppe": "NEDSATT_ARBEIDSEVNE",
+        "tom": "2025-01-15"
+      }, {
+        "beløp": 5400,
+        "fom": "2025-01-15",
+        "fraTidligereVedtak": false,
+        "grunnlag": {
+          "avstandEnVei": 100,
+          "bompenger": 300,
+          "ferge": 400,
+          "henger": 200,
+          "parkering": 500,
+          "sats": 2.94,
+          "satsBekreftet": true,
+          "type": "FLYTTE_SELV"
+        },
+        "målgruppe": "NEDSATT_ARBEIDSEVNE",
+        "tom": "2025-01-15"
+      } ]
+    },
+    "læremidler": null,
+    "reiseTilSamling": null,
+    "tilsynBarn": null
+  },
+  "målgrupper": [ {
+    "begrunnelse": "Målgruppen er dokumentert.",
+    "faktaOgVurderinger": {
+      "@type": "MÅLGRUPPE",
+      "aldersvilkår": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
+      },
+      "medlemskap": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
+      },
+      "mottarSykepengerForFulltidsstilling": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
+      },
+      "utgifterDekketAvAnnetRegelverk": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
+      }
+    },
+    "fom": "2025-01-01",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2025-02-28",
+    "type": "NEDSATT_ARBEIDSEVNE"
+  } ],
+  "rammevedtakPrivatBil": null,
+  "søknad": {
+    "mottattTidspunkt": "2025-01-01T00:00:00"
+  },
+  "vedtak": {
+    "innvilgelseBegrunnelse": "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+    "type": "INNVILGELSE"
+  },
+  "vedtaksperioder": [ {
+    "aktivitet": null,
+    "fom": "2025-01-15",
+    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+    "tom": "2025-01-15"
+  } ],
+  "vilkår": [ {
+    "delvilkår": [ {
+      "resultat": "OPPFYLT",
+      "vurderinger": [ {
+        "begrunnelse": null,
+        "regel": "Har bruker utgifter til flyttingen?",
+        "svar": "Ja"
+      }, {
+        "begrunnelse": "Syntetisk begrunnelse",
+        "regel": "I hvilken forbindelse flytter bruker?",
+        "svar": "Flytting ved oppstart eller avslutning av tiltak eller utdanning"
+      }, {
+        "begrunnelse": "Syntetisk begrunnelse",
+        "regel": "Må bruker flytte fra/til hjemsted?",
+        "svar": "Ja, flytter til aktivitetssted"
+      }, {
+        "begrunnelse": null,
+        "regel": "Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?",
+        "svar": "Flyttebyrå"
+      } ]
+    } ],
+    "fakta": {
+      "adresse": "Flytteveien 1, 1234 Oslo",
+      "erBetalingDokumentert": true,
+      "nødvendigUtgift": {
+        "begrunnelse": null,
+        "erUtgiftenNødvendig": "JA"
+      },
+      "tilbud": [ {
+        "navn": "Flyttebyrå A",
+        "pris": 12000
+      }, {
+        "navn": "Flyttebyrå B",
+        "pris": 10000
+      } ],
+      "type": "FLYTTING_FLYTTEBYRÅ"
+    },
+    "fom": "2025-01-15",
+    "fødselsdatoBarn": null,
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tom": "2025-01-15",
+    "type": "FLYTTING",
+    "utgift": null
+  }, {
+    "delvilkår": [ {
+      "resultat": "OPPFYLT",
+      "vurderinger": [ {
+        "begrunnelse": null,
+        "regel": "Har bruker utgifter til flyttingen?",
+        "svar": "Ja"
+      }, {
+        "begrunnelse": "Syntetisk begrunnelse",
+        "regel": "I hvilken forbindelse flytter bruker?",
+        "svar": "Flytting ved oppstart eller avslutning av tiltak eller utdanning"
+      }, {
+        "begrunnelse": "Syntetisk begrunnelse",
+        "regel": "Må bruker flytte fra/til hjemsted?",
+        "svar": "Ja, flytter til aktivitetssted"
+      }, {
+        "begrunnelse": null,
+        "regel": "Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?",
+        "svar": "Flytter selv"
+      } ]
+    } ],
+    "fakta": {
+      "adresse": "Flytteveien 2, 2345 Oslo",
+      "avstandEnVei": 100,
+      "bompenger": 300,
+      "ferge": 400,
+      "henger": 200,
+      "nødvendigUtgift": {
+        "begrunnelse": null,
+        "erUtgiftenNødvendig": "JA"
+      },
+      "parkering": 500,
+      "type": "FLYTTING_FLYTTE_SELV"
+    },
+    "fom": "2025-01-15",
+    "fødselsdatoBarn": null,
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tom": "2025-01-15",
+    "type": "FLYTTING",
+    "utgift": null
+  }, {
+    "delvilkår": [ {
+      "resultat": "IKKE_OPPFYLT",
+      "vurderinger": [ {
+        "begrunnelse": null,
+        "regel": "Har bruker utgifter til flyttingen?",
+        "svar": "Ja"
+      }, {
+        "begrunnelse": "Syntetisk begrunnelse",
+        "regel": "I hvilken forbindelse flytter bruker?",
+        "svar": "Flytting ved oppstart eller avslutning av tiltak eller utdanning"
+      }, {
+        "begrunnelse": "Flytting er ikke nødvendig for å gjennomføre aktiviteten.",
+        "regel": "Må bruker flytte fra/til hjemsted?",
+        "svar": "Nei"
+      } ]
+    } ],
+    "fakta": {
+      "adresse": "Flytteveien 3, 3456 Oslo",
+      "type": "FLYTTING_UBESTEMT"
+    },
+    "fom": "2025-01-15",
+    "fødselsdatoBarn": null,
+    "resultat": "IKKE_OPPFYLT",
+    "slettetKommentar": null,
+    "tom": "2025-01-15",
+    "type": "FLYTTING",
+    "utgift": null
+  } ]
+}

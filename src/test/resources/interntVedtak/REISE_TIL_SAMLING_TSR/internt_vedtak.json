@@ -31,7 +31,8 @@
 "beregningsresultat" : {
   "boutgifter" : null,
   "dagligReise" : null,
-  "læremidler" : null,
+  "flytting": null,
+    "læremidler" : null,
   "reiseTilSamling" : {
     "beregningsplan" : {
       "omfang" : "ALLE_PERIODER"

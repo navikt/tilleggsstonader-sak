@@ -13,9 +13,9 @@ enum class SvarId(
     ),
     FLYTTER_TIL_AKTIVITETSSTED("Ja, flytter til aktivitetssted"),
     FLYTTER_TIL_HJEMSTED("Ja, flytter til hjemsted"),
-    ARBEID_ETTER_GJENNOMFØRT_AKTIVITET("Arbeid etter gjennomført tiltak/utdanning"),
+    ARBEID_ETTER_GJENNOMFØRT_AKTIVITET("Flytting i forbindelse med arbeid etter gjennomført tiltak eller utdanning"),
     ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID(
-        "Enlig forsørger eller gjenlevende som flytter fra hjemstedet for å starte i arbeid",
+        "Enslig forsørger eller gjenlevende som flytter fra hjemstedet for å starte i arbeid",
     ),
     FLYTTEBYRÅ("Flyttebyrå"),
     FLYTTER_SELV("Flytter selv"),

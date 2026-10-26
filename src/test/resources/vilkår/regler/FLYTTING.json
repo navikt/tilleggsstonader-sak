@@ -15,8 +15,23 @@
         }
       }
     },
-    "HVILKEN_FORBINDELSE_FLYTTER_BRUKER": {
+    "HAR_UTGIFTER_TIL_FLYTTING": {
       "erHovedregel": true,
+      "regelId": "HAR_UTGIFTER_TIL_FLYTTING",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "HVILKEN_FORBINDELSE_FLYTTER_BRUKER"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
+    "HVILKEN_FORBINDELSE_FLYTTER_BRUKER": {
+      "erHovedregel": false,
       "regelId": "HVILKEN_FORBINDELSE_FLYTTER_BRUKER",
       "svarMapping": {
         "ARBEID_ETTER_GJENNOMFØRT_AKTIVITET": {

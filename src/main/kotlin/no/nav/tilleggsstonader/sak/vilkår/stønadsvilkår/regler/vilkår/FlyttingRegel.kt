@@ -17,6 +17,7 @@ class FlyttingRegel :
         vilkårType = VilkårType.FLYTTING,
         regler =
             setOf(
+                HAR_UTGIFTER_TIL_FLYTTING,
                 HVILKEN_FORBINDELSE_FLYTTER_BRUKER,
                 MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET,
                 FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET,
@@ -25,6 +26,21 @@ class FlyttingRegel :
             ),
     ) {
     companion object {
+        private val HAR_UTGIFTER_TIL_FLYTTING =
+            RegelSteg(
+                regelId = RegelId.HAR_UTGIFTER_TIL_FLYTTING,
+                erHovedregel = true,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER, BegrunnelseType.VALGFRI),
+                        hvisNei =
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.PÅKREVD,
+                            ),
+                    ),
+            )
+
         private val HVORDAN_SKAL_BRUKER_FLYTTE =
             RegelSteg(
                 regelId = RegelId.HVORDAN_SKAL_BRUKER_FLYTTE,
@@ -89,7 +105,7 @@ class FlyttingRegel :
         private val HVILKEN_FORBINDELSE_FLYTTER_BRUKER =
             RegelSteg(
                 regelId = RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER,
-                erHovedregel = true,
+                erHovedregel = false,
                 svarMapping =
                     mapOf(
                         SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING to

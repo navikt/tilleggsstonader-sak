@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260817115650_f13f507"
 val tilleggsstønaderLibsVersion = "2026.08.07-12.32.dfeb3286fb52"
-val tilleggsstønaderKontrakterVersion = "2026.10.23-11.09.f9ea0dfe2e97"
+val tilleggsstønaderKontrakterVersion = "2026.10.26-10.37.186ca87669de"
 val avroVersion = "1.12.2"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "2.0.0"
@@ -23,7 +23,7 @@ plugins {
 
     kotlin("jvm") version "2.4.21"
     id("com.diffplug.spotless") version "8.10.4"
-    id("io.github.ben-manes.versions") version "0.65.0"
+    id("io.github.ben-manes.versions") version "0.66.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
     id("org.springframework.boot") version "4.1.1"

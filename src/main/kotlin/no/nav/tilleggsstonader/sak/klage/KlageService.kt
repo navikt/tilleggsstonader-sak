@@ -1,18 +1,24 @@
 package no.nav.tilleggsstonader.sak.klage
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingEventType
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingResultat
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.UUID
@@ -22,6 +28,8 @@ class KlageService(
     private val fagsakService: FagsakService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
+    private val ytelseService: YtelseService,
+    private val unleashService: UnleashService,
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -42,12 +50,18 @@ class KlageService(
             boutgifter = klagebehandlingerPåEksternId[fagsaker.boutgifter?.eksternId?.id] ?: emptyList(),
             dagligReiseTso = klagebehandlingerPåEksternId[fagsaker.dagligReiseTso?.eksternId?.id] ?: emptyList(),
             dagligReiseTsr = klagebehandlingerPåEksternId[fagsaker.dagligReiseTsr?.eksternId?.id] ?: emptyList(),
-            reiseTilSamlingTso = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTso?.eksternId?.id] ?: emptyList(),
-            reiseTilSamlingTsr = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTsr?.eksternId?.id] ?: emptyList(),
+            reiseTilSamlingTso =
+                klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTso?.eksternId?.id]
+                    ?: emptyList(),
+            reiseTilSamlingTsr =
+                klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTsr?.eksternId?.id]
+                    ?: emptyList(),
             reiseOppstartAvslutningHjemreiseTso =
-                klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTso?.eksternId?.id] ?: emptyList(),
+                klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTso?.eksternId?.id]
+                    ?: emptyList(),
             reiseOppstartAvslutningHjemreiseTsr =
-                klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTsr?.eksternId?.id] ?: emptyList(),
+                klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTsr?.eksternId?.id]
+                    ?: emptyList(),
             flyttingTso = klagebehandlingerPåEksternId[fagsaker.flyttingTso?.eksternId?.id] ?: emptyList(),
             flyttingTsr = klagebehandlingerPåEksternId[fagsaker.flyttingTsr?.eksternId?.id] ?: emptyList(),
         )
@@ -85,8 +99,22 @@ class KlageService(
                 fagsystem = Fagsystem.TILLEGGSSTONADER,
                 klageMottatt = klageMottatt,
                 behandlendeEnhet = enhetId,
+                gjelderAktivitetspenger = gjelderAktivitetspenger(aktivIdent, fagsak.stønadstype),
             ),
         )
+    }
+
+    private fun gjelderAktivitetspenger(
+        aktivIdent: String,
+        stønadstype: Stønadstype,
+    ): Boolean {
+        if (!unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER)) {
+            return false
+        }
+        if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
+            return false
+        }
+        return ytelseService.harAktivitetspengerIDagEllerFremITid(aktivIdent)
     }
 
     private fun brukVedtaksdatoFraKlageinstansHvisOversendt(klagebehandling: KlagebehandlingDto): KlagebehandlingDto {

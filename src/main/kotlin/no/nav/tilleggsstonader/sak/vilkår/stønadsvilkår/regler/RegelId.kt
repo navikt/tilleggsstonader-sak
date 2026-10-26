@@ -47,9 +47,10 @@ enum class RegelId(
     HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE("Har bruker dokumenterte utgifter til drosje?"),
 
     // FLYTTING
+    HAR_UTGIFTER_TIL_FLYTTING("Har bruker utgifter til flyttingen?"),
     HVILKEN_FORBINDELSE_FLYTTER_BRUKER("I hvilken forbindelse flytter bruker?"),
-    MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET("Må bruker flytte til/fra hjemsted for å gjennomføre aktiviteten?"),
-    FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET("Flytter bruker i forbindelse med arbeid etter at aktiviteten er gjennomført?"),
+    MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET("Må bruker flytte fra/til hjemsted?"),
+    FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET("Må bruker flytte i forbindelse med arbeid etter gjennomført tiltak eller utdanning?"),
     MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID("Må bruker flytte fra hjemstedet for å starte i arbeid på et annet sted?"),
     HVORDAN_SKAL_BRUKER_FLYTTE("Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?"),
 }

@@ -21,7 +21,11 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockIsEnabled
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -40,11 +44,17 @@ internal class KlageServiceTest {
 
     private val klageClient = mockk<KlageClient>()
 
+    private val ytelseService = mockk<YtelseService>()
+
+    private val unleashService = mockUnleashService()
+
     private val klageService =
         KlageService(
             fagsakService,
             arbeidsfordelingService,
             klageClient,
+            ytelseService,
+            unleashService,
         )
 
     private val fagsakId = FagsakId.random()
@@ -67,6 +77,7 @@ internal class KlageServiceTest {
                 "Nav arbeid og ytelser",
             )
         justRun { klageClient.opprettKlage(capture(opprettKlageSlot)) }
+        every { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) } returns false
     }
 
     @Nested
@@ -84,6 +95,27 @@ internal class KlageServiceTest {
             assertThat(request.fagsystem).isEqualTo(Fagsystem.TILLEGGSSTONADER)
             assertThat(request.klageMottatt).isEqualTo(klageMottattTidspunkt)
             assertThat(request.behandlendeEnhet).isEqualTo(arbeidsfordelingEnhetNr)
+            assertThat(request.gjelderAktivitetspenger).isFalse()
+        }
+
+        @Test
+        internal fun `skal markere klage som aktivitetspenger når bruker har aktivitetspenger`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) } returns true
+
+            klageService.opprettKlage(fagsak.id, OpprettKlageDto(LocalDate.now()))
+
+            assertThat(opprettKlageSlot.captured.gjelderAktivitetspenger).isTrue()
+        }
+
+        @Test
+        internal fun `skal ikke markere klage som aktivitetspenger når toggle er av`() {
+            unleashService.mockIsEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER, false)
+            every { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) } returns true
+
+            klageService.opprettKlage(fagsak.id, OpprettKlageDto(LocalDate.now()))
+
+            assertThat(opprettKlageSlot.captured.gjelderAktivitetspenger).isFalse()
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
         }
     }
 
