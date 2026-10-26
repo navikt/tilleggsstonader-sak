@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -25,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
@@ -46,6 +46,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
@@ -56,13 +57,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -151,6 +154,11 @@ class InterntVedtakService(
                     )
                 }
 
+                is InnvilgelseEllerOpphørFlytting ->
+                    BeregningsresultatInterntVedtakDto(
+                        flytting = data.beregningsresultat.tilInterntVedtak(),
+                    )
+
                 is Innvilgelse,
                 -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
@@ -218,6 +226,7 @@ class InterntVedtakService(
             is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseDagligReise -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseReiseTilSamling -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseEllerOpphørFlytting -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is Avslag, is Opphør -> emptyList()
             else -> {
                 error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
@@ -400,6 +409,21 @@ class InterntVedtakService(
             }
         }
 
+    private fun BeregningsresultatFlytting.tilInterntVedtak() =
+        BeregningsresultatFlyttingInterntVedtak(
+            resultater =
+                resultater.map {
+                    BeregningsresultatFlyttevilkårInterntVedtak(
+                        fraTidligereVedtak = it.fraTidligereVedtak,
+                        fom = it.fom,
+                        tom = it.tom,
+                        grunnlag = it.grunnlag,
+                        beløp = it.beløp,
+                        målgruppe = it.målgruppe,
+                    )
+                },
+        )
+
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
         val barn = this[barnId] ?: error("Finner ikke barn=$barnId")
         return barn.fødselsdato ?: error("Mangler fødselsdato for barn=$barnId")
@@ -414,6 +438,8 @@ class InterntVedtakService(
             Stønadstype.DAGLIG_REISE_TSR -> {}
             Stønadstype.REISE_TIL_SAMLING_TSO -> {}
             Stønadstype.REISE_TIL_SAMLING_TSR -> {}
+            Stønadstype.FLYTTING_TSO -> {}
+            Stønadstype.FLYTTING_TSR -> {}
 
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }
@@ -421,7 +447,26 @@ class InterntVedtakService(
 
     private fun mapVilkårFakta(fakta: VilkårFakta?): VilkårFaktaInterntVedtak? =
         when (fakta) {
-            is FlyttingVilkårFakta -> feil("Internt vedtak for flytting støttes ikke ennå")
+            is FaktaFlyttebyrå ->
+                VilkårFaktaFlyttebyråInterntVedtak(
+                    tilbud = fakta.tilbud,
+                    erBetalingDokumentert = fakta.erBetalingDokumentert,
+                    nødvendigUtgift = fakta.nødvendigUtgift,
+                    adresse = fakta.adresse,
+                )
+
+            is FaktaFlytteSelv ->
+                VilkårFaktaFlytteSelvInterntVedtak(
+                    avstandEnVei = fakta.avstandEnVei,
+                    henger = fakta.henger,
+                    bompenger = fakta.bompenger,
+                    ferge = fakta.ferge,
+                    parkering = fakta.parkering,
+                    nødvendigUtgift = fakta.nødvendigUtgift,
+                    adresse = fakta.adresse,
+                )
+
+            is FaktaFlyttingUbestemt -> VilkårFaktaFlyttingUbestemtInterntVedtak(adresse = fakta.adresse)
             is FaktaDagligReiseOffentligTransport ->
                 VilkårFaktaOffentligTransportInterntVedtak(
                     reisedagerPerUke = fakta.reisedagerPerUke,
@@ -441,7 +486,7 @@ class InterntVedtakService(
                 )
 
             is FaktaDagligReiseUbestemt ->
-                VilkårFaktaUbestemtInterntVedtak(
+                VilkårReiseFaktaUbestemtInterntVedtak(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
                 )
