@@ -121,11 +121,11 @@ data class BehandlingFaktaFlyttingDto(
 ) : BehandlingFaktaDto
 
 data class FaktaFlyttingDetaljer(
-    val årsak: Flytteårsak?,
-    val flyttedato: LocalDate?,
-    val adresse: FaktaFlytteadresse?,
-    val flyttemåte: Flyttemåte?,
-    val utgifterDekketPåAnnenMåte: JaNei?,
+    val årsak: Flytteårsak,
+    val flyttedato: LocalDate,
+    val adresse: FaktaFlytteadresse,
+    val flyttemåte: Flyttemåte,
+    val utgifterDekketPåAnnenMåte: JaNei,
     val utgifterEgenFlytting: FaktaUtgifterEgenFlytting?,
     val flyttetilbud: List<FaktaFlyttetilbud>?,
 )
@@ -138,7 +138,7 @@ data class FaktaFlytteadresse(
 )
 
 data class FaktaUtgifterEgenFlytting(
-    val avstand: BigDecimal?,
+    val avstand: BigDecimal,
     val hengerleie: BigDecimal?,
     val bom: BigDecimal?,
     val parkering: BigDecimal?,
@@ -147,8 +147,8 @@ data class FaktaUtgifterEgenFlytting(
 )
 
 data class FaktaFlyttetilbud(
-    val navn: String?,
-    val beløp: BigDecimal?,
+    val navn: String,
+    val beløp: BigDecimal,
 )
 
 data class FaktaAvreiseadresse(

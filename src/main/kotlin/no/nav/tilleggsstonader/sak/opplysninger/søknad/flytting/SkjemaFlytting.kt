@@ -16,17 +16,17 @@ data class SkjemaFlytting(
 )
 
 data class FlyttingDetaljer(
-    val årsak: Flytteårsak?,
-    val flyttedato: LocalDate?,
-    val adresse: Adresse?,
-    val flyttemåte: Flyttemåte?,
-    val utgifterDekketPåAnnenMåte: JaNei?,
+    val årsak: Flytteårsak,
+    val flyttedato: LocalDate,
+    val adresse: Adresse,
+    val flyttemåte: Flyttemåte,
+    val utgifterDekketPåAnnenMåte: JaNei,
     val utgifterEgenFlytting: UtgifterEgenFlytting?,
     val flyttetilbud: List<Flyttetilbud>?,
 )
 
 data class UtgifterEgenFlytting(
-    val avstand: BigDecimal?,
+    val avstand: BigDecimal,
     val hengerleie: BigDecimal?,
     val bom: BigDecimal?,
     val parkering: BigDecimal?,
@@ -35,6 +35,6 @@ data class UtgifterEgenFlytting(
 )
 
 data class Flyttetilbud(
-    val navn: String?,
-    val beløp: BigDecimal?,
+    val navn: String,
+    val beløp: BigDecimal,
 )
