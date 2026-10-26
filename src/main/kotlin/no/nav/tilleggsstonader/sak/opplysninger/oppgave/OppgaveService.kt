@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
@@ -144,6 +145,10 @@ class OppgaveService(
             oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)
         val oppgave = hentOppgave(gsakOppgaveId)
 
+        if (saksbehandler != null) {
+            validerKanTildelesAktivitetspengerOppgave(oppgave)
+        }
+
         finnOppgave?.let { it ->
             oppgaveRepository.update(it.copy(tilordnetSaksbehandler = saksbehandler))
         }
@@ -157,6 +162,18 @@ class OppgaveService(
             )
 
         return medMetadata(oppdatertOppgave)
+    }
+
+    /**
+     * Kun saksbehandlere med [Toggle.KAN_BEHANDLE_AKTIVITETSPENGER] kan plukke aktivitetspenger oppgaver.
+     */
+    private fun validerKanTildelesAktivitetspengerOppgave(oppgave: Oppgave) {
+        brukerfeilHvis(
+            OppgaveUtil.gjelderAktivitetspenger(oppgave.behandlingstype) &&
+                !unleashService.isEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER),
+        ) {
+            "Oppgaven gjelder aktivitetspenger og kan kun tildeles saksbehandlere som jobber med aktivitetspenger"
+        }
     }
 
     private fun medMetadata(oppdatertOppgave: Oppgave): OppgaveMedMetadata =
@@ -447,13 +464,32 @@ class OppgaveService(
         }
 
     fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
+        validerKanTildelesVedBeholdOppgave(settPåVent.oppgaveId, settPåVent.beholdOppgave)
         logger.info("Setter oppgave ${settPåVent.oppgaveId} på vent")
         return oppgaveClient.settPåVent(settPåVent)
     }
 
-    fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse = oppgaveClient.oppdaterPåVent(oppdaterPåVent)
+    fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
+        validerKanTildelesVedBeholdOppgave(oppdaterPåVent.oppgaveId, oppdaterPåVent.beholdOppgave)
+        return oppgaveClient.oppdaterPåVent(oppdaterPåVent)
+    }
 
-    fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse = oppgaveClient.taAvVent(taAvVent)
+    fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
+        validerKanTildelesVedBeholdOppgave(taAvVent.oppgaveId, taAvVent.beholdOppgave)
+        return oppgaveClient.taAvVent(taAvVent)
+    }
+
+    /**
+     * Når oppgaven beholdes tildeles den innlogget saksbehandler, så samme sperre som ved fordeling må gjelde.
+     */
+    private fun validerKanTildelesVedBeholdOppgave(
+        oppgaveId: Long,
+        beholdOppgave: Boolean,
+    ) {
+        if (beholdOppgave) {
+            validerKanTildelesAktivitetspengerOppgave(hentOppgave(oppgaveId))
+        }
+    }
 
     private fun Map<String, PdlPersonKort>.visningsnavnFor(oppgave: Oppgave) =
         oppgave.ident

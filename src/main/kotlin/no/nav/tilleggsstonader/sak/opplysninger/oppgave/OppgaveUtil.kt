@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -21,6 +22,10 @@ object OppgaveUtil {
             Enhet.VIKAFOSSEN.enhetsnr,
             Enhet.NAV_EGNE_ANSATTE_OSLO.enhetsnr,
         )
+
+    fun gjelderAktivitetspenger(behandlingstype: String?): Boolean =
+        behandlingstype == Behandlingstype.Aktivitetspenger.value ||
+            behandlingstype == Behandlingstype.AktivitetspengerKlage.value
 
     fun utledBehandlesAvApplikasjon(oppgavetype: Oppgavetype) =
         when (oppgavetype) {

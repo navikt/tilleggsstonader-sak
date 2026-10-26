@@ -138,6 +138,7 @@ fun eksternOppgave(
     aktivDato: LocalDate = 1 januar 2026,
     bruker: OppgaveBruker? = null,
     tilordnetRessurs: String? = null,
+    behandlingstype: String? = null,
 ) = Oppgave(
     id = id,
     tildeltEnhetsnr = tildeltEnhetsnr,
@@ -149,6 +150,7 @@ fun eksternOppgave(
     aktivDato = aktivDato,
     bruker = bruker,
     tilordnetRessurs = tilordnetRessurs,
+    behandlingstype = behandlingstype,
 )
 
 fun oppgave(
