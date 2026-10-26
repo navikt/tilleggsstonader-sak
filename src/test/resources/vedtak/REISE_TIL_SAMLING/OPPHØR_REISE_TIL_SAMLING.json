@@ -5,6 +5,7 @@
     "omfang": "FRA_DATO"
   },
   "beregningsresultat": {
+    "drosje": [ ],
     "offentligTransport": [ {
       "aktivitetId": null,
       "begrunnelse": "diurgierhug",
@@ -25,8 +26,7 @@
       },
       "reiseId": "01a01909-7c2e-72dc-a318-f8c08154a603"
     } ],
-    "privatBil": [ ],
-    "drosje": [ ]
+    "privatBil": [ ]
   },
   "type": "OPPHØR_REISE_TIL_SAMLING",
   "vedtaksperioder": [ {
