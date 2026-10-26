@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
@@ -43,7 +44,6 @@ import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 
 @Service
 class OppgaveService(
@@ -227,7 +227,7 @@ class OppgaveService(
     private fun utledBehandlingstype(
         personIdent: String,
         behandlingId: BehandlingId?,
-        stønadstype: Stønadstype
+        stønadstype: Stønadstype,
     ): Behandlingstype? {
         if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
             return null
