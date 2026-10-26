@@ -247,6 +247,7 @@ class FlyttingVilkårValideringTest {
                 lagreVilkår(
                     svar =
                         mapOf(
+                            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                                 SvarOgBegrunnelse(
                                     SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -266,6 +267,7 @@ class FlyttingVilkårValideringTest {
                 lagreVilkår(
                     svar =
                         mapOf(
+                            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                                 SvarOgBegrunnelse(SvarId.ARBEID_ETTER_GJENNOMFØRT_AKTIVITET, "Arbeid"),
                             RegelId.FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET to SvarOgBegrunnelse(SvarId.NEI, "Nei"),

@@ -46,6 +46,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     private val svarFramTilFlyttemåte =
         arrayOf(
+            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                 SvarOgBegrunnelseDto(
                     SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -304,6 +305,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 flyttedato = 1 januar 2026,
                 svar =
                     mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                             SvarOgBegrunnelseDto(
                                 SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -322,6 +324,25 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(kall.vilkårFlytting.hentVilkår(behandling.id)).containsExactly(opprettet)
     }
 
+    @Test
+    fun `skal gi ikke oppfylt når bruker ikke har utgifter til flyttingen`() {
+        val nyttVilkår =
+            LagreVilkårFlyttingDto(
+                flyttedato = 1 januar 2026,
+                svar =
+                    mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to
+                            SvarOgBegrunnelseDto(SvarId.NEI, "Bruker har ingen utgifter til flyttingen"),
+                    ),
+                fakta = FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
+            )
+
+        val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkår)
+
+        assertThat(opprettet.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertLagretVilkår(nyttVilkår, opprettet)
+    }
+
     private fun assertLagretVilkår(
         request: LagreVilkårFlyttingDto,
         resultat: VilkårFlyttingDto,
@@ -331,7 +352,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(resultat.fakta).usingRecursiveComparison().isEqualTo(request.fakta)
         assertThat(resultat.delvilkårsett).hasSize(1)
         val vurderinger = resultat.delvilkårsett.single().vurderinger
-        val forventedeRegelIder = request.svar.keys.ifEmpty { setOf(RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER) }
+        val forventedeRegelIder = request.svar.keys.ifEmpty { setOf(RegelId.HAR_UTGIFTER_TIL_FLYTTING) }
         assertThat(vurderinger.map { it.regelId }).containsExactlyElementsOf(forventedeRegelIder)
         vurderinger.forEach { vurdering ->
             val svar = request.svar[vurdering.regelId]
