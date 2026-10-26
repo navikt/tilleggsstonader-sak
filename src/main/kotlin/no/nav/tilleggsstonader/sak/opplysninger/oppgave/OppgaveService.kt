@@ -43,6 +43,7 @@ import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 
 @Service
 class OppgaveService(
@@ -202,7 +203,7 @@ class OppgaveService(
                 oppgave,
                 enhetsnummer,
                 mappeId,
-                behandlingstype ?: utledBehandlingstype(personIdent, behandlingId),
+                behandlingstype ?: utledBehandlingstype(personIdent, behandlingId, stønadstype),
             )
         val oppgave =
             OppgaveDomain(
@@ -226,13 +227,19 @@ class OppgaveService(
     private fun utledBehandlingstype(
         personIdent: String,
         behandlingId: BehandlingId?,
+        stønadstype: Stønadstype
     ): Behandlingstype? {
+        if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
+            return null
+        }
+
         val gjelderAktivitetspenger =
             if (behandlingId != null) {
                 ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
             } else {
                 ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
             }
+
         return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
     }
 
