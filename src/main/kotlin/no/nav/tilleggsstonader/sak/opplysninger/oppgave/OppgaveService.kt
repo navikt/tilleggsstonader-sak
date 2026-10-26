@@ -21,10 +21,12 @@ import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalHåndteresAvTSSak
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
@@ -55,6 +57,7 @@ class OppgaveService(
     private val personService: PersonService,
     private val klageService: KlageService,
     private val ytelseService: YtelseService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -229,6 +232,9 @@ class OppgaveService(
         behandlingId: BehandlingId?,
         stønadstype: Stønadstype,
     ): Behandlingstype? {
+        if (!unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER)) {
+            return null
+        }
         if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
             return null
         }

@@ -9,11 +9,13 @@ import no.nav.tilleggsstonader.kontrakter.klage.BehandlingResultat
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
@@ -27,6 +29,7 @@ class KlageService(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
     private val ytelseService: YtelseService,
+    private val unleashService: UnleashService,
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -105,6 +108,9 @@ class KlageService(
         aktivIdent: String,
         stønadstype: Stønadstype,
     ): Boolean {
+        if (!unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER)) {
+            return false
+        }
         if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
             return false
         }

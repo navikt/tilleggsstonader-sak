@@ -33,6 +33,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockIsEnabled
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
@@ -65,6 +68,7 @@ internal class OppgaveServiceTest {
     private val personService = mockk<PersonService>(relaxed = true)
     private val klageService = mockk<KlageService>(relaxed = true)
     private val ytelseService = mockk<YtelseService>()
+    private val unleashService = mockUnleashService()
 
     private val oppgaveService =
         OppgaveService(
@@ -76,6 +80,7 @@ internal class OppgaveServiceTest {
             personService = personService,
             klageService = klageService,
             ytelseService = ytelseService,
+            unleashService = unleashService,
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
@@ -184,6 +189,18 @@ internal class OppgaveServiceTest {
             )
 
             assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Tilbakekreving.value)
+        }
+
+        @Test
+        fun `skal ikke slå opp ung-sak eller sette behandlingstype når toggle er av`() {
+            unleashService.mockIsEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER, false)
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            assertThat(slot.captured.behandlingstype).isNull()
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
         }
 
         @Test
