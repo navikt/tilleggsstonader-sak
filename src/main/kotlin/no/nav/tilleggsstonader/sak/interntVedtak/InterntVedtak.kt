@@ -207,7 +207,7 @@ data class VilkårFaktaReiseTilSamlingDrosjeInterntVedtak(
     val utgifterDrosje: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.REISE_TIL_SAMLING_DROSJE
 }
 

@@ -97,27 +97,11 @@ data class FaktaReiseTilSamlingDrosjeDto(
     ) = FaktaDrosje(
         reiseId = reiseId,
         adresse = adresse,
-        nødvendigUtgift = nødvendigUtgift.tilDomain(),
+        nødvendigUtgift = nødvendigUtgift.tilDomene(),
         utgifterDrosje = utgifterDrosje,
         begrunnelse = begrunnelse,
         aktivitetId = aktivitet?.aktivitetId,
     )
-}
-
-data class NødvendigUtgiftDto(
-    val erUtgiftenNødvendig: SvarJaNei,
-    val begrunnelse: String?,
-) {
-    fun tilDomain(): NødvendigUtgift {
-        feilHvis(erUtgiftenNødvendig == SvarJaNei.GAMMEL_MANGLER_DATA) {
-            "erNødvendig kan ikke settes til GAMMEL_MANGLER_DATA ved oppretting eller oppdatering"
-        }
-
-        return NødvendigUtgift(
-            erUtgiftenNødvendig = erUtgiftenNødvendig,
-            begrunnelse = begrunnelse?.ifBlank { null },
-        )
-    }
 }
 
 data object FaktaReiseTilSamlingUbestemtDto : FaktaReiseTilSamlingDto {
