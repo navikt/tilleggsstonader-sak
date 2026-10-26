@@ -21,7 +21,7 @@ data class BeregningsresultatFlyttevilkår(
 
 fun BeregningsresultatFlyttevilkår.skalUtbetales(): Boolean =
     when (val beregningsgrunnlag = grunnlag) {
-        is BeregningsgrunnlagFlyttebyrå -> beregningsgrunnlag.erBetalingDokumentert
+        is BeregningsgrunnlagFlyttebyrå -> beregningsgrunnlag.erUtgifterDokumentert
         is BeregningsgrunnlagFlytteSelv -> beregningsgrunnlag.erUtgifterDokumentert
     }
 
@@ -39,7 +39,7 @@ sealed interface BeregningsgrunnlagFlytting
 
 data class BeregningsgrunnlagFlyttebyrå(
     val tilbud: List<BeregningsgrunnlagFlyttebyråTilbud>,
-    val erBetalingDokumentert: Boolean,
+    val erUtgifterDokumentert: Boolean,
 ) : BeregningsgrunnlagFlytting {
     init {
         require(tilbud.filter { it.erValgt }.size == 1) { "Det må være nøyaktig ett valgt tilbud" }

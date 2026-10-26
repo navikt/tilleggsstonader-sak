@@ -93,7 +93,7 @@ class FlyttingBeregningServiceTest {
                                     FlyttebyråTilbud(navn = "Byrå A", pris = 124),
                                     FlyttebyråTilbud(navn = "Byrå B", pris = 123),
                                 ),
-                            erBetalingDokumentert = true,
+                            erUtgifterDokumentert = true,
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -111,7 +111,7 @@ class FlyttingBeregningServiceTest {
                             BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("124"), erValgt = false),
                             BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123"), erValgt = true),
                         ),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 ),
             )
         assertThat(resultat.målgruppe).isEqualTo(periode.målgruppe)
@@ -487,7 +487,7 @@ class FlyttingBeregningServiceTest {
             ),
     ) = FaktaFlyttebyrå(
         tilbud = tilbud,
-        erBetalingDokumentert = true,
+        erUtgifterDokumentert = true,
         adresse = "Flytteveien 1",
         nødvendigUtgift = nødvendigUtgift,
     )
@@ -525,7 +525,7 @@ class FlyttingBeregningServiceTest {
                         BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("500"), erValgt = true),
                         BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("600"), erValgt = false),
                     ),
-                erBetalingDokumentert = true,
+                erUtgifterDokumentert = true,
             ),
     )
 

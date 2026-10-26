@@ -98,7 +98,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
     fun `udokumentert byrå gir ingen andeler for TSO eller TSR`() {
         listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
             assertThat(
-                resultat(1 januar 2026, erBetalingDokumentert = false).mapTilAndeler(stønadstype),
+                resultat(1 januar 2026, erUtgifterDokumentert = false).mapTilAndeler(stønadstype),
             ).isEmpty()
         }
     }
@@ -123,8 +123,8 @@ class FlyttingAndelTilkjentYtelseMapperTest {
             )
         val blandet =
             BeregningsresultatFlytting(
-                resultat(dato, erBetalingDokumentert = false).resultater +
-                    resultat(dato, erBetalingDokumentert = true).resultater +
+                resultat(dato, erUtgifterDokumentert = false).resultater +
+                    resultat(dato, erUtgifterDokumentert = true).resultater +
                     egenKjøring +
                     egenKjøring.copy(
                         grunnlag = (egenKjøring.grunnlag as BeregningsgrunnlagFlytteSelv).copy(erUtgifterDokumentert = false),
@@ -144,7 +144,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
 
     private fun resultat(
         fom: java.time.LocalDate,
-        erBetalingDokumentert: Boolean = true,
+        erUtgifterDokumentert: Boolean = true,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     ) = BeregningsresultatFlytting(
         listOf(
@@ -158,7 +158,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                                 BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
                                 BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
                             ),
-                        erBetalingDokumentert = erBetalingDokumentert,
+                        erUtgifterDokumentert = erUtgifterDokumentert,
                     ),
                 beløp = BigDecimal("100"),
                 målgruppe = målgruppe,

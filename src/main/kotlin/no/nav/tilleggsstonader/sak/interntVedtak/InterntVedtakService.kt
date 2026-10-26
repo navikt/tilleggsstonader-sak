@@ -450,7 +450,7 @@ class InterntVedtakService(
             is FaktaFlyttebyrå ->
                 VilkårFaktaFlyttebyråInterntVedtak(
                     tilbud = fakta.tilbud,
-                    erBetalingDokumentert = fakta.erBetalingDokumentert,
+                    erUtgifterDokumentert = fakta.erUtgifterDokumentert,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     adresse = fakta.adresse,
                 )

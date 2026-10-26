@@ -21,7 +21,7 @@
         "fom": "2025-01-15",
         "fraTidligereVedtak": true,
         "grunnlag": {
-          "erBetalingDokumentert": true,
+          "erUtgifterDokumentert": true,
           "tilbud": [ {
             "erValgt": false,
             "navn": "Flyttebyrå A",
@@ -124,7 +124,7 @@
     } ],
     "fakta": {
       "adresse": "Flytteveien 1, 1234 Oslo",
-      "erBetalingDokumentert": true,
+      "erUtgifterDokumentert": true,
       "nødvendigUtgift": {
         "begrunnelse": null,
         "erUtgiftenNødvendig": "JA"

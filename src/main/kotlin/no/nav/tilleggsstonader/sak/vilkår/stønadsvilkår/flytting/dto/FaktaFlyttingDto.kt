@@ -28,7 +28,7 @@ enum class TypeFaktaFlytting {
 
 data class FaktaFlyttebyråDto(
     val tilbud: List<FlyttebyråTilbudDto>,
-    val erBetalingDokumentert: Boolean,
+    val erUtgifterDokumentert: Boolean,
     val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
 ) : FaktaFlyttingDto {

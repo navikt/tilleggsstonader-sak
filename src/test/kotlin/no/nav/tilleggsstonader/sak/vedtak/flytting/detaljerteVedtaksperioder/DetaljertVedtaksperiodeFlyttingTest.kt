@@ -98,7 +98,7 @@ class DetaljertVedtaksperiodeFlyttingTest {
                             BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
                             BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("100"), erValgt = false),
                         ),
-                    erBetalingDokumentert = dokumentert,
+                    erUtgifterDokumentert = dokumentert,
                 )
             },
     )

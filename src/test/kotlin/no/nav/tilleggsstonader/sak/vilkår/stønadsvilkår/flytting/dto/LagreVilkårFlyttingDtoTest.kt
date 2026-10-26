@@ -49,7 +49,7 @@ class LagreVilkårFlyttingDtoTest {
                   "type": "FLYTTING_FLYTTEBYRÅ",
                   "tilbud": [{"navn": "Flyttebyrå A"}, {}],
                   "adresse": "Flytteveien 1",
-                  "erBetalingDokumentert": false,
+                  "erUtgifterDokumentert": false,
                   "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}
                 }
                 """.trimIndent(),
@@ -63,7 +63,7 @@ class LagreVilkårFlyttingDtoTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erBetalingDokumentert = false,
+                erUtgifterDokumentert = false,
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )

@@ -32,7 +32,7 @@ class FlyttingVilkårValideringTest {
                             FlyttebyråTilbud(navn = null, pris = null),
                         ),
                     adresse = "Flytteveien 1",
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                     nødvendigUtgift = nødvendigUtgift,
                 ),
             )
@@ -50,7 +50,7 @@ class FlyttingVilkårValideringTest {
                             FlyttebyråTilbud(navn = " flyttebyrå a ", pris = 12000),
                         ),
                     adresse = "Flytteveien 1",
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                     nødvendigUtgift = nødvendigUtgift,
                 ),
             )
@@ -69,7 +69,7 @@ class FlyttingVilkårValideringTest {
                     FlyttingVilkårValidering.validerOppgitteFakta(
                         FaktaFlyttebyrå(
                             tilbud = tilbud,
-                            erBetalingDokumentert = true,
+                            erUtgifterDokumentert = true,
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -94,7 +94,7 @@ class FlyttingVilkårValideringTest {
                     FaktaFlyttebyrå(
                         tilbud = tilbud,
                         adresse = "Flytteveien 1",
-                        erBetalingDokumentert = true,
+                        erUtgifterDokumentert = true,
                         nødvendigUtgift = nødvendigUtgift,
                     ),
                 )
@@ -128,7 +128,7 @@ class FlyttingVilkårValideringTest {
                 FaktaFlytteSelv(null, null, null, null, null, nødvendigUtgift, adresse, erUtgifterDokumentert = true),
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null)),
-                    erBetalingDokumentert = false,
+                    erUtgifterDokumentert = false,
                     adresse = adresse,
                     nødvendigUtgift = nødvendigUtgift,
                 ),
@@ -174,7 +174,7 @@ class FlyttingVilkårValideringTest {
                                     FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
                                 ),
                             adresse = "Flytteveien 1",
-                            erBetalingDokumentert = false,
+                            erUtgifterDokumentert = false,
                             nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
@@ -206,7 +206,7 @@ class FlyttingVilkårValideringTest {
                             FaktaFlyttebyrå(
                                 tilbud = tilbud,
                                 adresse = "Flytteveien 1",
-                                erBetalingDokumentert = false,
+                                erUtgifterDokumentert = false,
                                 nødvendigUtgift = nødvendigUtgift,
                             ),
                     ),
@@ -296,7 +296,7 @@ class FlyttingVilkårValideringTest {
                                     FlyttebyråTilbud("Flyttebyrå A", 10000),
                                     FlyttebyråTilbud("Flyttebyrå B", 12000),
                                 ),
-                            erBetalingDokumentert = false,
+                            erUtgifterDokumentert = false,
                             nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Utgiften er for høy"),
                             adresse = "Flytteveien 1",
                         ),

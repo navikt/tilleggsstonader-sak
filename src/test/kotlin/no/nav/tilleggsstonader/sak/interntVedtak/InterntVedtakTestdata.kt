@@ -1319,7 +1319,7 @@ object InterntVedtakTestdata {
                                     FlyttebyråTilbud("Flyttebyrå A", 12000),
                                     FlyttebyråTilbud("Flyttebyrå B", 10000),
                                 ),
-                            erBetalingDokumentert = true,
+                            erUtgifterDokumentert = true,
                             nødvendigUtgift = NødvendigUtgift(SvarJaNeiReiseTilSamling.JA, null),
                             adresse = "Flytteveien 1, 1234 Oslo",
                         ),
@@ -1433,7 +1433,7 @@ object InterntVedtakTestdata {
                                                 true,
                                             ),
                                         ),
-                                    erBetalingDokumentert = true,
+                                    erUtgifterDokumentert = true,
                                 ),
                         ),
                         BeregningsresultatFlyttevilkår(

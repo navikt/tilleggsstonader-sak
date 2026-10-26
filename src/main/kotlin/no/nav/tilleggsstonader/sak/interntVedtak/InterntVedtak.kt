@@ -217,7 +217,7 @@ data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
 
 data class VilkårFaktaFlyttebyråInterntVedtak(
     val tilbud: List<FlyttebyråTilbud>,
-    val erBetalingDokumentert: Boolean,
+    val erUtgifterDokumentert: Boolean,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
 ) : VilkårFaktaInterntVedtak {

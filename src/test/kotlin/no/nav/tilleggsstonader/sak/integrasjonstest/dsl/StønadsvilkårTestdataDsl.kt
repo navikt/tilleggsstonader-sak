@@ -68,7 +68,7 @@ class StønadsvilkårTestdataDsl {
     fun flyttingByrå(
         flyttedato: LocalDate,
         tilbudPriser: List<Int>,
-        erBetalingDokumentert: Boolean,
+        erUtgifterDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
@@ -81,7 +81,7 @@ class StønadsvilkårTestdataDsl {
                                 FlyttebyråTilbudDto(navn = "Syntetisk tilbud ${index + 1}", pris = pris)
                             },
                         adresse = "Syntetisk adresse",
-                        erBetalingDokumentert = erBetalingDokumentert,
+                        erUtgifterDokumentert = erUtgifterDokumentert,
                         nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
                     ),
             )

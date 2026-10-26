@@ -161,7 +161,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -217,7 +217,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = false,
+                    erUtgifterDokumentert = false,
                 )
             }
         }

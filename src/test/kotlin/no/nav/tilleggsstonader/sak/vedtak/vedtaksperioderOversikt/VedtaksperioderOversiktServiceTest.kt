@@ -313,7 +313,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                                                                 erValgt = false,
                                                             ),
                                                         ),
-                                                    erBetalingDokumentert = true,
+                                                    erUtgifterDokumentert = true,
                                                 ),
                                         ),
                                     ),

@@ -62,7 +62,7 @@ class InterntVedtakFlyttingMappingTest {
             val flyttebyråFakta =
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud("Byrå A", 1200), FlyttebyråTilbud("Byrå B", 1000)),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                     nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
                     adresse = "Flytteveien 1",
                 )
@@ -89,7 +89,7 @@ class InterntVedtakFlyttingMappingTest {
                 .isEqualTo(
                     VilkårFaktaFlyttebyråInterntVedtak(
                         tilbud = flyttebyråFakta.tilbud,
-                        erBetalingDokumentert = true,
+                        erUtgifterDokumentert = true,
                         nødvendigUtgift = flyttebyråFakta.nødvendigUtgift,
                         adresse = "Flytteveien 1",
                     ),
@@ -234,7 +234,7 @@ class InterntVedtakFlyttingMappingTest {
                                         BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("1200"), false),
                                         BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("1000"), true),
                                     ),
-                                erBetalingDokumentert = true,
+                                erUtgifterDokumentert = true,
                             ),
                     ),
                 ),

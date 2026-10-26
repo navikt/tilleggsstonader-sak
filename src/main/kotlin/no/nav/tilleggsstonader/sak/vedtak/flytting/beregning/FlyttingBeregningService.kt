@@ -145,7 +145,7 @@ class FlyttingBeregningService(
         val grunnlag =
             BeregningsgrunnlagFlyttebyrå(
                 tilbud = tilbud.mapIndexed { indeks, tilbud -> tilbud.copy(erValgt = indeks == valgtTilbudIndeks) },
-                erBetalingDokumentert = fakta.erBetalingDokumentert,
+                erUtgifterDokumentert = fakta.erUtgifterDokumentert,
             )
         val beløp = tilbud[valgtTilbudIndeks].pris.avrundetStønadsbeløp()
 

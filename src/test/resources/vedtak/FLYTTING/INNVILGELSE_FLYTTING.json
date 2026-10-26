@@ -9,7 +9,7 @@
       "fom": "2026-01-01",
       "fraTidligereVedtak": false,
       "grunnlag": {
-        "erBetalingDokumentert": true,
+        "erUtgifterDokumentert": true,
         "tilbud": [ {
           "erValgt": true,
           "navn": "Syntetisk tilbud 1",
