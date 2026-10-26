@@ -95,6 +95,7 @@ class StønadsvilkårTestdataDsl {
         bompenger: Int? = null,
         ferge: Int? = null,
         parkering: Int? = null,
+        erUtgifterDokumentert: Boolean = true,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
@@ -102,6 +103,7 @@ class StønadsvilkårTestdataDsl {
                 svar = oppfylteSvarFlytteSelvDto(),
                 fakta =
                     FaktaFlytteSelvDto(
+                        erUtgifterDokumentert = erUtgifterDokumentert,
                         avstandEnVei = avstandEnVei,
                         henger = henger,
                         bompenger = bompenger,

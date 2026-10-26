@@ -22,7 +22,7 @@ data class BeregningsresultatFlyttevilkår(
 fun BeregningsresultatFlyttevilkår.skalUtbetales(): Boolean =
     when (val beregningsgrunnlag = grunnlag) {
         is BeregningsgrunnlagFlyttebyrå -> beregningsgrunnlag.erBetalingDokumentert
-        is BeregningsgrunnlagFlytteSelv -> true
+        is BeregningsgrunnlagFlytteSelv -> beregningsgrunnlag.erUtgifterDokumentert
     }
 
 enum class Flyttemåte {
@@ -60,4 +60,5 @@ data class BeregningsgrunnlagFlytteSelv(
     val bompenger: BigDecimal,
     val ferge: BigDecimal,
     val parkering: BigDecimal,
+    val erUtgifterDokumentert: Boolean,
 ) : BeregningsgrunnlagFlytting

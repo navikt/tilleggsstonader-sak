@@ -457,6 +457,7 @@ class InterntVedtakService(
 
             is FaktaFlytteSelv ->
                 VilkårFaktaFlytteSelvInterntVedtak(
+                    erUtgifterDokumentert = fakta.erUtgifterDokumentert,
                     avstandEnVei = fakta.avstandEnVei,
                     henger = fakta.henger,
                     bompenger = fakta.bompenger,

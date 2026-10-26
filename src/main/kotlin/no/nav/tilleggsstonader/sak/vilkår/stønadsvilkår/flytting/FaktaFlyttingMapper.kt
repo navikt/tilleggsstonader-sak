@@ -26,6 +26,7 @@ object FaktaFlyttingMapper {
 
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
+                    erUtgifterDokumentert = erUtgifterDokumentert,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     bompenger = bompenger,
@@ -50,6 +51,7 @@ object FaktaFlyttingMapper {
 
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
+                    erUtgifterDokumentert = erUtgifterDokumentert,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     bompenger = bompenger,

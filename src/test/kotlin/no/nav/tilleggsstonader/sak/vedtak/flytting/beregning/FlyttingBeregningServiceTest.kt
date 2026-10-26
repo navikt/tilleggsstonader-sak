@@ -42,6 +42,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -147,8 +149,9 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.beløp).isEqualByComparingTo(valgtTilbud.pris)
     }
 
-    @Test
-    fun `egen flytting beregnes med kilometersats og tilleggskostnader`() {
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `egen flytting beregnes med kilometersats og tilleggskostnader`(dokumentert: Boolean) {
         val periode = vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
@@ -156,6 +159,7 @@ class FlyttingBeregningServiceTest {
                     flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
+                            erUtgifterDokumentert = dokumentert,
                             avstandEnVei = 100,
                             henger = 100,
                             bompenger = 20,
@@ -173,6 +177,7 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = dokumentert,
                     avstandEnVei = 100,
                     sats = BigDecimal("2.88"),
                     satsBekreftet = true,
@@ -192,6 +197,7 @@ class FlyttingBeregningServiceTest {
                     flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
+                            erUtgifterDokumentert = true,
                             avstandEnVei = 1,
                             henger = null,
                             bompenger = null,
@@ -213,6 +219,7 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = true,
                     avstandEnVei = 1,
                     sats = BigDecimal("2.88"),
                     satsBekreftet = true,
@@ -492,6 +499,7 @@ class FlyttingBeregningServiceTest {
         ferge: Int? = 30,
         parkering: Int? = 40,
     ) = FaktaFlytteSelv(
+        erUtgifterDokumentert = true,
         avstandEnVei = avstandEnVei,
         henger = henger,
         bompenger = bompenger,

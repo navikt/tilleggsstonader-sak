@@ -70,6 +70,7 @@ data class FaktaFlytteSelv(
     val parkering: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
+    val erUtgifterDokumentert: Boolean,
 ) : FlyttingVilkårFakta
 
 data class FaktaFlyttingUbestemt(

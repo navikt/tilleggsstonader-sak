@@ -66,6 +66,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 ),
             fakta =
                 FaktaFlytteSelvDto(
+                    erUtgifterDokumentert = true,
                     avstandEnVei = 100,
                     henger = 1500,
                     bompenger = 300,
@@ -105,6 +106,49 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun `skal bevare alle innsendte felter ved lagring og henting av flyttevilkår`() {
+        val nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.NEI, "Deler av utgiften er ikke nødvendig")
+        val flyttebyrå =
+            FaktaFlyttebyråDto(
+                tilbud = listOf(FlyttebyråTilbudDto("Byrå B", 12000), FlyttebyråTilbudDto("Byrå A", 10000)),
+                adresse = "Flytteveien 1",
+                erBetalingDokumentert = true,
+                nødvendigUtgift = nødvendigUtgift,
+            )
+        val flytteSelv =
+            FaktaFlytteSelvDto(
+                avstandEnVei = 250,
+                henger = 1500,
+                bompenger = 0,
+                ferge = null,
+                parkering = 100,
+                adresse = "Flytteveien 2",
+                erUtgifterDokumentert = true,
+                nødvendigUtgift = nødvendigUtgift,
+            )
+        val requests =
+            listOf(true, false).flatMap { dokumentert ->
+                listOf(
+                    nyttVilkårFlyttebyrå.copy(fakta = flyttebyrå.copy(erBetalingDokumentert = dokumentert)),
+                    nyttVilkårFlytteSelv.copy(fakta = flytteSelv.copy(erUtgifterDokumentert = dokumentert)),
+                )
+            } +
+                nyttVilkårFlytteSelv.copy(
+                    svar = emptyMap(),
+                    fakta = FaktaFlyttingUbestemtDto(adresse = "Flytteveien 3"),
+                )
+
+        requests.forEachIndexed { index, request ->
+            val innsendt = request.copy(flyttedato = (1 januar 2026).plusDays(index.toLong()))
+            val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, innsendt)
+            val hentet = kall.vilkårFlytting.hentVilkår(behandling.id).single { it.id == opprettet.id }
+
+            assertThat(hentet).isEqualTo(opprettet)
+            assertLagretVilkår(innsendt, hentet)
+        }
+    }
+
+    @Test
     fun `skal kunne lagre, endre og slette vilkår for flytting selv`() {
         val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkårFlytteSelv)
 
@@ -118,6 +162,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 flyttedato = 20 januar 2026,
                 fakta =
                     FaktaFlytteSelvDto(
+                        erUtgifterDokumentert = false,
                         avstandEnVei = 200,
                         henger = 2000,
                         bompenger = 500,

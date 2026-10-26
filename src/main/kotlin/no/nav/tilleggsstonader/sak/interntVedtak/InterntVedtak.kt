@@ -232,6 +232,7 @@ data class VilkårFaktaFlytteSelvInterntVedtak(
     val parkering: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
+    val erUtgifterDokumentert: Boolean,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.FLYTTING_FLYTTE_SELV
 }

@@ -25,6 +25,7 @@ class DetaljertVedtaksperiodeFlyttingTest {
                         resultat(flyttedato, tom, BigDecimal("100"), dokumentert = true),
                         resultat(flyttedato, tom, BigDecimal("200"), dokumentert = false),
                         resultat(flyttedato, tom, BigDecimal("300"), flytteSelv = true),
+                        resultat(flyttedato, tom, BigDecimal("400"), dokumentert = false, flytteSelv = true),
                     ),
             )
 
@@ -56,6 +57,14 @@ class DetaljertVedtaksperiodeFlyttingTest {
                     flyttemåte = Flyttemåte.FLYTTE_SELV,
                     skalUtbetales = true,
                 ),
+                DetaljertVedtaksperiodeFlytting(
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    flyttedato = flyttedato,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                    beløp = BigDecimal("400"),
+                    flyttemåte = Flyttemåte.FLYTTE_SELV,
+                    skalUtbetales = false,
+                ),
             )
     }
 
@@ -73,6 +82,7 @@ class DetaljertVedtaksperiodeFlyttingTest {
         grunnlag =
             if (flytteSelv) {
                 BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = dokumentert,
                     avstandEnVei = 100,
                     sats = BigDecimal("2.94"),
                     satsBekreftet = true,

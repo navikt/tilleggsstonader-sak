@@ -32,7 +32,7 @@ class FaktaFlyttingMapperTest {
                 erBetalingDokumentert = true,
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
-            FaktaFlytteSelvDto(adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
+            FaktaFlytteSelvDto(erUtgifterDokumentert = true, adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
         ).forEach { fakta ->
             assertThat(fakta.tilDomene().tilDto()).isEqualTo(fakta)
         }
@@ -52,6 +52,7 @@ class FaktaFlyttingMapperTest {
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
             FaktaFlytteSelvDto(
+                erUtgifterDokumentert = true,
                 avstandEnVei = 250,
                 henger = 1500,
                 bompenger = 0,

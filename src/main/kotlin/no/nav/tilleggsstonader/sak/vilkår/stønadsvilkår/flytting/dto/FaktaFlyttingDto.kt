@@ -48,6 +48,7 @@ data class FaktaFlytteSelvDto(
     val parkering: Int? = null,
     val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
+    val erUtgifterDokumentert: Boolean,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTE_SELV
 }

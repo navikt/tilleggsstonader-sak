@@ -169,6 +169,7 @@ class FlyttingBeregningService(
 
         val grunnlag =
             BeregningsgrunnlagFlytteSelv(
+                erUtgifterDokumentert = fakta.erUtgifterDokumentert,
                 avstandEnVei = avstandEnVei,
                 sats = sats.first,
                 satsBekreftet = sats.second,

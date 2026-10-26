@@ -46,6 +46,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -53,8 +55,9 @@ class InterntVedtakFlyttingMappingTest {
     private val behandlingId = BehandlingId.random()
     private val dato = LocalDate.of(2025, 1, 15)
 
-    @Test
-    fun `mapper flyttefakta og beregningsresultat for begge stønadstypene`() {
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `mapper flyttefakta og beregningsresultat for begge stønadstypene`(dokumentert: Boolean) {
         listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
             val flyttebyråFakta =
                 FaktaFlyttebyrå(
@@ -65,6 +68,7 @@ class InterntVedtakFlyttingMappingTest {
                 )
             val flytteSelvFakta =
                 FaktaFlytteSelv(
+                    erUtgifterDokumentert = dokumentert,
                     avstandEnVei = 100,
                     henger = 200,
                     bompenger = 300,
@@ -93,6 +97,7 @@ class InterntVedtakFlyttingMappingTest {
             assertThat(flytteSelv.vilkår.single().fakta)
                 .isEqualTo(
                     VilkårFaktaFlytteSelvInterntVedtak(
+                        erUtgifterDokumentert = dokumentert,
                         avstandEnVei = 100,
                         henger = 200,
                         bompenger = 300,

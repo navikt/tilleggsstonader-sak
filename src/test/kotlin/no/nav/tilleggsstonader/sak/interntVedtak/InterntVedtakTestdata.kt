@@ -1334,6 +1334,7 @@ object InterntVedtakTestdata {
                     utgift = null,
                     fakta =
                         FaktaFlytteSelv(
+                            erUtgifterDokumentert = true,
                             avstandEnVei = 100,
                             henger = 200,
                             bompenger = 300,
@@ -1443,6 +1444,7 @@ object InterntVedtakTestdata {
                             målgruppe = målgruppe(stønadstype),
                             grunnlag =
                                 BeregningsgrunnlagFlytteSelv(
+                                    erUtgifterDokumentert = true,
                                     avstandEnVei = 100,
                                     sats = BigDecimal("2.94"),
                                     satsBekreftet = true,

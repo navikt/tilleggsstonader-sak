@@ -42,6 +42,7 @@
         "grunnlag": {
           "avstandEnVei": 100,
           "bompenger": 300,
+          "erUtgifterDokumentert": true,
           "ferge": 400,
           "henger": 200,
           "parkering": 500,
@@ -157,6 +158,7 @@
       "adresse": "Flytteveien 2, 2345 Oslo",
       "avstandEnVei": 100,
       "bompenger": 300,
+      "erUtgifterDokumentert": true,
       "ferge": 400,
       "henger": 200,
       "nødvendigUtgift": {

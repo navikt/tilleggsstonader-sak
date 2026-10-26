@@ -107,6 +107,7 @@ class FlyttingVilkårValideringTest {
         assertThrows<ApiFeil> {
             FlyttingVilkårValidering.validerOppgitteFakta(
                 FaktaFlytteSelv(
+                    erUtgifterDokumentert = true,
                     avstandEnVei = 250,
                     henger = -1,
                     bompenger = null,
@@ -124,7 +125,7 @@ class FlyttingVilkårValideringTest {
         listOf("", " ", "\t\n").forEach { adresse ->
             listOf(
                 FaktaFlyttingUbestemt(adresse = adresse),
-                FaktaFlytteSelv(null, null, null, null, null, nødvendigUtgift, adresse),
+                FaktaFlytteSelv(null, null, null, null, null, nødvendigUtgift, adresse, erUtgifterDokumentert = true),
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null)),
                     erBetalingDokumentert = false,
@@ -227,6 +228,7 @@ class FlyttingVilkårValideringTest {
                         ),
                     fakta =
                         FaktaFlytteSelv(
+                            erUtgifterDokumentert = true,
                             avstandEnVei = 250,
                             henger = null,
                             bompenger = null,

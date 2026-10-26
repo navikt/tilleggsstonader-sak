@@ -84,7 +84,7 @@ class InterntVedtakGenereringTest {
      * For å oppdatere html og pdf ved endringer i htmlify,
      * 1. Fyr opp htmlify lokalt
      * 2. Kjør:
-     *     SKAL_SKRIVE_TIL_FIL=true ./gradlew test --tests "no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf"
+     *     SKRIV_TIL_FIL=true ./gradlew test --tests "no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf"
      * 3. Formatter htmlfil etter generering for å unngå stor diff
      */
     @ParameterizedTest
