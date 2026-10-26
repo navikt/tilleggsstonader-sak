@@ -155,7 +155,7 @@ sealed interface ReiseVilkårFaktaInterntVedtak : VilkårFaktaInterntVedtak {
     val adresse: String?
 }
 
-data class VilkårFaktaUbestemtInterntVedtak(
+data class VilkårReiseFaktaUbestemtInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,
 ) : ReiseVilkårFaktaInterntVedtak {

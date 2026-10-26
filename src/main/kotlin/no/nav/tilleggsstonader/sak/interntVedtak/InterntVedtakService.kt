@@ -486,7 +486,7 @@ class InterntVedtakService(
                 )
 
             is FaktaDagligReiseUbestemt ->
-                VilkårFaktaUbestemtInterntVedtak(
+                VilkårReiseFaktaUbestemtInterntVedtak(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
                 )
