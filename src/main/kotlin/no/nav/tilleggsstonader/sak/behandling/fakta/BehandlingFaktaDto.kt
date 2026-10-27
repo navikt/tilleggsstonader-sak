@@ -128,6 +128,8 @@ data class FaktaFlyttingDetaljer(
     val utgifterDekketPåAnnenMåte: JaNei,
     val utgifterEgenFlytting: FaktaUtgifterEgenFlytting?,
     val flyttetilbud: List<FaktaFlyttetilbud>?,
+    val skalFlytteFraFolkeregistrertAdresse: JaNei,
+    val adresseDetSkalFlyttesFra: FaktaFlytteadresse,
 )
 
 data class FaktaFlytteadresse(

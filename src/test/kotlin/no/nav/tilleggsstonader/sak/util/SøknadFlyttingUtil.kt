@@ -56,6 +56,15 @@ object SøknadFlyttingUtil {
                             flyttemåte = EnumFelt("Hvordan flytter du?", flyttemåte, flyttemåte.name, emptyList()),
                             utgifterDekketPåAnnenMåte =
                                 EnumFelt("Får du dekket utgiftene på annen måte?", JaNei.NEI, "Nei", emptyList()),
+                            skalFlytteFraFolkeregistrertAdresse =
+                                EnumFelt("Flytter du fra folkeregistrert adresse?", JaNei.NEI, "Nei", emptyList()),
+                            adresseDetSkalFlyttesFra =
+                                Adresse(
+                                    land = SelectFelt("Land", "NOR", "Norge"),
+                                    gateadresse = VerdiFelt("Hjemveien 2", "Gateadresse"),
+                                    postnummer = VerdiFelt("0123", "Postnummer"),
+                                    poststed = VerdiFelt("Oslo", "Poststed"),
+                                ),
                             utgifterEgenFlytting =
                                 if (flyttemåte == Flyttemåte.FLYTTER_SELV) {
                                     UtgifterEgenFlytting(

@@ -53,6 +53,15 @@ class OpprettDummySøknadFlytting(
                                 postnummer = VerdiFelt("0150", "Postnummer"),
                                 poststed = VerdiFelt("Oslo", "Poststed"),
                             ),
+                        skalFlytteFraFolkeregistrertAdresse =
+                            EnumFelt("Flytter du fra din folkeregistrerte adresse?", JaNei.NEI, "Nei", emptyList()),
+                        adresseDetSkalFlyttesFra =
+                            Adresse(
+                                land = SelectFelt("Land", "NO", "Norge"),
+                                gateadresse = VerdiFelt("Gamlegata 2", "Gateadresse"),
+                                postnummer = VerdiFelt("5003", "Postnummer"),
+                                poststed = VerdiFelt("Bergen", "Poststed"),
+                            ),
                         flyttemåte =
                             EnumFelt("Hvordan skal du flytte?", Flyttemåte.FLYTTEBYRÅ, "Med flyttebyrå", emptyList()),
                         utgifterDekketPåAnnenMåte =

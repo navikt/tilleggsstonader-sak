@@ -54,6 +54,15 @@ object SøknadsskjemaFlyttingMapper {
                 },
             flyttemåte = detaljer.flyttemåte.verdi,
             utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte.verdi,
+            skalFlytteFraFolkeregistrertAdresse = detaljer.skalFlytteFraFolkeregistrertAdresse.verdi,
+            adresseDetSkalFlyttesFra =
+                Adresse(
+                    gyldigFraOgMed = null,
+                    adresse = detaljer.adresseDetSkalFlyttesFra.gateadresse?.verdi,
+                    postnummer = detaljer.adresseDetSkalFlyttesFra.postnummer?.verdi,
+                    poststed = detaljer.adresseDetSkalFlyttesFra.poststed?.verdi,
+                    landkode = detaljer.adresseDetSkalFlyttesFra.land?.verdi,
+                ),
             utgifterEgenFlytting =
                 detaljer.utgifterEgenFlytting?.let {
                     UtgifterEgenFlytting(
