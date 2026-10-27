@@ -158,6 +158,47 @@ class OppgaveClient(
         }
     }
 
+    /**
+     * Setter eller fjerner behandlingstype på oppgaven. behandlingstype = null fjerner verdien.
+     */
+    fun oppdaterBehandlingstype(
+        oppgaveId: Long,
+        versjon: Int,
+        behandlingstype: String?,
+        endretAvEnhetsnr: String?,
+    ): Oppgave {
+        val uriBuilder =
+            UriComponentsBuilder
+                .fromUri(oppgaveUri)
+                .pathSegment("{id}", "behandlingstype")
+        val uriVariables = oppgaveIdUriVariables(oppgaveId).toMutableMap()
+
+        val queryParams =
+            listOf(
+                "versjon" to versjon.toString(),
+                "behandlingstype" to behandlingstype,
+                "endretAvEnhetsnr" to endretAvEnhetsnr,
+            )
+        queryParams.forEach { (key, value) ->
+            if (value != null) {
+                uriBuilder.queryParam(key, "{$key}")
+                uriVariables[key] = value
+            }
+        }
+
+        try {
+            return restTemplate.patchForEntity<Oppgave>(
+                uriBuilder.encode().toUriString(),
+                "",
+                HttpHeaders().medContentTypeJsonUTF8(),
+                uriVariables,
+            )
+        } catch (e: ProblemDetailException) {
+            sjekkOgHåndtertConflict(e)
+            throw e
+        }
+    }
+
     fun finnMapper(
         enhetsnummer: String,
         limit: Int,

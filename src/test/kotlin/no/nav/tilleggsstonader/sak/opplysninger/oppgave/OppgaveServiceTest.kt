@@ -216,6 +216,50 @@ internal class OppgaveServiceTest {
     }
 
     @Nested
+    inner class ArvAvMarkeringFraForrigeOppgave {
+        private val forrigeOppgave = lagTestOppgave().copy(gsakOppgaveId = 999L, type = Oppgavetype.BehandleSak)
+        private val slot = slot<OpprettOppgaveRequest>()
+
+        @BeforeEach
+        fun setUp() {
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = false)
+            every { oppgaveRepository.findByBehandlingId(BEHANDLING_ID) } returns listOf(forrigeOppgave)
+        }
+
+        @Test
+        fun `skal arve markering fra forrige oppgave også når ung-sak sier nei`() {
+            every { oppgaveClient.finnOppgaveMedId(999L) } returns
+                lagEksternTestOppgave().copy(behandlingstype = Behandlingstype.Aktivitetspenger.value)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+
+            assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
+        }
+
+        @Test
+        fun `skal ikke markere når forrige oppgave ble rettet til å ikke gjelde aktivitetspenger`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns true
+            every { oppgaveClient.finnOppgaveMedId(999L) } returns lagEksternTestOppgave().copy(behandlingstype = null)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+
+            assertThat(slot.captured.behandlingstype).isNull()
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
+        }
+
+        @Test
+        fun `skal falle tilbake på ung-sak når forrige oppgave ikke kan hentes`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns true
+            every { oppgaveClient.finnOppgaveMedId(999L) } throws RuntimeException("Gosys feilet")
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+
+            assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+        }
+    }
+
+    @Nested
     inner class BehandlingstypeAktivitetspengerUtenBehandling {
         private val request = slot<OpprettOppgaveRequest>()
 
@@ -623,6 +667,7 @@ internal class OppgaveServiceTest {
     ) {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
         every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns gjelderAktivitetspenger
+        every { oppgaveRepository.findByBehandlingId(any()) } returns emptyList()
 
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())

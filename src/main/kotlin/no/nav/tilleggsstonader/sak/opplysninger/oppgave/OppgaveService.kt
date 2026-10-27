@@ -130,10 +130,6 @@ class OppgaveService(
         }
     }
 
-    private val Oppgave.ident: String?
-        get() =
-            this.bruker?.ident.takeIf { this.bruker?.type == OppgaveBrukerType.PERSON }
-
     @Transactional
     fun fordelOppgave(
         gsakOppgaveId: Long,
@@ -224,7 +220,9 @@ class OppgaveService(
     }
 
     /**
-     * Slår opp personen mot ung-sak. Med behandling opprettes oppgaven uten markering hvis oppslaget feiler.
+     * Oppgaven i Gosys er sannheten. En ny oppgave på en behandling arver markeringen fra forrige oppgave,
+     * slik at manuelle rettinger følger behandlingen. Uten tidligere oppgave slås personen opp mot ung-sak.
+     * Med behandling opprettes oppgaven uten markering hvis oppslaget feiler.
      * Uten behandling opprettes ikke oppgaven hvis oppslaget feiler, slik at tasken kan prøves på nytt.
      */
     private fun utledBehandlingstype(
@@ -239,17 +237,43 @@ class OppgaveService(
             return null
         }
 
+        val arvetMarkering = behandlingId?.let { finnMarkeringFraForrigeOppgave(it) }
         val gjelderAktivitetspenger =
-            if (behandlingId != null) {
-                ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
-            } else {
-                ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
-            }
+            arvetMarkering
+                ?: if (behandlingId != null) {
+                    ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
+                } else {
+                    ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
+                }
 
         return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
     }
 
+    private fun finnMarkeringFraForrigeOppgave(behandlingId: BehandlingId): Boolean? {
+        val forrigeOppgave = finnSisteBehandlingsoppgaveForBehandling(behandlingId) ?: return null
+        return try {
+            oppgaveClient.finnOppgaveMedId(forrigeOppgave.gsakOppgaveId).behandlingstype == Behandlingstype.Aktivitetspenger.value
+        } catch (e: Exception) {
+            logger.warn("Kunne ikke hente forrige oppgave=${forrigeOppgave.gsakOppgaveId} for å arve markering av aktivitetspenger", e)
+            null
+        }
+    }
+
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse = oppgaveClient.oppdaterOppgave(oppgave)
+
+    fun oppdaterBehandlingstype(
+        oppgave: Oppgave,
+        behandlingstype: Behandlingstype?,
+    ): OppgaveMedMetadata {
+        val oppdatertOppgave =
+            oppgaveClient.oppdaterBehandlingstype(
+                oppgaveId = oppgave.id,
+                versjon = oppgave.versjon,
+                behandlingstype = behandlingstype?.value,
+                endretAvEnhetsnr = oppgave.tildeltEnhetsnr,
+            )
+        return medMetadata(oppdatertOppgave)
+    }
 
     /**
      * I de tilfeller en service ønsker å ansvare selv for lagring til [OppgaveRepository]
@@ -491,3 +515,6 @@ class OppgaveService(
         }
     }
 }
+
+internal val Oppgave.ident: String?
+    get() = bruker?.ident.takeIf { bruker?.type == OppgaveBrukerType.PERSON }

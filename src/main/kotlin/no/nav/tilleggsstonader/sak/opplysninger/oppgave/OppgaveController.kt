@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.EndreAktivitetspengerMarkeringDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
@@ -27,6 +28,7 @@ class OppgaveController(
     private val oppgaveService: OppgaveService,
     private val tilgangService: TilgangService,
     private val fagsakPersonService: FagsakPersonService,
+    private val aktivitetspengerMarkeringService: AktivitetspengerMarkeringService,
 ) {
     @PostMapping("/soek")
     fun hentOppgaver(
@@ -53,6 +55,12 @@ class OppgaveController(
         val tildeltSaksbehandler = if (tilbakestill) null else SikkerhetContext.hentSaksbehandler()
         return oppgaveService.fordelOppgave(oppgaveId, tildeltSaksbehandler, versjon).tilDto()
     }
+
+    @PostMapping("/{oppgaveId}/aktivitetspenger")
+    fun endreAktivitetspengerMarkering(
+        @PathVariable oppgaveId: Long,
+        @RequestBody request: EndreAktivitetspengerMarkeringDto,
+    ): OppgaveDto = aktivitetspengerMarkeringService.endreMarkering(oppgaveId, request.gjelderAktivitetspenger).tilDto()
 
     @GetMapping("/mapper")
     fun hentMapper(): List<MappeDto> {
