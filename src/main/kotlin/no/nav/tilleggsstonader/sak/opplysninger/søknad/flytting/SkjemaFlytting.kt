@@ -23,8 +23,8 @@ data class FlyttingDetaljer(
     val utgifterDekketPåAnnenMåte: JaNei,
     val utgifterEgenFlytting: UtgifterEgenFlytting?,
     val flyttetilbud: List<Flyttetilbud>?,
-    val skalFlytteFraFolkeregistrertAdresse: JaNei? = null,
-    val adresseDetSkalFlyttesFra: Adresse? = null,
+    val skalFlytteFraFolkeregistrertAdresse: JaNei,
+    val adresseDetSkalFlyttesFra: Adresse,
 )
 
 data class UtgifterEgenFlytting(
