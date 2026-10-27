@@ -588,6 +588,15 @@ internal class BehandlingFaktaServiceTest {
                         Flyttetilbud(navn = "Byrå 1", beløp = BigDecimal("1000.50")),
                         Flyttetilbud(navn = "Byrå 2", beløp = BigDecimal("900")),
                     ),
+                skalFlytteFraFolkeregistrertAdresse = JaNei.NEI,
+                adresseDetSkalFlyttesFra =
+                    Adresse(
+                        gyldigFraOgMed = null,
+                        adresse = "Hjemveien 2",
+                        postnummer = "0002",
+                        poststed = "Oslo",
+                        landkode = "NOR",
+                    ),
             )
         val søknad =
             SøknadFlytting(
@@ -639,6 +648,14 @@ internal class BehandlingFaktaServiceTest {
                     listOf(
                         FaktaFlyttetilbud(navn = "Byrå 1", beløp = BigDecimal("1000.50")),
                         FaktaFlyttetilbud(navn = "Byrå 2", beløp = BigDecimal("900")),
+                    ),
+                skalFlytteFraFolkeregistrertAdresse = JaNei.NEI,
+                adresseDetSkalFlyttesFra =
+                    FaktaFlytteadresse(
+                        gateadresse = "Hjemveien 2",
+                        postnummer = "0002",
+                        poststed = "Oslo",
+                        landkode = "NOR",
                     ),
             ),
         )

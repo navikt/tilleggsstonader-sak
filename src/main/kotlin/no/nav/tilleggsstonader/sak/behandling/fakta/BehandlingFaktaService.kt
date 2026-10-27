@@ -184,6 +184,16 @@ class BehandlingFaktaService(
                 },
             flyttemåte = detaljer.flyttemåte,
             utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte,
+            skalFlytteFraFolkeregistrertAdresse = detaljer.skalFlytteFraFolkeregistrertAdresse,
+            adresseDetSkalFlyttesFra =
+                detaljer.adresseDetSkalFlyttesFra?.let {
+                    FaktaFlytteadresse(
+                        gateadresse = it.adresse,
+                        postnummer = it.postnummer,
+                        poststed = it.poststed,
+                        landkode = it.landkode,
+                    )
+                },
             utgifterEgenFlytting =
                 detaljer.utgifterEgenFlytting?.let {
                     FaktaUtgifterEgenFlytting(
