@@ -68,7 +68,7 @@ class StønadsvilkårTestdataDsl {
     fun flyttingByrå(
         flyttedato: LocalDate,
         tilbudPriser: List<Int>,
-        erBetalingDokumentert: Boolean,
+        erUtgifterDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
@@ -81,7 +81,7 @@ class StønadsvilkårTestdataDsl {
                                 FlyttebyråTilbudDto(navn = "Syntetisk tilbud ${index + 1}", pris = pris)
                             },
                         adresse = "Syntetisk adresse",
-                        erBetalingDokumentert = erBetalingDokumentert,
+                        erUtgifterDokumentert = erUtgifterDokumentert,
                         nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
                     ),
             )
@@ -95,6 +95,7 @@ class StønadsvilkårTestdataDsl {
         bompenger: Int? = null,
         ferge: Int? = null,
         parkering: Int? = null,
+        erUtgifterDokumentert: Boolean = true,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
@@ -102,6 +103,7 @@ class StønadsvilkårTestdataDsl {
                 svar = oppfylteSvarFlytteSelvDto(),
                 fakta =
                     FaktaFlytteSelvDto(
+                        erUtgifterDokumentert = erUtgifterDokumentert,
                         avstandEnVei = avstandEnVei,
                         henger = henger,
                         bompenger = bompenger,

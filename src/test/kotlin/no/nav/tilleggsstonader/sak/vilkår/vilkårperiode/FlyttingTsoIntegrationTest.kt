@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 
 class FlyttingTsoIntegrationTest : IntegrationTest() {
@@ -74,8 +76,9 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
         assertThat(tilkjentYtelseRepository.findByBehandlingId(behandling.id)).isNull()
     }
 
-    @Test
-    fun `skal kunne vedta og beregne flytting med flytting selv`() {
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `skal beregne egen flytting og bare utbetale dokumenterte utgifter`(dokumentert: Boolean) {
         val fom = 1 januar 2026
         val tom = 1 januar 2026
 
@@ -102,6 +105,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
                     flyttedato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
+                    erUtgifterDokumentert = dokumentert,
                 )
             }
         }
@@ -118,12 +122,17 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         assertThat(resultat.beløp).isEqualTo(394.toBigDecimal())
         assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlytteSelv::class.java)
+        assertThat((resultat.grunnlag as BeregningsgrunnlagFlytteSelv).erUtgifterDokumentert).isEqualTo(dokumentert)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 
-        assertThat(andeler).hasSize(1)
-        assertThat(andeler.single().beløp).isEqualTo(394)
-        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_AAP)
+        if (dokumentert) {
+            assertThat(andeler).hasSize(1)
+            assertThat(andeler.single().beløp).isEqualTo(394)
+            assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_AAP)
+        } else {
+            assertThat(andeler).isEmpty()
+        }
     }
 
     @Test
@@ -153,7 +162,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -209,7 +218,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = false,
+                    erUtgifterDokumentert = false,
                 )
             }
         }

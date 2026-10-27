@@ -217,7 +217,7 @@ data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
 
 data class VilkårFaktaFlyttebyråInterntVedtak(
     val tilbud: List<FlyttebyråTilbud>,
-    val erBetalingDokumentert: Boolean,
+    val erUtgifterDokumentert: Boolean,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
 ) : VilkårFaktaInterntVedtak {
@@ -232,6 +232,7 @@ data class VilkårFaktaFlytteSelvInterntVedtak(
     val parkering: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
+    val erUtgifterDokumentert: Boolean,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.FLYTTING_FLYTTE_SELV
 }

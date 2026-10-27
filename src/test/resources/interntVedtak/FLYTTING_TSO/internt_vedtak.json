@@ -21,7 +21,7 @@
         "fom": "2025-01-15",
         "fraTidligereVedtak": true,
         "grunnlag": {
-          "erBetalingDokumentert": true,
+          "erUtgifterDokumentert": true,
           "tilbud": [ {
             "erValgt": false,
             "navn": "Flyttebyrå A",
@@ -42,6 +42,7 @@
         "grunnlag": {
           "avstandEnVei": 100,
           "bompenger": 300,
+          "erUtgifterDokumentert": true,
           "ferge": 400,
           "henger": 200,
           "parkering": 500,
@@ -123,7 +124,7 @@
     } ],
     "fakta": {
       "adresse": "Flytteveien 1, 1234 Oslo",
-      "erBetalingDokumentert": true,
+      "erUtgifterDokumentert": true,
       "nødvendigUtgift": {
         "begrunnelse": null,
         "erUtgiftenNødvendig": "JA"
@@ -169,6 +170,7 @@
       "adresse": "Flytteveien 2, 2345 Oslo",
       "avstandEnVei": 100,
       "bompenger": 300,
+      "erUtgifterDokumentert": true,
       "ferge": 400,
       "henger": 200,
       "nødvendigUtgift": {
