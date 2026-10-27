@@ -18,6 +18,7 @@ fun Journalpost.gjelderSøknad() =
             DokumentBrevkode.DAGLIG_REISE,
             DokumentBrevkode.REISE_TIL_SAMLING,
             DokumentBrevkode.FLYTTING,
+            DokumentBrevkode.REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE,
         )
 
 fun Journalpost.gjelderKjøreliste() = this.dokumentBrevkode() == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE

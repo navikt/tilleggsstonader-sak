@@ -30,7 +30,6 @@ class JournalhendelseKafkaHåndtererServiceTest {
     @EnumSource(
         value = DokumentBrevkode::class,
         names = [
-            "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE",
             "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE_GAMMEL",
             "REISE_FOR_Å_KOMME_I_ARBEID",
             "REISE_FOR_Å_KOMME_I_ARBEID_GAMMEL",
@@ -56,6 +55,7 @@ class JournalhendelseKafkaHåndtererServiceTest {
             "DAGLIG_REISE",
             "REISE_TIL_SAMLING",
             "FLYTTING",
+            "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE",
         ],
     )
     fun `skal prosessere eksisterende søknadsbrevkoder`(brevkode: DokumentBrevkode) {
