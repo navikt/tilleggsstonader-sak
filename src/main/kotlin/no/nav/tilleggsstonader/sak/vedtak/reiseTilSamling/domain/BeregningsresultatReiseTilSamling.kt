@@ -12,7 +12,7 @@ import java.time.LocalDate
 data class BeregningsresultatReiseTilSamling(
     val offentligTransport: List<BeregningsresultatOffentligTransport>,
     val privatBil: List<BeregningsresultatPrivatBil>,
-    val drosje: List<BeregningsresultatDrosje>,
+    val drosje: List<BeregningsresultatDrosje> = emptyList(),
 ) {
     fun alleSamlinger(): Collection<BeregningsresultatForSamling> = offentligTransport + privatBil + drosje
 }
