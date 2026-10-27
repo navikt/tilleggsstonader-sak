@@ -1,29 +1,13 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
-import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
-import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
+import no.nav.tilleggsstonader.kontrakter.søknad.*
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SøknadskjemaBoutgifterMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SøknadskjemaDagligReiseMapper
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.*
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SøknadsskjemaFlyttingMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaPassAvBarnMapper
@@ -138,6 +122,8 @@ class SøknadService(
                     journalpost,
                     søknadsskjema,
                 )
+
+            is SøknadsskjemaROAH -> TODO("Mapping for ROAH søknad ikke laget enda")
 
             is SøknadsskjemaBoutgifterFyllUtSendInn ->
                 søknadskjemaBoutgifterMapper.map(
