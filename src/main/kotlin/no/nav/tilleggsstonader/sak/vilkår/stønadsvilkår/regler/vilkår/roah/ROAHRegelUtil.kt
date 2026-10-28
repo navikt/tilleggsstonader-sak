@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 
 object ROAHRegelUtil {
-    fun finnRelevantRegel(typeReiseformål: TypeReiseformål): Vilkårsregel =
+    fun finnRelevantVilkårsregel(typeReiseformål: TypeReiseformål): Vilkårsregel =
         when (typeReiseformål) {
             TypeReiseformål.OPPSTART, TypeReiseformål.AVSLUTNING -> OppstartAvslutningRegel()
             TypeReiseformål.HJEMREISE -> HjemreiseRegel()

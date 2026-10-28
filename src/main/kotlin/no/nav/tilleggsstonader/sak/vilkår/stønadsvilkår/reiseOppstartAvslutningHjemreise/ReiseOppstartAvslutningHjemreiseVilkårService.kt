@@ -120,7 +120,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     ): VilkårReiseOppstartAvslutningHjemreise {
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = ROAHRegelUtil.finnRelevantRegel(nyttVilkår.typeReiseformål),
+                vilkårsregel = ROAHRegelUtil.finnRelevantVilkårsregel(nyttVilkår.typeReiseformål),
                 svar = nyttVilkår.svar,
             )
 

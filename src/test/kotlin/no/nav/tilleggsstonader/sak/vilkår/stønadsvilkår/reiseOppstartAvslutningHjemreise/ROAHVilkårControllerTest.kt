@@ -40,7 +40,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre, endre og slette vilkår for daglig reise - privat bil`() {
+    fun `skal kunne lagre, endre og slette vilkår for daglig reise - offentlig transport`() {
         val fom = 1 januar 2026
         val tom = 31 mars 2026
 
