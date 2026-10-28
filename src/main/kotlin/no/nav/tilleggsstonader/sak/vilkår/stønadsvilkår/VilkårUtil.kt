@@ -66,7 +66,8 @@ object VilkårUtil {
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER -> true
                 VilkårType.DAGLIG_REISE -> true
                 VilkårType.REISE_TIL_SAMLING -> false // TODO: Sjekk om dette er riktig
-                VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE -> false
+                VilkårType.ROAH_OPPSTART_AVSLUTNING -> false
+                VilkårType.ROAH_HJEMREISE -> false
                 VilkårType.FLYTTING -> false
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false

@@ -5,12 +5,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseOppstartAvslutningHjemreiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.HjemreiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.OppstartAvslutningRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.RegelstrukturROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
@@ -32,7 +33,15 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
     private val reiseOppstartAvslutningHjemreiseVilkårService: ReiseOppstartAvslutningHjemreiseVilkårService,
 ) {
     @GetMapping("regler")
-    fun regler(): RegelstrukturDto = ReiseOppstartAvslutningHjemreiseRegel().tilRegelstruktur()
+    fun regler(): RegelstrukturROAHDto {
+        val reglerOppstartAvslutning = OppstartAvslutningRegel().tilRegelstruktur()
+
+        return RegelstrukturROAHDto(
+            oppstart = reglerOppstartAvslutning,
+            avslutning = reglerOppstartAvslutning,
+            hjemreise = HjemreiseRegel().tilRegelstruktur(),
+        )
+    }
 
     @GetMapping("{behandlingId}")
     fun hentVilkår(

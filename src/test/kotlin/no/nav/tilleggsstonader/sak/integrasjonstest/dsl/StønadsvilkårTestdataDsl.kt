@@ -40,6 +40,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
@@ -343,12 +344,14 @@ class OpprettStønadsvilkårDsl {
         tom: LocalDate? = null,
         typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
         hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
+        svar: Map<RegelId, SvarOgBegrunnelseDto> = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
     ) {
         dtoer += { _, _, aktiviteter ->
             lagreReiseOppstartAvslutningHjemreiseDto(
                 fom = fom,
                 tom = tom,
                 typeReiseformål = typeReiseformål,
+                svar = svar,
                 aktivitetId = hentAktivitetId(aktiviteter),
             )
         }

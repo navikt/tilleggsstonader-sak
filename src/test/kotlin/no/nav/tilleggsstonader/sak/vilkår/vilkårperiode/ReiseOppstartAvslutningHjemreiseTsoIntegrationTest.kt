@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseResponse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
@@ -129,16 +130,19 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
                         fom = fom,
                         tom = null,
                         typeReiseformål = TypeReiseformål.OPPSTART,
+                        svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
                     )
                     offentligTransportReiseOppstartAvslutningHjemreise(
                         fom = 1 februar 2026,
                         tom = 2 februar 2026,
                         typeReiseformål = TypeReiseformål.HJEMREISE,
+                        svar = ROAHTestUtil.oppfylteSvarHjemreiseOffentligTransportDto(),
                     )
                     offentligTransportReiseOppstartAvslutningHjemreise(
                         fom = tom,
                         tom = null,
                         typeReiseformål = TypeReiseformål.AVSLUTNING,
+                        svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
                     )
                 }
             }

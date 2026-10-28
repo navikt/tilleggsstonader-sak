@@ -100,7 +100,7 @@ data class Vilkår(
                 // TODO skal det være noe her?
             }
 
-            VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE -> {
+            VilkårType.ROAH_OPPSTART_AVSLUTNING, VilkårType.ROAH_HJEMREISE -> {
                 // Dette er kun for tester foreløpig
             }
 
@@ -276,8 +276,15 @@ enum class VilkårType(
     ),
 
     // Reise oppstart, avslutning og hjemreise
-    REISE_OPPSTART_AVSLUTNING_HJEMREISE(
-        "Reise oppstart, avslutning og hjemreise",
+    ROAH_OPPSTART_AVSLUTNING(
+        "Reise ved oppstart eller avslutning",
+        listOf(
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        ),
+    ),
+    ROAH_HJEMREISE(
+        "Hjemreise",
         listOf(
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
