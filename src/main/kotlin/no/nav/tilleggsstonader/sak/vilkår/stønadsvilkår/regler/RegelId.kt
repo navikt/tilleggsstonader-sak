@@ -44,6 +44,15 @@ enum class RegelId(
     KAN_REISE_MED_EGEN_BIL("Kan bruker benytte privat bil?"),
     DOKUMENTERTE_UTGIFTER("Har bruker dokumenterte utgifter til reise?"),
 
+    // REISE OPPSTART, AVSLUTNING OG HJEMREISE
+    ROAH_HAR_UTGIFTER_TIL_REISEN("Har bruker utgifter til reisen?"),
+    ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT("Har bruker mulighet til å reise med offentlig transport?"),
+    ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN("Har bruker dokumenterte utgifter til reisen?"),
+    ROAH_KAN_BENYTTE_PRIVAT_BIL("Kan bruker benytte seg av privat bil?"),
+    ROAH_BENYTTET_TAXI("Benyttet bruker taxi?"),
+    ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL("Er søker innenfor normalt antall hjemreiser per år?"),
+    ROAH_HJEMREISE_BEHOV_FLERE_REISER("Har bruker behov for flere hjemreiser, og er behovet tilfredsstillende dokumentert?"),
+
     // FLYTTING
     HAR_UTGIFTER_TIL_FLYTTING("Har bruker utgifter til flyttingen?"),
     HVILKEN_FORBINDELSE_FLYTTER_BRUKER("I hvilken forbindelse flytter bruker?"),

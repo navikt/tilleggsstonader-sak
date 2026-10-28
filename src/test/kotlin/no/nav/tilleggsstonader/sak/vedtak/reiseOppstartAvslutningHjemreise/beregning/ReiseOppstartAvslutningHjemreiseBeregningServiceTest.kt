@@ -66,7 +66,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
             listOf(
                 vilkår(
                     behandlingId = behandling.id,
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
@@ -83,7 +83,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 ),
                 vilkår(
                     behandlingId = behandling.id,
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    type = VilkårType.ROAH_HJEMREISE,
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 16 januar 2025,
@@ -120,7 +120,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
             listOf(
                 vilkår(
                     behandlingId = behandling.id,
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
@@ -158,7 +158,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
             listOf(
                 vilkår(
                     behandlingId = behandling.id,
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
@@ -175,7 +175,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 ),
                 vilkår(
                     behandlingId = behandling.id,
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    type = VilkårType.ROAH_HJEMREISE,
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 februar 2025,
@@ -208,7 +208,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
             listOf(
                 vilkår(
                     behandlingId = behandling.id,
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,

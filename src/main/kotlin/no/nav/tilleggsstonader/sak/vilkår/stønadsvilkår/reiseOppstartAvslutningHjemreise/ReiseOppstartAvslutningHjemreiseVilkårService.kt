@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseOppstartAvslutningHjemreiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.ROAHRegelUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
@@ -45,15 +45,11 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
             .map { it.mapTilVilkårReiseOppstartAvslutningHjemreise() }
             .sortedBy { it.fom }
 
-    /**
-     * Grupperer reisene per aktivitet fra inngangsvilkår. Inneholder alle aktiviteter for behandlingen, også de
-     * som ikke (ennå) har noen reise knyttet til seg. Reiser med fakta-type Ubestemt har ingen aktivitetId og vises
-     * derfor ikke i noen av gruppene.
-     */
     fun hentVilkårGruppertPåAktivitet(behandlingId: BehandlingId): List<AktivitetMedReiser> {
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         val reiserPerAktivitet = hentVilkårForBehandling(behandlingId).groupBy { it.aktivitetId }
 
+        // TODO: Bør markere reiser som tilhører en slettet aktivitet
         return aktiviteter
             .sortedBy { it.fom }
             .map { aktivitet ->
@@ -124,7 +120,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     ): VilkårReiseOppstartAvslutningHjemreise {
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = ReiseOppstartAvslutningHjemreiseRegel(),
+                vilkårsregel = ROAHRegelUtil.finnRelevantVilkårsregel(nyttVilkår.typeReiseformål),
                 svar = nyttVilkår.svar,
             )
 
