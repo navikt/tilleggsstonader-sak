@@ -11,22 +11,21 @@ internal class RegelIdTest {
         fun getRegler(
             vilkårsregel: Vilkårsregel,
             regelId: RegelId,
-        ): List<RegelId> {
+            besøkteRegler: MutableSet<RegelId>,
+        ) {
+            if (!besøkteRegler.add(regelId)) return
             val regler =
                 vilkårsregel
                     .regel(regelId)
                     .svarMapping.values
                     .map(SvarRegel::regelId)
                     .filterNot { it == RegelId.SLUTT_NODE }
-            val childrenRegler = regler.flatMap { getRegler(vilkårsregel, it) }
-            return regler + childrenRegler
+            regler.forEach { getRegler(vilkårsregel, it, besøkteRegler) }
         }
         vilkårsregler.forEach { vilkårsregel ->
             val alleRegler = vilkårsregel.regler.keys
-            val reglerFraHovedregler =
-                vilkårsregel.hovedregler +
-                    vilkårsregel.hovedregler
-                        .flatMap { getRegler(vilkårsregel, it) }
+            val reglerFraHovedregler = mutableSetOf<RegelId>()
+            vilkårsregel.hovedregler.forEach { getRegler(vilkårsregel, it, reglerFraHovedregler) }
             assertThat(alleRegler).containsExactlyInAnyOrderElementsOf(reglerFraHovedregler)
         }
     }

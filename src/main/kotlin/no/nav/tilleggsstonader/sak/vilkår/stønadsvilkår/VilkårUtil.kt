@@ -68,6 +68,7 @@ object VilkårUtil {
                 VilkårType.REISE_TIL_SAMLING -> false // TODO: Sjekk om dette er riktig
                 VilkårType.ROAH_OPPSTART_AVSLUTNING -> false
                 VilkårType.ROAH_HJEMREISE -> false
+                VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE -> false
                 VilkårType.FLYTTING -> false
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false

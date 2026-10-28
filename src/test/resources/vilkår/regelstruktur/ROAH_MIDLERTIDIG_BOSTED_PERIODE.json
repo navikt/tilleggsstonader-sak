@@ -1,0 +1,62 @@
+{
+  "ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ "ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER",
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "ROAH_HAR_BARN_UNDER_18_ÅR_SOM_FLYTTER_MED": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ "ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME", "ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME",
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "ROAH_MÅ_BO_MIDLERTIDIG_BORTE": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [ "ROAH_HAR_BARN_UNDER_18_ÅR_SOM_FLYTTER_MED", "ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME", "ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "ROAH_HAR_BARN_UNDER_18_ÅR_SOM_FLYTTER_MED",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  }
+}
