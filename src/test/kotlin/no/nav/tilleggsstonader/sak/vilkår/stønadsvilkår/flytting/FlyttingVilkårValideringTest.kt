@@ -32,7 +32,7 @@ class FlyttingVilkårValideringTest {
                             FlyttebyråTilbud(navn = null, pris = null),
                         ),
                     adresse = "Flytteveien 1",
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                     nødvendigUtgift = nødvendigUtgift,
                 ),
             )
@@ -50,7 +50,7 @@ class FlyttingVilkårValideringTest {
                             FlyttebyråTilbud(navn = " flyttebyrå a ", pris = 12000),
                         ),
                     adresse = "Flytteveien 1",
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                     nødvendigUtgift = nødvendigUtgift,
                 ),
             )
@@ -69,7 +69,7 @@ class FlyttingVilkårValideringTest {
                     FlyttingVilkårValidering.validerOppgitteFakta(
                         FaktaFlyttebyrå(
                             tilbud = tilbud,
-                            erBetalingDokumentert = true,
+                            erUtgifterDokumentert = true,
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -94,7 +94,7 @@ class FlyttingVilkårValideringTest {
                     FaktaFlyttebyrå(
                         tilbud = tilbud,
                         adresse = "Flytteveien 1",
-                        erBetalingDokumentert = true,
+                        erUtgifterDokumentert = true,
                         nødvendigUtgift = nødvendigUtgift,
                     ),
                 )
@@ -107,6 +107,7 @@ class FlyttingVilkårValideringTest {
         assertThrows<ApiFeil> {
             FlyttingVilkårValidering.validerOppgitteFakta(
                 FaktaFlytteSelv(
+                    erUtgifterDokumentert = true,
                     avstandEnVei = 250,
                     henger = -1,
                     bompenger = null,
@@ -124,10 +125,10 @@ class FlyttingVilkårValideringTest {
         listOf("", " ", "\t\n").forEach { adresse ->
             listOf(
                 FaktaFlyttingUbestemt(adresse = adresse),
-                FaktaFlytteSelv(null, null, null, null, null, nødvendigUtgift, adresse),
+                FaktaFlytteSelv(null, null, null, null, null, nødvendigUtgift, adresse, erUtgifterDokumentert = true),
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null)),
-                    erBetalingDokumentert = false,
+                    erUtgifterDokumentert = false,
                     adresse = adresse,
                     nødvendigUtgift = nødvendigUtgift,
                 ),
@@ -173,7 +174,7 @@ class FlyttingVilkårValideringTest {
                                     FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
                                 ),
                             adresse = "Flytteveien 1",
-                            erBetalingDokumentert = false,
+                            erUtgifterDokumentert = false,
                             nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
@@ -205,7 +206,7 @@ class FlyttingVilkårValideringTest {
                             FaktaFlyttebyrå(
                                 tilbud = tilbud,
                                 adresse = "Flytteveien 1",
-                                erBetalingDokumentert = false,
+                                erUtgifterDokumentert = false,
                                 nødvendigUtgift = nødvendigUtgift,
                             ),
                     ),
@@ -227,6 +228,7 @@ class FlyttingVilkårValideringTest {
                         ),
                     fakta =
                         FaktaFlytteSelv(
+                            erUtgifterDokumentert = true,
                             avstandEnVei = 250,
                             henger = null,
                             bompenger = null,
@@ -247,6 +249,7 @@ class FlyttingVilkårValideringTest {
                 lagreVilkår(
                     svar =
                         mapOf(
+                            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                                 SvarOgBegrunnelse(
                                     SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -266,6 +269,7 @@ class FlyttingVilkårValideringTest {
                 lagreVilkår(
                     svar =
                         mapOf(
+                            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                                 SvarOgBegrunnelse(SvarId.ARBEID_ETTER_GJENNOMFØRT_AKTIVITET, "Arbeid"),
                             RegelId.FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
@@ -292,7 +296,7 @@ class FlyttingVilkårValideringTest {
                                     FlyttebyråTilbud("Flyttebyrå A", 10000),
                                     FlyttebyråTilbud("Flyttebyrå B", 12000),
                                 ),
-                            erBetalingDokumentert = false,
+                            erUtgifterDokumentert = false,
                             nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Utgiften er for høy"),
                             adresse = "Flytteveien 1",
                         ),

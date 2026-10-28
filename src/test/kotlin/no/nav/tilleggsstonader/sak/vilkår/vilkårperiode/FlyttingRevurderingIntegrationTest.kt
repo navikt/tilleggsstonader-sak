@@ -68,7 +68,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -134,12 +134,12 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = førsteFlyttedato,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
                 flyttingByrå(
                     flyttedato = andreFlyttedato,
                     tilbudPriser = listOf(8000, 3000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -227,7 +227,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -307,7 +307,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = false,
+                    erUtgifterDokumentert = false,
                 )
             }
         }
@@ -325,7 +325,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 vilkår {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(erBetalingDokumentert = true))
+                        copy(fakta = byrå.copy(erUtgifterDokumentert = true))
                     }
                 }
             }
@@ -391,7 +391,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -411,7 +411,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 vilkår {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(erBetalingDokumentert = false))
+                        copy(fakta = byrå.copy(erUtgifterDokumentert = false))
                     }
                 }
             }
@@ -429,7 +429,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
 
         assertThat(resultatRevurdering.beløp).isEqualTo(5000.toBigDecimal())
         assertThat(resultatRevurdering.fraTidligereVedtak).isFalse
-        assertThat((resultatRevurdering.grunnlag as BeregningsgrunnlagFlyttebyrå).erBetalingDokumentert).isFalse
+        assertThat((resultatRevurdering.grunnlag as BeregningsgrunnlagFlyttebyrå).erUtgifterDokumentert).isFalse
         assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
 
         val andelerRevurdering =
@@ -471,7 +471,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 flyttingByrå(
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                 )
             }
         }

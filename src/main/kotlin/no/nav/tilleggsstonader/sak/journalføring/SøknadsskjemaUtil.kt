@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
@@ -48,6 +49,8 @@ object SøknadsskjemaUtil {
             -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaReiseTilSamling>>(data)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
+            -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaFlytting>>(data)
+
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> error("Søknadsskjema for $stønadstype er ikke implementert")

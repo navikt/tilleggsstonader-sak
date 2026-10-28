@@ -109,7 +109,7 @@ class UtledTidligsteEndringServiceTest {
         val fakta =
             FaktaFlyttebyrå(
                 tilbud = listOf(FlyttebyråTilbud("A", 5000), FlyttebyråTilbud("B", 6000)),
-                erBetalingDokumentert = true,
+                erUtgifterDokumentert = true,
                 nødvendigUtgift = nødvendigUtgift,
                 adresse = "Syntetisk adresse",
             )
@@ -139,9 +139,9 @@ class UtledTidligsteEndringServiceTest {
                         if (index == 0) tilbud.copy(pris = 3000) else tilbud
                     },
             ),
-            fakta.copy(erBetalingDokumentert = false),
+            fakta.copy(erUtgifterDokumentert = false),
             fakta.copy(adresse = "Ny syntetisk adresse"),
-            FaktaFlytteSelv(100, null, null, null, null, nødvendigUtgift, fakta.adresse),
+            FaktaFlytteSelv(100, null, null, null, null, nødvendigUtgift, fakta.adresse, erUtgifterDokumentert = true),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)
@@ -149,10 +149,10 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
-    fun `egen flytting oppdager avstand og alle tilleggskostnader`() {
+    fun `egen flytting oppdager avstand tilleggskostnader og dokumentasjon`() {
         val fom = 1 januar 2026
         val tom = 31 januar 2026
-        val fakta = FaktaFlytteSelv(100, 100, 100, 100, 100, nødvendigUtgift, "Syntetisk adresse")
+        val fakta = FaktaFlytteSelv(100, 100, 100, 100, 100, nødvendigUtgift, "Syntetisk adresse", erUtgifterDokumentert = true)
         val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING, fakta = fakta)
         val utleder =
             TidligsteEndringIBehandlingUtleder(
@@ -170,6 +170,7 @@ class UtledTidligsteEndringServiceTest {
             fakta.copy(bompenger = 200),
             fakta.copy(ferge = 200),
             fakta.copy(parkering = 200),
+            fakta.copy(erUtgifterDokumentert = false),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)

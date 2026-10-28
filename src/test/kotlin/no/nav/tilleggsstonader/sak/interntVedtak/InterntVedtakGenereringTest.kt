@@ -70,6 +70,8 @@ class InterntVedtakGenereringTest {
             "DAGLIG_REISE_TSR",
             "REISE_TIL_SAMLING_TSO",
             "REISE_TIL_SAMLING_TSR",
+            "FLYTTING_TSO",
+            "FLYTTING_TSR",
         ],
     )
     fun `json til htmlify er riktig`(stønadstype: Stønadstype) {
@@ -82,14 +84,14 @@ class InterntVedtakGenereringTest {
      * For å oppdatere html og pdf ved endringer i htmlify,
      * 1. Fyr opp htmlify lokalt
      * 2. Kjør:
-     *     SKAL_SKRIVE_TIL_FIL=true ./gradlew test --tests "no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf"
+     *     SKRIV_TIL_FIL=true ./gradlew test --tests "no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf"
      * 3. Formatter htmlfil etter generering for å unngå stor diff
      */
     @ParameterizedTest
     @EnumSource(
         value = Stønadstype::class,
         names = [
-// Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
+            // Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
             "BARNETILSYN",
             "LÆREMIDLER",
             "BOUTGIFTER",
@@ -97,6 +99,8 @@ class InterntVedtakGenereringTest {
             "DAGLIG_REISE_TSR",
             "REISE_TIL_SAMLING_TSO",
             "REISE_TIL_SAMLING_TSR",
+            "FLYTTING_TSO",
+            "FLYTTING_TSR",
         ],
     )
     fun `lag html og pdf`(stønadstype: Stønadstype) {
@@ -121,7 +125,7 @@ class InterntVedtakGenereringTest {
             Stønadstype.REISE_TIL_SAMLING_TSR -> mockReiseTilSamlingTsr()
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
-            -> TODO("mockFlytting")
+            -> mockFlytting(type)
 
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
@@ -198,6 +202,18 @@ class InterntVedtakGenereringTest {
             InterntVedtakTestdata.ReiseTilSamling.vilkårOffentligTransport +
             InterntVedtakTestdata.ReiseTilSamling.vilkårPrivatBil
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.innvilgetVedtakTsr()
+    }
+
+    private fun mockFlytting(stønadstype: Stønadstype) {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns
+            InterntVedtakTestdata.Flytting.behandling(stønadstype)
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
+            InterntVedtakTestdata.Flytting.vilkårperioder(stønadstype)
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
+            InterntVedtakTestdata.Flytting.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.Flytting.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Flytting.vedtak(stønadstype)
     }
 
     @Test

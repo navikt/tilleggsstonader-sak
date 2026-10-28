@@ -20,12 +20,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyrå(
                     tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erBetalingDokumentert = erBetalingDokumentert,
+                    erUtgifterDokumentert = erUtgifterDokumentert,
                     nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
 
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
+                    erUtgifterDokumentert = erUtgifterDokumentert,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     bompenger = bompenger,
@@ -44,12 +45,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyråDto(
                     tilbud = tilbud.map { FlyttebyråTilbudDto(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erBetalingDokumentert = erBetalingDokumentert,
+                    erUtgifterDokumentert = erUtgifterDokumentert,
                     nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )
 
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
+                    erUtgifterDokumentert = erUtgifterDokumentert,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     bompenger = bompenger,

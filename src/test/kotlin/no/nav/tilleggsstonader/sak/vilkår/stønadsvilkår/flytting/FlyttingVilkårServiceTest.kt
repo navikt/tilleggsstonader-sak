@@ -112,6 +112,7 @@ class FlyttingVilkårServiceTest {
             nyttVilkår.copy(
                 svar =
                     mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                             SvarOgBegrunnelse(
                                 SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,
@@ -155,6 +156,7 @@ class FlyttingVilkårServiceTest {
             nyttVilkår.copy(
                 svar =
                     mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                             SvarOgBegrunnelse(
                                 SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,
@@ -206,6 +208,7 @@ class FlyttingVilkårServiceTest {
                     nyttVilkår.copy(
                         svar =
                             mapOf(
+                                RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
                                 RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                                     SvarOgBegrunnelse(
                                         SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,

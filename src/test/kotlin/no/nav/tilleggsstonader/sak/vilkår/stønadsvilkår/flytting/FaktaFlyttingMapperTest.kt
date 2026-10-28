@@ -29,10 +29,10 @@ class FaktaFlyttingMapperTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erBetalingDokumentert = true,
+                erUtgifterDokumentert = true,
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
-            FaktaFlytteSelvDto(adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
+            FaktaFlytteSelvDto(erUtgifterDokumentert = true, adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
         ).forEach { fakta ->
             assertThat(fakta.tilDomene().tilDto()).isEqualTo(fakta)
         }
@@ -48,10 +48,11 @@ class FaktaFlyttingMapperTest {
                         FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
                     ),
                 adresse = "Flytteveien 1",
-                erBetalingDokumentert = false,
+                erUtgifterDokumentert = false,
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
             FaktaFlytteSelvDto(
+                erUtgifterDokumentert = true,
                 avstandEnVei = 250,
                 henger = 1500,
                 bompenger = 0,

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
@@ -18,9 +19,11 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -38,12 +41,14 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpos
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.tomYtelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadFlyttingUtil.søknadFlytting
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
@@ -51,6 +56,8 @@ import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
 import java.util.UUID
@@ -73,6 +80,9 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var behandlingsjournalpostRepository: BehandlingsjournalpostRepository
+
+    @Autowired
+    lateinit var søknadService: SøknadService
 
     val journalpostId = 123321L
     val ident = "12345678901"
@@ -340,6 +350,111 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `mottar flytting-søknad fra kafka, journalføres og oppretter sak`() {
+        val hendelse = journalfoeringHendelseRecord()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        mockJournalpost(brevkode = DokumentBrevkode.FLYTTING, søknad = søknadFlytting(ident = ident))
+        kjørTasksKlareForProsessering()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.FLYTTING_TSO,
+            journalpostId.toString(),
+        )
+    }
+
+    @ParameterizedTest
+    @EnumSource(Flyttemåte::class)
+    fun `flyttesøknad fra journalhendelse bevarer alle opplysninger til fakta-api`(flyttemåte: Flyttemåte) {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        val søknad = søknadFlytting(ident = ident, flyttemåte = flyttemåte, medDokumentasjon = true)
+        val vedlegg =
+            søknad.skjema.dokumentasjon.flatMap { it.opplastedeVedlegg }.mapIndexed { index, dokument ->
+                dokumentInfo(
+                    dokumentInfoId = "flyttevedlegg-${index + 1}",
+                    dokumentvarianter = listOf(dokumentvariant(filnavn = dokument.id.toString())),
+                )
+            }
+        mockJournalpost(brevkode = DokumentBrevkode.FLYTTING, søknad = søknad, vedlegg = vedlegg)
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", journalfoeringHendelseRecord()),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.FLYTTING_TSO, journalpostId.toString())
+        val behandling = behandlingRepository.findAll().single()
+        val lagret = requireNotNull(søknadService.hentSøknadFlytting(behandling.id))
+        assertThat(lagret.data.flyttingDetaljer?.flyttedato).isEqualTo(1 mars 2026)
+        assertThat(
+            lagret.data.dokumentasjon
+                .flatMap { it.dokumenter }
+                .map { it.dokumentInfoId },
+        ).containsExactlyElementsOf(vedlegg.map { it.dokumentInfoId })
+
+        restTestClient
+            .get()
+            .uri("/api/behandling/${behandling.id}")
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .isOk
+
+        val fakta =
+            restTestClient
+                .get()
+                .uri("/api/behandling/${behandling.id}/fakta")
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+                .expectBody()
+        fakta.jsonPath("$['@type']").isEqualTo("FLYTTING_TSO")
+        fakta.jsonPath("$.søknadMottattTidspunkt").isNotEmpty
+        fakta.jsonPath("$.flyttingDetaljer.årsak").isEqualTo("NY_JOBB")
+        fakta.jsonPath("$.flyttingDetaljer.flyttedato").isEqualTo("2026-03-01")
+        fakta.jsonPath("$.flyttingDetaljer.adresse.gateadresse").isEqualTo("Mimes vei 1")
+        fakta.jsonPath("$.flyttingDetaljer.adresse.postnummer").isEqualTo("5132")
+        fakta.jsonPath("$.flyttingDetaljer.adresse.poststed").isEqualTo("Nyborg")
+        fakta.jsonPath("$.flyttingDetaljer.adresse.landkode").isEqualTo("NO")
+        fakta.jsonPath("$.flyttingDetaljer.skalFlytteFraFolkeregistrertAdresse").isEqualTo("NEI")
+        fakta.jsonPath("$.flyttingDetaljer.adresseDetSkalFlyttesFra.gateadresse").isEqualTo("Hjemveien 2")
+        fakta.jsonPath("$.flyttingDetaljer.adresseDetSkalFlyttesFra.postnummer").isEqualTo("0123")
+        fakta.jsonPath("$.flyttingDetaljer.adresseDetSkalFlyttesFra.poststed").isEqualTo("Oslo")
+        fakta.jsonPath("$.flyttingDetaljer.adresseDetSkalFlyttesFra.landkode").isEqualTo("NOR")
+        fakta.jsonPath("$.flyttingDetaljer.flyttemåte").isEqualTo(flyttemåte.name)
+        fakta.jsonPath("$.flyttingDetaljer.utgifterDekketPåAnnenMåte").isEqualTo("NEI")
+        fakta.jsonPath("$.hovedytelse.søknadsgrunnlag.hovedytelse[0]").isEqualTo("AAP")
+        fakta.jsonPath("$.dokumentasjon.journalpostId").isEqualTo(journalpostId.toString())
+        vedlegg.forEachIndexed { index, dokument ->
+            fakta.jsonPath("$.dokumentasjon.dokumentasjon[$index].dokumenter[0].dokumentInfoId").isEqualTo(dokument.dokumentInfoId)
+        }
+        if (flyttemåte == Flyttemåte.FLYTTER_SELV) {
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.avstand").isEqualTo(120.25)
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.hengerleie").isEqualTo(500)
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.bom").isEqualTo(0)
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.parkering").isEqualTo(25.50)
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.ferje").isEqualTo(100.25)
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.annet").isEmpty
+            fakta.jsonPath("$.flyttingDetaljer.flyttetilbud").isEmpty
+        } else {
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting").isEmpty
+            fakta.jsonPath("$.flyttingDetaljer.flyttetilbud.length()").isEqualTo(2)
+            fakta.jsonPath("$.flyttingDetaljer.flyttetilbud[0].navn").isEqualTo("Flyttebyrå 1")
+            fakta.jsonPath("$.flyttingDetaljer.flyttetilbud[0].beløp").isEqualTo(12000)
+            fakta.jsonPath("$.flyttingDetaljer.flyttetilbud[1].navn").isEqualTo("Flyttebyrå 2")
+            fakta.jsonPath("$.flyttingDetaljer.flyttetilbud[1].beløp").isEqualTo(10500.50)
+        }
+    }
+
+    @Test
     fun `mottar scannet reise-til-samling søknad fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
         // Når toggle KAN_BEHANDLE_REISE_TIL_SAMLING fjernes, testen oppdateres til reise oppstart, flytting eller reise arbeid,
         // altså andre ikke-støttede søknader/stønadstyper
@@ -412,6 +527,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         søknad: Any?,
         journalpostKanal: String = "NAV_NO",
         journalpostId: Long = this.journalpostId,
+        vedlegg: List<DokumentInfo> = emptyList(),
     ): Journalpost {
         val dokumentvariantformat = if (søknad != null) Dokumentvariantformat.ORIGINAL else Dokumentvariantformat.ARKIV
         val søknaddookumentInfo =
@@ -423,7 +539,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
             journalpost(
                 journalpostId = journalpostId.toString(),
                 journalposttype = Journalposttype.I,
-                dokumenter = listOf(søknaddookumentInfo),
+                dokumenter = listOf(søknaddookumentInfo) + vedlegg,
                 kanal = journalpostKanal,
                 bruker = Bruker(ident, BrukerIdType.FNR),
                 journalstatus = Journalstatus.MOTTATT,

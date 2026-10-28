@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.FlyttingDetaljer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeInfo
@@ -154,11 +155,56 @@ class BehandlingFaktaService(
     }
 
     private fun hentFaktaDtoForFlytting(behandlingId: BehandlingId): BehandlingFaktaFlyttingDto {
+        val søknad = søknadService.hentSøknadFlytting(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaFlyttingDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            hovedytelse = mapHovedytelse(søknad?.data?.hovedytelse),
+            dokumentasjon =
+                søknad?.let {
+                    mapDokumentasjonFlytting(it.data.dokumentasjon, it.journalpostId)
+                },
             arena = arenaFakta(grunnlagsdata),
+            flyttingDetaljer = søknad?.data?.flyttingDetaljer?.let { mapFlyttingDetaljer(it) },
         )
     }
+
+    private fun mapFlyttingDetaljer(detaljer: FlyttingDetaljer) =
+        FaktaFlyttingDetaljer(
+            årsak = detaljer.årsak,
+            flyttedato = detaljer.flyttedato,
+            adresse =
+                detaljer.adresse.let {
+                    FaktaFlytteadresse(
+                        gateadresse = it.adresse,
+                        postnummer = it.postnummer,
+                        poststed = it.poststed,
+                        landkode = it.landkode,
+                    )
+                },
+            flyttemåte = detaljer.flyttemåte,
+            utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte,
+            skalFlytteFraFolkeregistrertAdresse = detaljer.skalFlytteFraFolkeregistrertAdresse,
+            adresseDetSkalFlyttesFra =
+                FaktaFlytteadresse(
+                    gateadresse = detaljer.adresseDetSkalFlyttesFra.adresse,
+                    postnummer = detaljer.adresseDetSkalFlyttesFra.postnummer,
+                    poststed = detaljer.adresseDetSkalFlyttesFra.poststed,
+                    landkode = detaljer.adresseDetSkalFlyttesFra.landkode,
+                ),
+            utgifterEgenFlytting =
+                detaljer.utgifterEgenFlytting?.let {
+                    FaktaUtgifterEgenFlytting(
+                        avstand = it.avstand,
+                        hengerleie = it.hengerleie,
+                        bom = it.bom,
+                        parkering = it.parkering,
+                        ferje = it.ferje,
+                        annet = it.annet,
+                    )
+                },
+            flyttetilbud = detaljer.flyttetilbud?.map { FaktaFlyttetilbud(navn = it.navn, beløp = it.beløp) },
+        )
 
     private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
         grunnlagsdata.arenaVedtak?.let {
@@ -504,6 +550,21 @@ class BehandlingFaktaService(
             }
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
+
+    private fun mapDokumentasjonFlytting(
+        dokumentasjonListe: List<SøknadDokumentasjon>,
+        journalpostId: String,
+    ): FaktaDokumentasjon =
+        FaktaDokumentasjon(
+            journalpostId = journalpostId,
+            dokumentasjon =
+                dokumentasjonListe.map { dokumentasjon ->
+                    Dokumentasjon(
+                        type = dokumentasjon.type.tittel,
+                        dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+                    )
+                },
+        )
 
     private fun mapDokumentasjonDagligReise(
         dokumentasjonListe: List<DokumentasjonDagligReise>,

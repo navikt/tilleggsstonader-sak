@@ -46,6 +46,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     private val svarFramTilFlyttemåte =
         arrayOf(
+            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                 SvarOgBegrunnelseDto(
                     SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -65,6 +66,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 ),
             fakta =
                 FaktaFlytteSelvDto(
+                    erUtgifterDokumentert = true,
                     avstandEnVei = 100,
                     henger = 1500,
                     bompenger = 300,
@@ -87,7 +89,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 FaktaFlyttebyråDto(
                     tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B", 12000)),
                     adresse = "Flytteveien 1",
-                    erBetalingDokumentert = true,
+                    erUtgifterDokumentert = true,
                     nødvendigUtgift = nødvendigUtgiftDto,
                 ),
         )
@@ -104,6 +106,49 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun `skal bevare alle innsendte felter ved lagring og henting av flyttevilkår`() {
+        val nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.NEI, "Deler av utgiften er ikke nødvendig")
+        val flyttebyrå =
+            FaktaFlyttebyråDto(
+                tilbud = listOf(FlyttebyråTilbudDto("Byrå B", 12000), FlyttebyråTilbudDto("Byrå A", 10000)),
+                adresse = "Flytteveien 1",
+                erUtgifterDokumentert = true,
+                nødvendigUtgift = nødvendigUtgift,
+            )
+        val flytteSelv =
+            FaktaFlytteSelvDto(
+                avstandEnVei = 250,
+                henger = 1500,
+                bompenger = 0,
+                ferge = null,
+                parkering = 100,
+                adresse = "Flytteveien 2",
+                erUtgifterDokumentert = true,
+                nødvendigUtgift = nødvendigUtgift,
+            )
+        val requests =
+            listOf(true, false).flatMap { dokumentert ->
+                listOf(
+                    nyttVilkårFlyttebyrå.copy(fakta = flyttebyrå.copy(erUtgifterDokumentert = dokumentert)),
+                    nyttVilkårFlytteSelv.copy(fakta = flytteSelv.copy(erUtgifterDokumentert = dokumentert)),
+                )
+            } +
+                nyttVilkårFlytteSelv.copy(
+                    svar = emptyMap(),
+                    fakta = FaktaFlyttingUbestemtDto(adresse = "Flytteveien 3"),
+                )
+
+        requests.forEachIndexed { index, request ->
+            val innsendt = request.copy(flyttedato = (1 januar 2026).plusDays(index.toLong()))
+            val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, innsendt)
+            val hentet = kall.vilkårFlytting.hentVilkår(behandling.id).single { it.id == opprettet.id }
+
+            assertThat(hentet).isEqualTo(opprettet)
+            assertLagretVilkår(innsendt, hentet)
+        }
+    }
+
+    @Test
     fun `skal kunne lagre, endre og slette vilkår for flytting selv`() {
         val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkårFlytteSelv)
 
@@ -117,6 +162,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 flyttedato = 20 januar 2026,
                 fakta =
                     FaktaFlytteSelvDto(
+                        erUtgifterDokumentert = false,
                         avstandEnVei = 200,
                         henger = 2000,
                         bompenger = 500,
@@ -166,7 +212,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlyttebyråDto(
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå C", 8000), FlyttebyråTilbudDto("Byrå D", 9000)),
                         adresse = "Flytteveien 2",
-                        erBetalingDokumentert = true,
+                        erUtgifterDokumentert = true,
                         nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
@@ -209,7 +255,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlyttebyråDto(
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B")),
                         adresse = "Flytteveien 1",
-                        erBetalingDokumentert = false,
+                        erUtgifterDokumentert = false,
                         nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
@@ -229,7 +275,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlyttebyråDto(
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000)),
                         adresse = "Flytteveien 1",
-                        erBetalingDokumentert = false,
+                        erUtgifterDokumentert = false,
                         nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
@@ -304,6 +350,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 flyttedato = 1 januar 2026,
                 svar =
                     mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
                             SvarOgBegrunnelseDto(
                                 SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
@@ -322,6 +369,25 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(kall.vilkårFlytting.hentVilkår(behandling.id)).containsExactly(opprettet)
     }
 
+    @Test
+    fun `skal gi ikke oppfylt når bruker ikke har utgifter til flyttingen`() {
+        val nyttVilkår =
+            LagreVilkårFlyttingDto(
+                flyttedato = 1 januar 2026,
+                svar =
+                    mapOf(
+                        RegelId.HAR_UTGIFTER_TIL_FLYTTING to
+                            SvarOgBegrunnelseDto(SvarId.NEI, "Bruker har ingen utgifter til flyttingen"),
+                    ),
+                fakta = FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
+            )
+
+        val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkår)
+
+        assertThat(opprettet.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertLagretVilkår(nyttVilkår, opprettet)
+    }
+
     private fun assertLagretVilkår(
         request: LagreVilkårFlyttingDto,
         resultat: VilkårFlyttingDto,
@@ -331,7 +397,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(resultat.fakta).usingRecursiveComparison().isEqualTo(request.fakta)
         assertThat(resultat.delvilkårsett).hasSize(1)
         val vurderinger = resultat.delvilkårsett.single().vurderinger
-        val forventedeRegelIder = request.svar.keys.ifEmpty { setOf(RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER) }
+        val forventedeRegelIder = request.svar.keys.ifEmpty { setOf(RegelId.HAR_UTGIFTER_TIL_FLYTTING) }
         assertThat(vurderinger.map { it.regelId }).containsExactlyElementsOf(forventedeRegelIder)
         vurderinger.forEach { vurdering ->
             val svar = request.svar[vurdering.regelId]
