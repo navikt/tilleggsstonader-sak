@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgif
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.SkjemaROAH
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -149,6 +150,19 @@ data class SøknadFlytting(
     override val sporbar: Sporbar = Sporbar(),
     override val data: SkjemaFlytting,
 ) : Søknad<SkjemaFlytting>
+
+@Table("soknad")
+data class SøknadROAH(
+    @Id
+    override val id: UUID = UUID.randomUUID(),
+    override val journalpostId: String,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    override val sporbar: Sporbar = Sporbar(),
+    override val data: SkjemaROAH,
+) : Søknad<SkjemaROAH>
 
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,

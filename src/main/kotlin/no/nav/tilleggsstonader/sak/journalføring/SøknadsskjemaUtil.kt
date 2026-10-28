@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllU
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaROAH
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import tools.jackson.core.JsonParser
@@ -53,7 +54,7 @@ object SøknadsskjemaUtil {
 
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            -> error("Søknadsskjema for $stønadstype er ikke implementert")
+            -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaROAH>>(data)
         }
 
     private fun håndterBoutgifter(
