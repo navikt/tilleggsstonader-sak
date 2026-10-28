@@ -39,7 +39,7 @@ class AktivitetspengerMarkeringService(
 
         validerTilgangTilOpgpaveEllerPerson(
             gsakOppgaveId = gsakOppgaveId,
-            oppgave = oppgave
+            oppgave = oppgave,
         )
         validerKanEndreMarkering(oppgave)
 
@@ -47,7 +47,10 @@ class AktivitetspengerMarkeringService(
         return oppgaveService.oppdaterBehandlingstype(oppgave, behandlingstype)
     }
 
-    private fun validerTilgangTilOpgpaveEllerPerson(gsakOppgaveId: Long, oppgave: Oppgave) {
+    private fun validerTilgangTilOpgpaveEllerPerson(
+        gsakOppgaveId: Long,
+        oppgave: Oppgave,
+    ) {
         val behandlingId = oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)?.behandlingId
         if (behandlingId != null) {
             tilgangService.validerSkrivetilgangTilBehandling(
@@ -80,7 +83,7 @@ class AktivitetspengerMarkeringService(
     ): Behandlingstype? {
         val erKlage =
             oppgave.behandlingstype == Behandlingstype.Klage.value ||
-                    oppgave.behandlingstype == Behandlingstype.AktivitetspengerKlage.value
+                oppgave.behandlingstype == Behandlingstype.AktivitetspengerKlage.value
         return when {
             erKlage && gjelderAktivitetspenger -> Behandlingstype.AktivitetspengerKlage
             erKlage -> Behandlingstype.Klage
