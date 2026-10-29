@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHAdresseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHAktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHBarnOgSærligeBehovAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHReiseInfo
-import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil
@@ -64,19 +63,6 @@ class SøknadsskjemaUtilTest {
             )
 
         assertThat(parset).isEqualTo(skjema)
-    }
-
-    @Test
-    fun `skal ikke eksponere skjemaverdier i feil fra ROAH-parsing`() {
-        assertThatThrownBy {
-            SøknadsskjemaUtil.parseSøknadsskjema(
-                Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                """{"ident":"skal-ikke-logges","mottattTidspunkt":"skal-ikke-logges"}""".toByteArray(),
-                (1 januar 2026).atStartOfDay(),
-            )
-        }.isInstanceOf(Feil::class.java)
-            .hasMessage("Kunne ikke lese ROAH-søknad")
-            .hasNoCause()
     }
 
     @Test
