@@ -128,12 +128,12 @@ class OpprettDummySøknadROAH(
                         ROAHReiseInfo(
                             typeReise = EnumFelt("Type reise", ROAHTypeReise.AVSLUTNING, "Avslutning", emptyList()),
                             fom = DatoFelt("Fra og med", 30 november 2026),
-                            tom = DatoFelt("Til og med", 30 november 2026),
                             reisemåte = reisemåte,
                         ),
                         ROAHReiseInfo(
                             typeReise = EnumFelt("Type reise", ROAHTypeReise.HJEMREISE, "Hjemreise", emptyList()),
                             fom = DatoFelt("Fra og med", 1 desember 2026),
+                            tom = DatoFelt("Til og med", 31 desember 2026),
                             reisemåte = reisemåte,
                         ),
                     ),
