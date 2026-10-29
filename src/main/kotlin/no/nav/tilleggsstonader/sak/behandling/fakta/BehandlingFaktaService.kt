@@ -252,6 +252,7 @@ class BehandlingFaktaService(
                     FaktaUtgifterEgenFlytting(
                         avstand = it.avstand,
                         hengerleie = it.hengerleie,
+                        leiebil = it.leiebil,
                         bom = it.bom,
                         parkering = it.parkering,
                         ferje = it.ferje,

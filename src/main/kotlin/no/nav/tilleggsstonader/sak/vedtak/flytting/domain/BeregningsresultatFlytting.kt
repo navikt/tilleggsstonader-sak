@@ -57,8 +57,10 @@ data class BeregningsgrunnlagFlytteSelv(
     val sats: BigDecimal,
     val satsBekreftet: Boolean,
     val henger: BigDecimal,
+    val leiebil: BigDecimal,
     val bompenger: BigDecimal,
     val ferge: BigDecimal,
     val parkering: BigDecimal,
+    val annet: BigDecimal,
     val erUtgifterDokumentert: Boolean,
 ) : BeregningsgrunnlagFlytting

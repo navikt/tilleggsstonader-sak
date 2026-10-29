@@ -95,9 +95,11 @@ class StønadsvilkårTestdataDsl {
         flyttedato: LocalDate,
         avstandEnVei: Int,
         henger: Int? = null,
+        leiebil: Int? = null,
         bompenger: Int? = null,
         ferge: Int? = null,
         parkering: Int? = null,
+        annet: Int? = null,
         erUtgifterDokumentert: Boolean = true,
     ) {
         opprettFlyttingScope += {
@@ -109,9 +111,11 @@ class StønadsvilkårTestdataDsl {
                         erUtgifterDokumentert = erUtgifterDokumentert,
                         avstandEnVei = avstandEnVei,
                         henger = henger,
+                        leiebil = leiebil,
                         bompenger = bompenger,
                         ferge = ferge,
                         parkering = parkering,
+                        annet = annet,
                         adresse = "Syntetisk adresse",
                         nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
                     ),

@@ -65,9 +65,11 @@ data class FlyttebyråTilbud(
 data class FaktaFlytteSelv(
     val avstandEnVei: Int?,
     val henger: Int?,
+    val leiebil: Int?,
     val bompenger: Int?,
     val ferge: Int?,
     val parkering: Int?,
+    val annet: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
     val erUtgifterDokumentert: Boolean,

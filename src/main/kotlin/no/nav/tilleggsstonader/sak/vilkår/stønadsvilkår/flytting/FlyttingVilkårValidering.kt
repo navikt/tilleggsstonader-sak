@@ -35,7 +35,7 @@ object FlyttingVilkårValidering {
                 brukerfeilHvis(fakta.avstandEnVei != null && fakta.avstandEnVei <= 0) {
                     "Avstanden må være større enn 0"
                 }
-                listOfNotNull(fakta.henger, fakta.bompenger, fakta.ferge, fakta.parkering)
+                listOfNotNull(fakta.henger, fakta.leiebil, fakta.bompenger, fakta.ferge, fakta.parkering, fakta.annet)
                     .forEach { beløp ->
                         brukerfeilHvis(beløp < 0) { "Kostnader kan ikke være negative" }
                     }

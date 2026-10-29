@@ -87,9 +87,11 @@ class DetaljertVedtaksperiodeFlyttingTest {
                     sats = BigDecimal("2.94"),
                     satsBekreftet = true,
                     henger = BigDecimal.ZERO,
+                    leiebil = BigDecimal.ZERO,
                     bompenger = BigDecimal.ZERO,
                     ferge = BigDecimal.ZERO,
                     parkering = BigDecimal.ZERO,
+                    annet = BigDecimal.ZERO,
                 )
             } else {
                 BeregningsgrunnlagFlyttebyrå(

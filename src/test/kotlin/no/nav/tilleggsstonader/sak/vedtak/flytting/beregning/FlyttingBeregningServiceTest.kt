@@ -162,9 +162,11 @@ class FlyttingBeregningServiceTest {
                             erUtgifterDokumentert = dokumentert,
                             avstandEnVei = 100,
                             henger = 100,
+                            leiebil = 50,
                             bompenger = 20,
                             ferge = 30,
                             parkering = 40,
+                            annet = 60,
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -173,7 +175,7 @@ class FlyttingBeregningServiceTest {
 
         val resultat = beregningService.beregn(behandling, listOf(periode)).resultater.single()
 
-        assertThat(resultat.beløp).isEqualByComparingTo("478")
+        assertThat(resultat.beløp).isEqualByComparingTo("588")
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlytteSelv(
@@ -182,9 +184,11 @@ class FlyttingBeregningServiceTest {
                     sats = BigDecimal("2.88"),
                     satsBekreftet = true,
                     henger = BigDecimal("100"),
+                    leiebil = BigDecimal("50"),
                     bompenger = BigDecimal("20"),
                     ferge = BigDecimal("30"),
                     parkering = BigDecimal("40"),
+                    annet = BigDecimal("60"),
                 ),
             )
     }
@@ -200,9 +204,11 @@ class FlyttingBeregningServiceTest {
                             erUtgifterDokumentert = true,
                             avstandEnVei = 1,
                             henger = null,
+                            leiebil = null,
                             bompenger = null,
                             ferge = null,
                             parkering = null,
+                            annet = null,
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -224,9 +230,11 @@ class FlyttingBeregningServiceTest {
                     sats = BigDecimal("2.88"),
                     satsBekreftet = true,
                     henger = BigDecimal.ZERO,
+                    leiebil = BigDecimal.ZERO,
                     bompenger = BigDecimal.ZERO,
                     ferge = BigDecimal.ZERO,
                     parkering = BigDecimal.ZERO,
+                    annet = BigDecimal.ZERO,
                 ),
             )
     }
@@ -495,16 +503,20 @@ class FlyttingBeregningServiceTest {
     private fun faktaFlytteSelv(
         avstandEnVei: Int? = 100,
         henger: Int? = 10,
+        leiebil: Int? = null,
         bompenger: Int? = 20,
         ferge: Int? = 30,
         parkering: Int? = 40,
+        annet: Int? = null,
     ) = FaktaFlytteSelv(
         erUtgifterDokumentert = true,
         avstandEnVei = avstandEnVei,
         henger = henger,
+        leiebil = leiebil,
         bompenger = bompenger,
         ferge = ferge,
         parkering = parkering,
+        annet = annet,
         adresse = "Flytteveien 1",
         nødvendigUtgift = nødvendigUtgift,
     )

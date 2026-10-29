@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMa
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.DokumentasjonMapper.mapDokumentasjon
 import java.time.LocalDate
 import java.time.LocalDateTime
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljer as FlyttingDetaljerKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljerAvsnitt as FlyttingDetaljerKontrakt
 
 object SøknadsskjemaFlyttingMapper {
     fun map(
@@ -68,6 +68,7 @@ object SøknadsskjemaFlyttingMapper {
                     UtgifterEgenFlytting(
                         avstand = it.avstand.verdi,
                         hengerleie = it.hengerleie?.verdi,
+                        leiebil = it.leiebil?.verdi,
                         bom = it.bom?.verdi,
                         parkering = it.parkering?.verdi,
                         ferje = it.ferje?.verdi,

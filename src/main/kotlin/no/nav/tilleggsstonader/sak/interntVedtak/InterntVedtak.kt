@@ -227,9 +227,11 @@ data class VilkårFaktaFlyttebyråInterntVedtak(
 data class VilkårFaktaFlytteSelvInterntVedtak(
     val avstandEnVei: Int?,
     val henger: Int?,
+    val leiebil: Int?,
     val bompenger: Int?,
     val ferge: Int?,
     val parkering: Int?,
+    val annet: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
     val erUtgifterDokumentert: Boolean,

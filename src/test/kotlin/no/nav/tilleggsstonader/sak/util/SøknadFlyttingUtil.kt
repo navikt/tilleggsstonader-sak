@@ -13,13 +13,14 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttebyrå
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråTilbud
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljer
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterEgenFlytting
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Adresse
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljerAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FraAdresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.TilAdresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterEgenFlyttingAvsnitt
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -43,11 +44,11 @@ object SøknadFlyttingUtil {
                             arbeidOgOpphold = null,
                         ),
                     flyttingDetaljer =
-                        FlyttingDetaljer(
+                        FlyttingDetaljerAvsnitt(
                             årsak = EnumFelt("Hvorfor flytter du?", Flytteårsak.NY_JOBB, "Ny jobb", emptyList()),
                             flyttedato = VerdiFelt("2026-03-01", "Flyttedato"),
                             adresse =
-                                Adresse(
+                                TilAdresseAvsnitt(
                                     land = SelectFelt("Land", "NO", "Norge"),
                                     gateadresse = VerdiFelt(verdi = "Mimes vei 1", label = "Gateadresse"),
                                     postnummer = VerdiFelt(verdi = "5132", label = "Postnummer"),
@@ -59,7 +60,7 @@ object SøknadFlyttingUtil {
                             skalFlytteFraFolkeregistrertAdresse =
                                 EnumFelt("Flytter du fra folkeregistrert adresse?", JaNei.NEI, "Nei", emptyList()),
                             adresseDetSkalFlyttesFra =
-                                Adresse(
+                                FraAdresseAvsnitt(
                                     land = SelectFelt("Land", "NOR", "Norge"),
                                     gateadresse = VerdiFelt("Hjemveien 2", "Gateadresse"),
                                     postnummer = VerdiFelt("0123", "Postnummer"),
@@ -67,9 +68,10 @@ object SøknadFlyttingUtil {
                                 ),
                             utgifterEgenFlytting =
                                 if (flyttemåte == Flyttemåte.FLYTTER_SELV) {
-                                    UtgifterEgenFlytting(
+                                    UtgifterEgenFlyttingAvsnitt(
                                         avstand = VerdiFelt(BigDecimal("120.25"), "Avstand"),
                                         hengerleie = VerdiFelt(BigDecimal("500.00"), "Hengerleie"),
+                                        leiebil = VerdiFelt(BigDecimal("800.00"), "Leiebil"),
                                         bom = VerdiFelt(BigDecimal("0.00"), "Bom"),
                                         parkering = VerdiFelt(BigDecimal("25.50"), "Parkering"),
                                         ferje = VerdiFelt(BigDecimal("100.25"), "Ferje"),
@@ -80,7 +82,7 @@ object SøknadFlyttingUtil {
                                 },
                             flyttebyrå =
                                 if (flyttemåte == Flyttemåte.FLYTTEBYRÅ) {
-                                    Flyttebyrå(
+                                    FlyttebyråAvsnitt(
                                         tilbud =
                                             listOf(
                                                 FlyttebyråTilbud(

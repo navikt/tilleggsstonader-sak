@@ -460,9 +460,11 @@ class InterntVedtakService(
                     erUtgifterDokumentert = fakta.erUtgifterDokumentert,
                     avstandEnVei = fakta.avstandEnVei,
                     henger = fakta.henger,
+                    leiebil = fakta.leiebil,
                     bompenger = fakta.bompenger,
                     ferge = fakta.ferge,
                     parkering = fakta.parkering,
+                    annet = fakta.annet,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     adresse = fakta.adresse,
                 )
