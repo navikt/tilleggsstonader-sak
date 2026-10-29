@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantW
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -116,6 +117,9 @@ class SkjemaRoutingService(
         if (kontekst.kreverUgradertAdresse && harFortroligEllerStrengtFortroligAdresse(ident)) {
             return SkjemaRoutingAksjon.GAMMEL_LØSNING
         }
+        if (kontekst.krevBarnHarUgradertAdresse && barnHarFortroligEllerStrengtFortroligAdresse(ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
         if (harBehandling(ident, skjematype)) {
             lagreRoutingHvisIkkeLagret(ident, skjematype, mapOf("harBehandling" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
@@ -191,6 +195,15 @@ class SkjemaRoutingService(
             adressebeskyttelse == AdressebeskyttelseGradering.FORTROLIG ||
                 adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
                 adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+        }
+
+    private fun barnHarFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
+        personService.hentPersonMedBarn(ident).barn.any { barn ->
+            barn.value.adressebeskyttelse.any { adressebeskyttelse ->
+                adressebeskyttelse.gradering == AdressebeskyttelseGradering.FORTROLIG ||
+                    adressebeskyttelse.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
+                    adressebeskyttelse.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+            }
         }
 
     private fun maksAntallErNådd(
