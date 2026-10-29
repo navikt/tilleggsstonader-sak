@@ -189,7 +189,8 @@ class SkjemaRoutingService(
     private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
         personService.hentAdressebeskyttelse(ident).søker.adressebeskyttelse.let { adressebeskyttelse ->
             adressebeskyttelse == AdressebeskyttelseGradering.FORTROLIG ||
-                adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG
+                adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
+                adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
         }
 
     private fun maksAntallErNådd(
