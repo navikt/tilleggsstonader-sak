@@ -17,6 +17,8 @@ import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import no.nav.tilleggsstonader.libs.http.client.patchForEntity
 import no.nav.tilleggsstonader.libs.http.client.postForEntity
+import no.nav.tilleggsstonader.libs.http.client.putForEntity
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppdaterBehandlingstypeRequest
 import no.nav.tilleggsstonader.sak.util.medContentTypeJsonUTF8
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -167,31 +169,19 @@ class OppgaveClient(
         behandlingstype: String?,
         endretAvEnhetsnr: String?,
     ): Oppgave {
-        val uriBuilder =
+        val uri =
             UriComponentsBuilder
                 .fromUri(oppgaveUri)
                 .pathSegment("{id}", "behandlingstype")
-        val uriVariables = oppgaveIdUriVariables(oppgaveId).toMutableMap()
-
-        val queryParams =
-            listOf(
-                "versjon" to versjon.toString(),
-                "behandlingstype" to behandlingstype,
-                "endretAvEnhetsnr" to endretAvEnhetsnr,
-            )
-        queryParams.forEach { (key, value) ->
-            if (value != null) {
-                uriBuilder.queryParam(key, "{$key}")
-                uriVariables[key] = value
-            }
-        }
+                .encode()
+                .toUriString()
 
         try {
-            return restTemplate.patchForEntity<Oppgave>(
-                uriBuilder.encode().toUriString(),
-                "",
+            return restTemplate.putForEntity<Oppgave>(
+                uri,
+                OppdaterBehandlingstypeRequest(versjon, behandlingstype, endretAvEnhetsnr),
                 HttpHeaders().medContentTypeJsonUTF8(),
-                uriVariables,
+                oppgaveIdUriVariables(oppgaveId),
             )
         } catch (e: ProblemDetailException) {
             sjekkOgHåndtertConflict(e)
