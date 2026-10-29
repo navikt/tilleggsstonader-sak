@@ -237,9 +237,9 @@ class OppgaveService(
             return null
         }
 
-        val arvetMarkering = behandlingId?.let { finnMarkeringFraForrigeOppgave(it) }
+        val gjelderForrigeOppgaveAktivitetspenger = behandlingId?.let { gjelderForrigeOppgaveAktivitetspenger(it) }
         val gjelderAktivitetspenger =
-            arvetMarkering
+            gjelderForrigeOppgaveAktivitetspenger
                 ?: if (behandlingId != null) {
                     ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
                 } else {
@@ -249,15 +249,17 @@ class OppgaveService(
         return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
     }
 
-    private fun finnMarkeringFraForrigeOppgave(behandlingId: BehandlingId): Boolean? {
+    private fun gjelderForrigeOppgaveAktivitetspenger(behandlingId: BehandlingId): Boolean? {
         val forrigeOppgave = finnSisteBehandlingsoppgaveForBehandling(behandlingId) ?: return null
         return try {
-            oppgaveClient.finnOppgaveMedId(forrigeOppgave.gsakOppgaveId).behandlingstype == Behandlingstype.Aktivitetspenger.value
+            oppgaveClient.finnOppgaveMedId(forrigeOppgave.gsakOppgaveId).gjelderAktivitetspenger()
         } catch (e: Exception) {
             logger.warn("Kunne ikke hente forrige oppgave=${forrigeOppgave.gsakOppgaveId} for å arve markering av aktivitetspenger", e)
             null
         }
     }
+
+    private fun Oppgave.gjelderAktivitetspenger() = behandlingstype == Behandlingstype.Aktivitetspenger.value
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse = oppgaveClient.oppdaterOppgave(oppgave)
 
