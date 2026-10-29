@@ -222,8 +222,7 @@ class OppgaveService(
     /**
      * Oppgaven i Gosys er sannheten. En ny oppgave på en behandling arver markeringen fra forrige oppgave,
      * slik at manuelle rettinger følger behandlingen. Uten tidligere oppgave slås personen opp mot ung-sak.
-     * Med behandling opprettes oppgaven uten markering hvis oppslaget feiler.
-     * Uten behandling opprettes ikke oppgaven hvis oppslaget feiler, slik at tasken kan prøves på nytt.
+     * Feiler oppslaget mot Gosys, opprettes ikke oppgaven.
      */
     private fun utledBehandlingstype(
         personIdent: String,
@@ -251,12 +250,7 @@ class OppgaveService(
 
     private fun gjelderForrigeOppgaveAktivitetspenger(behandlingId: BehandlingId): Boolean? {
         val forrigeOppgave = finnSisteBehandlingsoppgaveForBehandling(behandlingId) ?: return null
-        return try {
-            oppgaveClient.finnOppgaveMedId(forrigeOppgave.gsakOppgaveId).gjelderAktivitetspenger()
-        } catch (e: Exception) {
-            logger.warn("Kunne ikke hente forrige oppgave=${forrigeOppgave.gsakOppgaveId} for å arve markering av aktivitetspenger", e)
-            null
-        }
+        return oppgaveClient.finnOppgaveMedId(forrigeOppgave.gsakOppgaveId).gjelderAktivitetspenger()
     }
 
     private fun Oppgave.gjelderAktivitetspenger() = behandlingstype == Behandlingstype.Aktivitetspenger.value

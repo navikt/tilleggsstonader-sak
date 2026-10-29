@@ -249,13 +249,15 @@ internal class OppgaveServiceTest {
         }
 
         @Test
-        fun `skal falle tilbake på ung-sak når forrige oppgave ikke kan hentes`() {
-            every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns true
+        fun `skal ikke opprette oppgave eller slå opp ung-sak når forrige oppgave ikke kan hentes`() {
             every { oppgaveClient.finnOppgaveMedId(999L) } throws RuntimeException("Gosys feilet")
 
-            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+            assertThrows<RuntimeException> {
+                oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+            }
 
-            assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+            verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
         }
     }
 
