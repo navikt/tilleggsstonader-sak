@@ -439,6 +439,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         if (flyttemåte == Flyttemåte.FLYTTER_SELV) {
             fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.avstand").isEqualTo(120.25)
             fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.hengerleie").isEqualTo(500)
+            fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.leiebil").isEqualTo(800)
             fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.bom").isEqualTo(0)
             fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.parkering").isEqualTo(25.50)
             fakta.jsonPath("$.flyttingDetaljer.utgifterEgenFlytting.ferje").isEqualTo(100.25)

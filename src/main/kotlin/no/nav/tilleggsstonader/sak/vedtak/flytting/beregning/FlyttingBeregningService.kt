@@ -163,9 +163,11 @@ class FlyttingBeregningService(
                 it.beløp to it.bekreftet
             }
         val henger = fakta.henger.tilBeløp()
+        val leiebil = fakta.leiebil.tilBeløp()
         val bompenger = fakta.bompenger.tilBeløp()
         val ferge = fakta.ferge.tilBeløp()
         val parkering = fakta.parkering.tilBeløp()
+        val annet = fakta.annet.tilBeløp()
 
         val grunnlag =
             BeregningsgrunnlagFlytteSelv(
@@ -174,13 +176,15 @@ class FlyttingBeregningService(
                 sats = sats.first,
                 satsBekreftet = sats.second,
                 henger = henger,
+                leiebil = leiebil,
                 bompenger = bompenger,
                 ferge = ferge,
                 parkering = parkering,
+                annet = annet,
             )
         val beløp =
             avstandEnVei.toBigDecimal() * sats.first +
-                henger + bompenger + ferge + parkering
+                henger + leiebil + bompenger + ferge + parkering + annet
 
         return grunnlag to beløp.avrundetStønadsbeløp()
     }

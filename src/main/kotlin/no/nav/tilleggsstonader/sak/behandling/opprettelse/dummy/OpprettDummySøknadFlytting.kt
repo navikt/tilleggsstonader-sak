@@ -13,12 +13,13 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttebyrå
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråTilbud
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
-import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljer
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Adresse
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljerAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FraAdresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.TilAdresseAvsnitt
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -43,11 +44,11 @@ class OpprettDummySøknadFlytting(
                         arbeidOgOpphold = null,
                     ),
                 flyttingDetaljer =
-                    FlyttingDetaljer(
+                    FlyttingDetaljerAvsnitt(
                         årsak = EnumFelt("Hvorfor skal du flytte?", Flytteårsak.NY_JOBB, "Jeg har fått ny jobb", emptyList()),
                         flyttedato = VerdiFelt(LocalDate.now().plusWeeks(2).toString(), "Når skal du flytte?"),
                         adresse =
-                            Adresse(
+                            TilAdresseAvsnitt(
                                 land = SelectFelt("Land", "NO", "Norge"),
                                 gateadresse = VerdiFelt("Flyttegata 1", "Gateadresse"),
                                 postnummer = VerdiFelt("0150", "Postnummer"),
@@ -56,7 +57,7 @@ class OpprettDummySøknadFlytting(
                         skalFlytteFraFolkeregistrertAdresse =
                             EnumFelt("Flytter du fra din folkeregistrerte adresse?", JaNei.NEI, "Nei", emptyList()),
                         adresseDetSkalFlyttesFra =
-                            Adresse(
+                            FraAdresseAvsnitt(
                                 land = SelectFelt("Land", "NO", "Norge"),
                                 gateadresse = VerdiFelt("Gamlegata 2", "Gateadresse"),
                                 postnummer = VerdiFelt("5003", "Postnummer"),
@@ -68,7 +69,7 @@ class OpprettDummySøknadFlytting(
                             EnumFelt("Får du dekket utgiftene på annen måte?", JaNei.NEI, "Nei", emptyList()),
                         utgifterEgenFlytting = null,
                         flyttebyrå =
-                            Flyttebyrå(
+                            FlyttebyråAvsnitt(
                                 tilbud =
                                     listOf(
                                         FlyttebyråTilbud(

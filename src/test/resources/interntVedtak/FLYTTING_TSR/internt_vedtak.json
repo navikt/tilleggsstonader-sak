@@ -40,11 +40,13 @@
         "fom": "2025-01-15",
         "fraTidligereVedtak": false,
         "grunnlag": {
+          "annet": 0,
           "avstandEnVei": 100,
           "bompenger": 300,
           "erUtgifterDokumentert": true,
           "ferge": 400,
           "henger": 200,
+          "leiebil": 0,
           "parkering": 500,
           "sats": 2.94,
           "satsBekreftet": true,
@@ -156,11 +158,13 @@
     } ],
     "fakta": {
       "adresse": "Flytteveien 2, 2345 Oslo",
+      "annet": null,
       "avstandEnVei": 100,
       "bompenger": 300,
       "erUtgifterDokumentert": true,
       "ferge": 400,
       "henger": 200,
+      "leiebil": null,
       "nødvendigUtgift": {
         "begrunnelse": null,
         "erUtgiftenNødvendig": "JA"

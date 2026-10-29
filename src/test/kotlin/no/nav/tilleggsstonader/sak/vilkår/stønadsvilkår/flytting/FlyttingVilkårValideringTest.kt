@@ -110,9 +110,11 @@ class FlyttingVilkårValideringTest {
                     erUtgifterDokumentert = true,
                     avstandEnVei = 250,
                     henger = -1,
+                    leiebil = null,
                     bompenger = null,
                     ferge = null,
                     parkering = null,
+                    annet = null,
                     adresse = "Flytteveien 1",
                     nødvendigUtgift = nødvendigUtgift,
                 ),
@@ -125,7 +127,7 @@ class FlyttingVilkårValideringTest {
         listOf("", " ", "\t\n").forEach { adresse ->
             listOf(
                 FaktaFlyttingUbestemt(adresse = adresse),
-                FaktaFlytteSelv(null, null, null, null, null, nødvendigUtgift, adresse, erUtgifterDokumentert = true),
+                FaktaFlytteSelv(null, null, null, null, null, null, null, nødvendigUtgift, adresse, erUtgifterDokumentert = true),
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null)),
                     erUtgifterDokumentert = false,
@@ -231,9 +233,11 @@ class FlyttingVilkårValideringTest {
                             erUtgifterDokumentert = true,
                             avstandEnVei = 250,
                             henger = null,
+                            leiebil = null,
                             bompenger = null,
                             ferge = null,
                             parkering = null,
+                            annet = null,
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),

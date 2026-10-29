@@ -61,9 +61,11 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                 sats = BigDecimal("2.94"),
                 satsBekreftet = false,
                 henger = BigDecimal.ZERO,
+                leiebil = BigDecimal.ZERO,
                 bompenger = BigDecimal.ZERO,
                 ferge = BigDecimal.ZERO,
                 parkering = BigDecimal.ZERO,
+                annet = BigDecimal.ZERO,
             )
         val beregningsresultat =
             resultat(1 januar 2026).let { resultat ->
@@ -116,9 +118,11 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                         sats = BigDecimal("2.94"),
                         satsBekreftet = true,
                         henger = BigDecimal("100"),
+                        leiebil = BigDecimal.ZERO,
                         bompenger = BigDecimal.ZERO,
                         ferge = BigDecimal.ZERO,
                         parkering = BigDecimal.ZERO,
+                        annet = BigDecimal.ZERO,
                     ),
             )
         val blandet =

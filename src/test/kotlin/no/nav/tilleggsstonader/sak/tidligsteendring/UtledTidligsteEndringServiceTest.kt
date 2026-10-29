@@ -141,7 +141,7 @@ class UtledTidligsteEndringServiceTest {
             ),
             fakta.copy(erUtgifterDokumentert = false),
             fakta.copy(adresse = "Ny syntetisk adresse"),
-            FaktaFlytteSelv(100, null, null, null, null, nødvendigUtgift, fakta.adresse, erUtgifterDokumentert = true),
+            FaktaFlytteSelv(100, null, null, null, null, null, null, nødvendigUtgift, fakta.adresse, erUtgifterDokumentert = true),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)
@@ -152,7 +152,7 @@ class UtledTidligsteEndringServiceTest {
     fun `egen flytting oppdager avstand tilleggskostnader og dokumentasjon`() {
         val fom = 1 januar 2026
         val tom = 31 januar 2026
-        val fakta = FaktaFlytteSelv(100, 100, 100, 100, 100, nødvendigUtgift, "Syntetisk adresse", erUtgifterDokumentert = true)
+        val fakta = FaktaFlytteSelv(100, 100, 100, 100, 100, 100, 100, nødvendigUtgift, "Syntetisk adresse", erUtgifterDokumentert = true)
         val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING, fakta = fakta)
         val utleder =
             TidligsteEndringIBehandlingUtleder(
@@ -167,9 +167,11 @@ class UtledTidligsteEndringServiceTest {
         listOf(
             fakta.copy(avstandEnVei = 200),
             fakta.copy(henger = 200),
+            fakta.copy(leiebil = 200),
             fakta.copy(bompenger = 200),
             fakta.copy(ferge = 200),
             fakta.copy(parkering = 200),
+            fakta.copy(annet = 200),
             fakta.copy(erUtgifterDokumentert = false),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)

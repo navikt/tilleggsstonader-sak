@@ -29,9 +29,11 @@ object FaktaFlyttingMapper {
                     erUtgifterDokumentert = erUtgifterDokumentert,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
+                    leiebil = leiebil,
                     bompenger = bompenger,
                     ferge = ferge,
                     parkering = parkering,
+                    annet = annet,
                     adresse = adresse,
                     nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
@@ -54,9 +56,11 @@ object FaktaFlyttingMapper {
                     erUtgifterDokumentert = erUtgifterDokumentert,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
+                    leiebil = leiebil,
                     bompenger = bompenger,
                     ferge = ferge,
                     parkering = parkering,
+                    annet = annet,
                     adresse = adresse,
                     nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )

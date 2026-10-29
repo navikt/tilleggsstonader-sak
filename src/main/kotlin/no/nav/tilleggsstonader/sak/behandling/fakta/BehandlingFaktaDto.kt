@@ -142,6 +142,7 @@ data class FaktaFlytteadresse(
 data class FaktaUtgifterEgenFlytting(
     val avstand: BigDecimal,
     val hengerleie: BigDecimal?,
+    val leiebil: BigDecimal?,
     val bom: BigDecimal?,
     val parkering: BigDecimal?,
     val ferje: BigDecimal?,
