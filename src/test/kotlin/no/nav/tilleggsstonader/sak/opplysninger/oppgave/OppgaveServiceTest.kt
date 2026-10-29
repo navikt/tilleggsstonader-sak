@@ -24,7 +24,12 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -449,6 +454,132 @@ internal class OppgaveServiceTest {
                 },
             )
         }
+    }
+
+    @Nested
+    inner class FordelAktivitetspengerOppgave {
+        private val aktivitetspengerOppgave =
+            eksternOppgave(
+                id = GSAK_OPPGAVE_ID,
+                versjon = 0,
+                behandlingstype = Behandlingstype.Aktivitetspenger.value,
+            )
+
+        @BeforeEach
+        fun setUpFordel() {
+            every { oppgaveRepository.findByGsakOppgaveId(GSAK_OPPGAVE_ID) } returns lagTestOppgave()
+            every { oppgaveClient.fordelOppgave(any(), any(), any(), any()) } returns aktivitetspengerOppgave
+        }
+
+        @Test
+        fun `skal ikke tildele aktivitetspenger-oppgave til saksbehandler uten tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+            }.hasMessageContaining("aktivitetspenger")
+
+            verify(exactly = 0) { oppgaveRepository.update(any()) }
+            verify(exactly = 0) { oppgaveClient.fordelOppgave(any(), any(), any(), any()) }
+        }
+
+        @Test
+        fun `skal ikke tildele aktivitetspenger-klage til saksbehandler uten tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns
+                aktivitetspengerOppgave.copy(behandlingstype = Behandlingstype.AktivitetspengerKlage.value)
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+            }.hasMessageContaining("aktivitetspenger")
+        }
+
+        @Test
+        fun `skal tildele aktivitetspenger-oppgave til saksbehandler med tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, true)
+
+            oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+
+            verify(exactly = 1) { oppgaveClient.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1, any()) }
+        }
+
+        @Test
+        fun `skal tildele vanlig oppgave til saksbehandler uten tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns lagEksternTestOppgave()
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+
+            verify(exactly = 1) { oppgaveClient.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1, any()) }
+        }
+
+        @Test
+        fun `skal alltid kunne tilbakestille fordeling av aktivitetspenger-oppgave`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, null, 1)
+
+            verify(exactly = 1) { oppgaveClient.fordelOppgave(GSAK_OPPGAVE_ID, null, 1, any()) }
+        }
+
+        @Test
+        fun `skal ikke ta aktivitetspenger-oppgave av vent og tildele til saksbehandler uten tilgang`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.taAvVent(taAvVentRequest(beholdOppgave = true))
+            }.hasMessageContaining("aktivitetspenger")
+
+            verify(exactly = 0) { oppgaveClient.taAvVent(any()) }
+        }
+
+        @Test
+        fun `skal ikke sette aktivitetspenger-oppgave på vent og beholde den uten tilgang`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.settPåVent(
+                    SettPåVentRequest(GSAK_OPPGAVE_ID, null, 1 januar 2026, beholdOppgave = true, endretAvEnhetsnr = null),
+                )
+            }.hasMessageContaining("aktivitetspenger")
+            assertThatThrownBy {
+                oppgaveService.oppdaterPåVent(
+                    OppdaterPåVentRequest(GSAK_OPPGAVE_ID, 1, null, 1 januar 2026, beholdOppgave = true, endretAvEnhetsnr = null),
+                )
+            }.hasMessageContaining("aktivitetspenger")
+
+            verify(exactly = 0) { oppgaveClient.settPåVent(any()) }
+            verify(exactly = 0) { oppgaveClient.oppdaterPåVent(any()) }
+        }
+
+        @Test
+        fun `skal kunne ta aktivitetspenger-oppgave av vent uten å beholde den`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            every { oppgaveClient.taAvVent(any()) } returns SettPåVentResponse(GSAK_OPPGAVE_ID, 2)
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            oppgaveService.taAvVent(taAvVentRequest(beholdOppgave = false))
+
+            verify(exactly = 1) { oppgaveClient.taAvVent(any()) }
+        }
+
+        @Test
+        fun `skal kunne ta aktivitetspenger-oppgave av vent og beholde den med tilgang`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            every { oppgaveClient.taAvVent(any()) } returns SettPåVentResponse(GSAK_OPPGAVE_ID, 2)
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, true)
+
+            oppgaveService.taAvVent(taAvVentRequest(beholdOppgave = true))
+
+            verify(exactly = 1) { oppgaveClient.taAvVent(any()) }
+        }
+
+        private fun taAvVentRequest(beholdOppgave: Boolean) = TaAvVentRequest(GSAK_OPPGAVE_ID, null, beholdOppgave, 1 januar 2026, null)
     }
 
     @Test
