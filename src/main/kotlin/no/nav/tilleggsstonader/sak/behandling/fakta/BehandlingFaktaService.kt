@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
@@ -32,6 +33,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.PrivatBi
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.UnntakFraOffentligTransport
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHAdresseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHBarnOgSærligeBehovAvsnitt
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
@@ -148,11 +151,63 @@ class BehandlingFaktaService(
     private fun hentFaktaDtoForReiseOppstartAvslutningHjemreise(
         behandlingId: BehandlingId,
     ): BehandlingFaktaReiseOppstartAvslutningHjemreiseDto {
+        val søknad = søknadService.hentSøknadROAH(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            hovedytelse = søknad?.let { mapHovedytelse(it.data.hovedytelse) },
+            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
+            aktivitet = søknad?.let { mapAktivitet(it.data.aktivitet) },
+            adresser = søknad?.data?.adresser?.let(::mapROAHAdresser),
+            barnOgSærligeBehov = søknad?.data?.barnOgSærligeBehov?.let(::mapROAHBarnOgSærligeBehov),
+            reiser =
+                søknad?.data?.reiser?.map {
+                    FaktaROAHReise(
+                        typeReise = it.typeReise,
+                        fom = it.fom,
+                        tom = it.tom,
+                        reisemåte = mapReisemåte(it.reisemåte),
+                    )
+                } ?: emptyList(),
         )
     }
+
+    private fun mapROAHAdresser(adresser: ROAHAdresseAvsnitt) =
+        FaktaROAHAdresser(
+            måBoBorteHjemmefra = adresser.måBoBorteHjemmefra,
+            periodeMidlertidigBosted =
+                adresser.periodeMidlertidigBosted?.let {
+                    FaktaROAHPeriodeMidlertidigBosted(
+                        fomFlyttedato = it.fomFlyttedato,
+                        tomFlyttedato = it.tomFlyttedato,
+                    )
+                },
+            adresseOriginaltBosted =
+                adresser.adresseOriginaltBosted?.let {
+                    FaktaROAHOriginaltBosted(
+                        skalReiseFraFolkeregistrertAdresse = it.skalReiseFraFolkeregistrertAdresse,
+                        adresseOriginaltBosted = it.adresseOriginaltBosted?.let(::mapAdresse),
+                    )
+                },
+            adresseMidlertidigBosted = adresser.adresseMidlertidigBosted?.let(::mapAdresse),
+        )
+
+    private fun mapAdresse(adresse: Adresse) =
+        FaktaAdresse(
+            gateadresse = adresse.adresse,
+            postnummer = adresse.postnummer,
+            poststed = adresse.poststed,
+            landkode = adresse.landkode,
+        )
+
+    private fun mapROAHBarnOgSærligeBehov(barnOgSærligeBehov: ROAHBarnOgSærligeBehovAvsnitt) =
+        FaktaROAHBarnOgSærligeBehov(
+            harBarnUnder18SomHarFlyttetMed = barnOgSærligeBehov.harBarnUnder18SomHarFlyttetMed,
+            hvilkeBarnFlytterMed = barnOgSærligeBehov.hvilkeBarnFlytterMed,
+            harBarnHjemmeUnder4Klasse = barnOgSærligeBehov.harBarnHjemmeUnder4Klasse,
+            harSærligeBehovForFlereHjemreiser = barnOgSærligeBehov.harSærligeBehovForFlereHjemreiser,
+        )
 
     private fun hentFaktaDtoForFlytting(behandlingId: BehandlingId): BehandlingFaktaFlyttingDto {
         val søknad = søknadService.hentSøknadFlytting(behandlingId)
@@ -162,7 +217,7 @@ class BehandlingFaktaService(
             hovedytelse = mapHovedytelse(søknad?.data?.hovedytelse),
             dokumentasjon =
                 søknad?.let {
-                    mapDokumentasjonFlytting(it.data.dokumentasjon, it.journalpostId)
+                    mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata)
                 },
             arena = arenaFakta(grunnlagsdata),
             flyttingDetaljer = søknad?.data?.flyttingDetaljer?.let { mapFlyttingDetaljer(it) },
@@ -175,7 +230,7 @@ class BehandlingFaktaService(
             flyttedato = detaljer.flyttedato,
             adresse =
                 detaljer.adresse.let {
-                    FaktaFlytteadresse(
+                    FaktaAdresse(
                         gateadresse = it.adresse,
                         postnummer = it.postnummer,
                         poststed = it.poststed,
@@ -186,7 +241,7 @@ class BehandlingFaktaService(
             utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte,
             skalFlytteFraFolkeregistrertAdresse = detaljer.skalFlytteFraFolkeregistrertAdresse,
             adresseDetSkalFlyttesFra =
-                FaktaFlytteadresse(
+                FaktaAdresse(
                     gateadresse = detaljer.adresseDetSkalFlyttesFra.adresse,
                     postnummer = detaljer.adresseDetSkalFlyttesFra.postnummer,
                     poststed = detaljer.adresseDetSkalFlyttesFra.poststed,
@@ -551,20 +606,20 @@ class BehandlingFaktaService(
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
 
-    private fun mapDokumentasjonFlytting(
-        dokumentasjonListe: List<SøknadDokumentasjon>,
-        journalpostId: String,
-    ): FaktaDokumentasjon =
-        FaktaDokumentasjon(
-            journalpostId = journalpostId,
-            dokumentasjon =
-                dokumentasjonListe.map { dokumentasjon ->
-                    Dokumentasjon(
-                        type = dokumentasjon.type.tittel,
-                        dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
-                    )
-                },
-        )
+//    private fun mapDokumentasjon(
+//        dokumentasjonListe: List<SøknadDokumentasjon>,
+//        journalpostId: String,
+//    ): FaktaDokumentasjon =
+//        FaktaDokumentasjon(
+//            journalpostId = journalpostId,
+//            dokumentasjon =
+//                dokumentasjonListe.map { dokumentasjon ->
+//                    Dokumentasjon(
+//                        type = dokumentasjon.type.tittel,
+//                        dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+//                    )
+//                },
+//        )
 
     private fun mapDokumentasjonDagligReise(
         dokumentasjonListe: List<DokumentasjonDagligReise>,

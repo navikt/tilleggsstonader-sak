@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteEgenBil
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteOffentligTransport
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHTypeReise
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.LeveringOgHentingIBarnehage
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
@@ -110,7 +111,42 @@ data class BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
+    val aktivitet: FaktaAktivitet? = null,
+    val adresser: FaktaROAHAdresser? = null,
+    val barnOgSærligeBehov: FaktaROAHBarnOgSærligeBehov? = null,
+    val reiser: List<FaktaROAHReise> = emptyList(),
 ) : BehandlingFaktaDto
+
+data class FaktaROAHAdresser(
+    val måBoBorteHjemmefra: JaNei?,
+    val periodeMidlertidigBosted: FaktaROAHPeriodeMidlertidigBosted?,
+    val adresseOriginaltBosted: FaktaROAHOriginaltBosted?,
+    val adresseMidlertidigBosted: FaktaAdresse?,
+)
+
+data class FaktaROAHPeriodeMidlertidigBosted(
+    val fomFlyttedato: LocalDate?,
+    val tomFlyttedato: LocalDate?,
+)
+
+data class FaktaROAHOriginaltBosted(
+    val skalReiseFraFolkeregistrertAdresse: JaNei?,
+    val adresseOriginaltBosted: FaktaAdresse?,
+)
+
+data class FaktaROAHBarnOgSærligeBehov(
+    val harBarnUnder18SomHarFlyttetMed: JaNei?,
+    val hvilkeBarnFlytterMed: List<String>?,
+    val harBarnHjemmeUnder4Klasse: JaNei?,
+    val harSærligeBehovForFlereHjemreiser: JaNei?,
+)
+
+data class FaktaROAHReise(
+    val typeReise: ROAHTypeReise?,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
+    val reisemåte: FaktaReisemåte?,
+)
 
 data class BehandlingFaktaFlyttingDto(
     override val søknadMottattTidspunkt: LocalDateTime? = null,
@@ -123,16 +159,16 @@ data class BehandlingFaktaFlyttingDto(
 data class FaktaFlyttingDetaljer(
     val årsak: Flytteårsak,
     val flyttedato: LocalDate,
-    val adresse: FaktaFlytteadresse,
+    val adresse: FaktaAdresse,
     val flyttemåte: Flyttemåte,
     val utgifterDekketPåAnnenMåte: JaNei,
     val utgifterEgenFlytting: FaktaUtgifterEgenFlytting?,
     val flyttetilbud: List<FaktaFlyttetilbud>?,
     val skalFlytteFraFolkeregistrertAdresse: JaNei,
-    val adresseDetSkalFlyttesFra: FaktaFlytteadresse,
+    val adresseDetSkalFlyttesFra: FaktaAdresse,
 )
 
-data class FaktaFlytteadresse(
+data class FaktaAdresse(
     val gateadresse: String?,
     val postnummer: String?,
     val poststed: String?,

@@ -6,7 +6,9 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Status
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -18,8 +20,10 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHTypeReise
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
@@ -49,6 +53,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
 import no.nav.tilleggsstonader.sak.util.SøknadFlyttingUtil.søknadFlytting
+import no.nav.tilleggsstonader.sak.util.SøknadROAHUtil.søknadROAH
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
@@ -368,6 +373,129 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
             Stønadstype.FLYTTING_TSO,
             journalpostId.toString(),
         )
+    }
+
+    @Test
+    fun `mottar ROAH-TSO-søknad, lagrer skjema og kobler det til behandling`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE) } returns true
+
+        val søknad = søknadROAH(ident = ident)
+        val vedleggsId =
+            søknad.skjema.dokumentasjon
+                .single()
+                .opplastedeVedlegg
+                .single()
+                .id
+        val vedlegg =
+            dokumentInfo(
+                dokumentInfoId = "roah-vedlegg-1",
+                dokumentvarianter = listOf(dokumentvariant(filnavn = vedleggsId.toString())),
+            )
+        val hendelse = journalfoeringHendelseRecord(tema = Tema.TSO)
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        mockJournalpost(
+            brevkode = DokumentBrevkode.REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE,
+            søknad = søknad,
+            vedlegg = listOf(vedlegg),
+        )
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        val journalhendelseTasks = taskService.finnAlleTaskerMedType(JournalhendelseKafkaHåndtererTask.TYPE)
+        assertThat(journalhendelseTasks).hasSize(1)
+        assertThat(journalhendelseTasks.single().status).isEqualTo(Status.FERDIG)
+
+        val fagsak = fagsakRepository.findBySøkerIdent(setOf(ident)).single()
+        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
+        val behandling = behandlingRepository.findByFagsakId(fagsak.id).single()
+        assertThat(behandlingsjournalpostRepository.findAllByBehandlingId(behandling.id).map { it.journalpostId })
+            .containsExactly(journalpostId.toString())
+
+        val lagret = requireNotNull(søknadService.hentSøknadROAH(behandling.id))
+        assertThat(lagret.journalpostId).isEqualTo(journalpostId.toString())
+        assertThat(lagret.språk).isEqualTo(Språkkode.NB)
+        assertThat(lagret.mottattTidspunkt).isEqualTo((2 mars 2026).atTime(12, 0))
+        assertThat(lagret.data.hovedytelse.hovedytelse).containsExactly(Hovedytelse.AAP)
+        assertThat(lagret.data.adresser.måBoBorteHjemmefra).isEqualTo(JaNei.JA)
+        assertThat(
+            lagret.data.adresser.adresseMidlertidigBosted
+                ?.landkode,
+        ).isEqualTo("NOR")
+        assertThat(lagret.data.reiser.map { it.typeReise }).containsExactlyElementsOf(ROAHTypeReise.entries)
+        assertThat(lagret.data.reiser.map { it.fom }).containsExactly(3 mars 2026, 4 mars 2026, 7 mars 2026)
+        assertThat(lagret.data.reiser.map { it.tom }).containsExactly(null, 6 mars 2026, null)
+        assertThat(
+            lagret.data.reiser
+                .first()
+                .reisemåte
+                ?.offentligTransport
+                ?.totalUtgifterOffentligTransport,
+        ).isEqualTo("1200")
+        assertThat(
+            lagret.data.dokumentasjon
+                .single()
+                .dokumenter
+                .single()
+                .dokumentInfoId,
+        ).isEqualTo(vedlegg.dokumentInfoId)
+
+        restTestClient
+            .get()
+            .uri("/api/behandling/${behandling.id}")
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .isOk
+
+        val fakta =
+            restTestClient
+                .get()
+                .uri("/api/behandling/${behandling.id}/fakta")
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+                .expectBody()
+        fakta.jsonPath("$['@type']").isEqualTo("REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO")
+        fakta.jsonPath("$.søknadMottattTidspunkt").isNotEmpty
+        fakta.jsonPath("$.hovedytelse.søknadsgrunnlag.hovedytelse[0]").isEqualTo("AAP")
+        fakta.jsonPath("$.dokumentasjon.journalpostId").isEqualTo(journalpostId.toString())
+        fakta.jsonPath("$.dokumentasjon.dokumentasjon[0].dokumenter[0].dokumentInfoId").isEqualTo(vedlegg.dokumentInfoId)
+
+        fakta.jsonPath("$.aktivitet").isNotEmpty
+        fakta.jsonPath("$.aktivitet.søknadsgrunnlag.aktiviteter").isEmpty
+        fakta.jsonPath("$.aktivitet.søknadsgrunnlag.annenAktivitet").isEmpty
+        fakta.jsonPath("$.aktivitet.søknadsgrunnlag.lønnetAktivitet").isEmpty
+        fakta.jsonPath("$.adresser.måBoBorteHjemmefra").isEqualTo("JA")
+        fakta.jsonPath("$.adresser.periodeMidlertidigBosted").isEmpty
+        fakta.jsonPath("$.adresser.adresseOriginaltBosted").isEmpty
+        fakta.jsonPath("$.adresser.adresseMidlertidigBosted").isNotEmpty
+        fakta.jsonPath("$.adresser.adresseMidlertidigBosted.gateadresse").isEmpty
+        fakta.jsonPath("$.adresser.adresseMidlertidigBosted.postnummer").isEmpty
+        fakta.jsonPath("$.adresser.adresseMidlertidigBosted.poststed").isEmpty
+        fakta.jsonPath("$.adresser.adresseMidlertidigBosted.landkode").isEqualTo("NOR")
+        fakta.jsonPath("$.barnOgSærligeBehov").isNotEmpty
+        fakta.jsonPath("$.barnOgSærligeBehov.harBarnUnder18SomHarFlyttetMed").isEmpty
+        fakta.jsonPath("$.barnOgSærligeBehov.hvilkeBarnFlytterMed").isEmpty
+        fakta.jsonPath("$.barnOgSærligeBehov.harBarnHjemmeUnder4Klasse").isEmpty
+        fakta.jsonPath("$.barnOgSærligeBehov.harSærligeBehovForFlereHjemreiser").isEmpty
+
+        fakta.jsonPath("$.reiser.length()").isEqualTo(3)
+        fakta.jsonPath("$.reiser[0].typeReise").isEqualTo("OPPSTART")
+        fakta.jsonPath("$.reiser[0].fom").isEqualTo("2026-03-03")
+        fakta.jsonPath("$.reiser[0].tom").isEmpty
+        fakta.jsonPath("$.reiser[0].reisemåte.hvilkeTransportmidlerBleBenyttet[0]").isEqualTo("OFFENTLIG_TRANSPORT")
+        fakta.jsonPath("$.reiser[0].reisemåte.offentligTransport.totalUtgifterOffentligTransport").isEqualTo("1200")
+        fakta.jsonPath("$.reiser[1].typeReise").isEqualTo("AVSLUTNING")
+        fakta.jsonPath("$.reiser[1].fom").isEqualTo("2026-03-04")
+        fakta.jsonPath("$.reiser[1].tom").isEqualTo("2026-03-06")
+        fakta.jsonPath("$.reiser[1].reisemåte").isEmpty
+        fakta.jsonPath("$.reiser[2].typeReise").isEqualTo("HJEMREISE")
+        fakta.jsonPath("$.reiser[2].fom").isEqualTo("2026-03-07")
+        fakta.jsonPath("$.reiser[2].tom").isEmpty
+        fakta.jsonPath("$.reiser[2].reisemåte").isEmpty
     }
 
     @ParameterizedTest

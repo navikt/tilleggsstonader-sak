@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSa
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMapper.mapArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.DokumentasjonMapper.mapDokumentasjon
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ReisemåteMapper.mapReisemåte
 import java.time.LocalDateTime
 
 object SøknadsskjemaReiseTilSamlingMapper {
@@ -77,68 +78,7 @@ object SøknadsskjemaReiseTilSamlingMapper {
                             poststed = adresse.poststed?.verdi,
                             landkode = adresse.land?.verdi,
                         ),
-                    reisemåte =
-                        samling.reisemåte?.let { reisemåte ->
-                            Reisemåte(
-                                hvilkeTransportmidlerBleBenyttet =
-                                    reisemåte.hvilkeTransportmidlerBleBenyttet
-                                        ?.verdier
-                                        ?.map { it.verdi },
-                                unntakFraOffentligTransport =
-                                    reisemåte.unntakFraOffentligTransport?.let { unntak ->
-                                        UnntakFraOffentligTransport(
-                                            årsaker = unntak.årsaker?.verdier?.map { it.verdi },
-                                            leveringOgHentingIBarnehage =
-                                                unntak.leveringOgHentingIBarnehage?.let {
-                                                    LeveringOgHentingIBarnehage(
-                                                        gateadresse = it.gateadresse?.verdi,
-                                                        postnummer = it.postnummer?.verdi,
-                                                    )
-                                                },
-                                        )
-                                    },
-                                unntakFraPrivatBil =
-                                    reisemåte.unntakFraPrivatBil
-                                        ?.verdier
-                                        ?.map { it.verdi },
-                                offentligTransport =
-                                    reisemåte.offentligTransport?.let {
-                                        OffentligTransportInfo(
-                                            totalUtgifterOffentligTransport = it.totalUtgifterOffentligTransport?.verdi,
-                                        )
-                                    },
-                                privatBil =
-                                    reisemåte.privatBil?.let { privatBil ->
-                                        PrivatBilInfo(
-                                            benyttetEgenBil = privatBil.benyttetEgenBil?.verdi,
-                                            betalteForReisen = privatBil.betalteForReisen?.verdi,
-                                            infoBilKunDelerAvStrekning =
-                                                privatBil.infoBilKunDelerAvStrekning?.let {
-                                                    InfoBilKunDelerAvStrekning(
-                                                        strekningHvorBilBleBenyttet = it.strekningHvorBilBleBenyttet?.verdi,
-                                                        antallKilometerKjørt = it.antallKilometerKjørt?.verdi,
-                                                    )
-                                                },
-                                            utgifterPrivatBil =
-                                                privatBil.utgifterPrivatBil?.let { utgifterPrivatBil ->
-                                                    UtgifterPrivatBil(
-                                                        bompenger = utgifterPrivatBil.bompenger?.verdi,
-                                                        ferge = utgifterPrivatBil.ferge?.verdi,
-                                                        piggdekkavgift = utgifterPrivatBil.piggdekkavgift?.verdi,
-                                                        parkering = utgifterPrivatBil.parkering?.verdi,
-                                                        drivstoffType = utgifterPrivatBil.drivstoffType?.verdi,
-                                                    )
-                                                },
-                                        )
-                                    },
-                                drosje =
-                                    reisemåte.drosje?.let {
-                                        DrosjeInfo(
-                                            harTTKort = it.harTTKort?.verdi,
-                                        )
-                                    },
-                            )
-                        },
+                    reisemåte = samling.reisemåte?.let(::mapReisemåte),
                 )
             },
         avreiseadresse =

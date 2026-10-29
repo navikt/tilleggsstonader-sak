@@ -7,9 +7,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaROAH
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHAdresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHAktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHBarnOgSærligeBehovAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHReiseInfo
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil
 import no.nav.tilleggsstonader.sak.util.SøknadFlyttingUtil
@@ -25,6 +31,40 @@ import tools.jackson.databind.node.ObjectNode
 import java.time.LocalDateTime
 
 class SøknadsskjemaUtilTest {
+    @Test
+    fun `skal parse ROAH uten å kreve sluttdato på reisen`() {
+        val skjema =
+            InnsendtSkjema(
+                ident = "12345678910",
+                mottattTidspunkt = (1 januar 2026).atTime(12, 0),
+                språk = Språkkode.NB,
+                skjema =
+                    SøknadsskjemaROAH(
+                        hovedytelse =
+                            HovedytelseAvsnitt(
+                                EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                                null,
+                            ),
+                        aktivitet = ROAHAktivitetAvsnitt(null, null, null),
+                        adresser = ROAHAdresseAvsnitt(null, null, null, null),
+                        barnOgSærligeBehov = ROAHBarnOgSærligeBehovAvsnitt(null, null, null, null),
+                        reiser = listOf(ROAHReiseInfo(null, null, null, null)),
+                        dokumentasjon = emptyList(),
+                    ),
+            )
+        val json = jsonMapper.valueToTree<ObjectNode>(skjema)
+        (json.path("skjema").path("reiser")[0] as ObjectNode).remove("tom")
+
+        val parset =
+            SøknadsskjemaUtil.parseSøknadsskjema(
+                Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                jsonMapper.writeValueAsBytes(json),
+                skjema.mottattTidspunkt,
+            )
+
+        assertThat(parset).isEqualTo(skjema)
+    }
+
     @Test
     fun `Skal kunne parse søknad av type BARNETILSYN`() {
         val skjema = SøknadUtil.søknadskjemaPassAvBarn()

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -7,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
+import no.nav.tilleggsstonader.sak.util.SøknadROAHUtil.søknadROAH
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -24,6 +26,23 @@ class SøknadServiceTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var søknadService: SøknadService
+
+    @Test
+    fun `skal bare hente ROAH-søknaden som er koblet til behandlingen`() {
+        val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val behandlingUtenSøknad = testoppsettService.lagre(behandling(fagsak))
+        val innsendtSkjema = søknadROAH()
+        val søknad =
+            søknadService.lagreSøknad(
+                behandling.id,
+                lagJournalpost(),
+                innsendtSkjema.copy(skjema = innsendtSkjema.skjema.copy(dokumentasjon = emptyList())),
+            )
+
+        assertThat(søknadService.hentSøknadROAH(behandling.id)?.id).isEqualTo(søknad.id)
+        assertThat(søknadService.hentSøknadROAH(behandlingUtenSøknad.id)).isNull()
+    }
 
     @Test
     internal fun `skal kopiere kobling av søknad til ny behandling`() {

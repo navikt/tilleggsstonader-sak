@@ -24,11 +24,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SøknadsskjemaFlyttingMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaPassAvBarnMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SøknadsskjemaReiseTilSamlingMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.SøknadsskjemaROAHMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -45,6 +47,7 @@ class SøknadService(
     private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
     private val søknadReiseTilSamlingRepository: SøknadReiseTilSamlingRepository,
     private val søknadFlyttingRepository: SøknadFlyttingRepository,
+    private val søknadROAHRepository: SøknadROAHRepository,
     private val søknadMetrikker: SøknadMetrikker,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -81,6 +84,11 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadFlyttingRepository.findByIdOrThrow(it.søknadId) }
 
+    fun hentSøknadROAH(behandlingId: BehandlingId): SøknadROAH? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadROAHRepository.findByIdOrThrow(it.søknadId) }
+
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
@@ -95,6 +103,7 @@ class SøknadService(
                 is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
                 is SøknadReiseTilSamling -> søknadReiseTilSamlingRepository.insert(søknad)
                 is SøknadFlytting -> søknadFlyttingRepository.insert(søknad)
+                is SøknadROAH -> søknadROAHRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
 
@@ -140,7 +149,13 @@ class SøknadService(
                     søknadsskjema,
                 )
 
-            is SøknadsskjemaROAH -> TODO("Mapping for ROAH søknad ikke laget enda")
+            is SøknadsskjemaROAH ->
+                SøknadsskjemaROAHMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
 
             is SøknadsskjemaBoutgifterFyllUtSendInn ->
                 søknadskjemaBoutgifterMapper.map(

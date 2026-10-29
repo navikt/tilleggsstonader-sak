@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling.opprettelse.dummy
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
-import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -38,6 +37,7 @@ class OpprettDummyBehandlingController(
     private val opprettDummySøknadDagligReise: OpprettDummySøknadDagligReise,
     private val opprettDummySøknadReiseTilSamling: OpprettDummySøknadReiseTilSamling,
     private val opprettDummySøknadFlytting: OpprettDummySøknadFlytting,
+    private val opprettDummySøknadROAH: OpprettDummySøknadROAH,
 ) {
     @Transactional
     @PostMapping
@@ -91,7 +91,7 @@ class OpprettDummyBehandlingController(
             -> opprettDummySøknadFlytting.opprettDummy(fagsak, behandling)
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            -> logger.warn("Ikke støtte for å opprette dummy-søknad for ${fagsak.stønadstype}") // TODO
+            -> opprettDummySøknadROAH.opprettDummy(fagsak, behandling)
         }
     }
 
