@@ -145,6 +145,17 @@ class OppgaveClientMockConfig {
             }
             mockFordeling(oppgaveClient, oppgavelager)
 
+            every { oppgaveClient.oppdaterBehandlingstype(any(), any(), any(), any()) } answers {
+                val eksisterendeOppgave = oppgavelager.hentOppgave(firstArg())
+                val versjon = secondArg<Int>()
+                feilHvis(versjon != eksisterendeOppgave.versjon, HttpStatus.CONFLICT) {
+                    "Oppgaven har endret seg siden du sist hentet oppgaver. versjon=$versjon (${eksisterendeOppgave.versjon})"
+                }
+                val oppdatertOppgave = eksisterendeOppgave.copy(versjon = versjon + 1, behandlingstype = thirdArg())
+                oppgavelager.oppdaterOppgave(oppdatertOppgave)
+                oppdatertOppgave
+            }
+
             every { oppgaveClient.settPåVent(any()) } answers {
                 val request = firstArg<SettPåVentRequest>()
                 val oppgave = oppgavelager.hentOppgave(request.oppgaveId)
