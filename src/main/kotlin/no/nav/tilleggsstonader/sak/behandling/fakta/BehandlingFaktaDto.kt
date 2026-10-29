@@ -121,7 +121,7 @@ data class FaktaROAHAdresser(
     val måBoBorteHjemmefra: JaNei?,
     val periodeMidlertidigBosted: FaktaROAHPeriodeMidlertidigBosted?,
     val adresseOriginaltBosted: FaktaROAHOriginaltBosted?,
-    val adresseMidlertidigBosted: FaktaROAHAdresse?,
+    val adresseMidlertidigBosted: FaktaAdresse?,
 )
 
 data class FaktaROAHPeriodeMidlertidigBosted(
@@ -131,14 +131,7 @@ data class FaktaROAHPeriodeMidlertidigBosted(
 
 data class FaktaROAHOriginaltBosted(
     val skalReiseFraFolkeregistrertAdresse: JaNei?,
-    val adresseOriginaltBosted: FaktaROAHAdresse?,
-)
-
-data class FaktaROAHAdresse(
-    val gateadresse: String?,
-    val postnummer: String?,
-    val poststed: String?,
-    val landkode: String?,
+    val adresseOriginaltBosted: FaktaAdresse?,
 )
 
 data class FaktaROAHBarnOgSærligeBehov(
@@ -166,16 +159,16 @@ data class BehandlingFaktaFlyttingDto(
 data class FaktaFlyttingDetaljer(
     val årsak: Flytteårsak,
     val flyttedato: LocalDate,
-    val adresse: FaktaFlytteadresse,
+    val adresse: FaktaAdresse,
     val flyttemåte: Flyttemåte,
     val utgifterDekketPåAnnenMåte: JaNei,
     val utgifterEgenFlytting: FaktaUtgifterEgenFlytting?,
     val flyttetilbud: List<FaktaFlyttetilbud>?,
     val skalFlytteFraFolkeregistrertAdresse: JaNei,
-    val adresseDetSkalFlyttesFra: FaktaFlytteadresse,
+    val adresseDetSkalFlyttesFra: FaktaAdresse,
 )
 
-data class FaktaFlytteadresse(
+data class FaktaAdresse(
     val gateadresse: String?,
     val postnummer: String?,
     val poststed: String?,

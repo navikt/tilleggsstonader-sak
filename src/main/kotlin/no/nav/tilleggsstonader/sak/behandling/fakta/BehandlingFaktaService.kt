@@ -156,7 +156,7 @@ class BehandlingFaktaService(
         return BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.let { mapHovedytelse(it.data.hovedytelse) },
-            dokumentasjon = søknad?.let { mapDokumentasjonUtenBarn(it.data.dokumentasjon, it.journalpostId) },
+            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
             aktivitet = søknad?.let { mapAktivitet(it.data.aktivitet) },
             adresser = søknad?.data?.adresser?.let(::mapROAHAdresser),
@@ -187,14 +187,14 @@ class BehandlingFaktaService(
                 adresser.adresseOriginaltBosted?.let {
                     FaktaROAHOriginaltBosted(
                         skalReiseFraFolkeregistrertAdresse = it.skalReiseFraFolkeregistrertAdresse,
-                        adresseOriginaltBosted = it.adresseOriginaltBosted?.let(::mapROAHAdresse),
+                        adresseOriginaltBosted = it.adresseOriginaltBosted?.let(::mapAdresse),
                     )
                 },
-            adresseMidlertidigBosted = adresser.adresseMidlertidigBosted?.let(::mapROAHAdresse),
+            adresseMidlertidigBosted = adresser.adresseMidlertidigBosted?.let(::mapAdresse),
         )
 
-    private fun mapROAHAdresse(adresse: Adresse) =
-        FaktaROAHAdresse(
+    private fun mapAdresse(adresse: Adresse) =
+        FaktaAdresse(
             gateadresse = adresse.adresse,
             postnummer = adresse.postnummer,
             poststed = adresse.poststed,
@@ -217,7 +217,7 @@ class BehandlingFaktaService(
             hovedytelse = mapHovedytelse(søknad?.data?.hovedytelse),
             dokumentasjon =
                 søknad?.let {
-                    mapDokumentasjonUtenBarn(it.data.dokumentasjon, it.journalpostId)
+                    mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata)
                 },
             arena = arenaFakta(grunnlagsdata),
             flyttingDetaljer = søknad?.data?.flyttingDetaljer?.let { mapFlyttingDetaljer(it) },
@@ -230,7 +230,7 @@ class BehandlingFaktaService(
             flyttedato = detaljer.flyttedato,
             adresse =
                 detaljer.adresse.let {
-                    FaktaFlytteadresse(
+                    FaktaAdresse(
                         gateadresse = it.adresse,
                         postnummer = it.postnummer,
                         poststed = it.poststed,
@@ -241,7 +241,7 @@ class BehandlingFaktaService(
             utgifterDekketPåAnnenMåte = detaljer.utgifterDekketPåAnnenMåte,
             skalFlytteFraFolkeregistrertAdresse = detaljer.skalFlytteFraFolkeregistrertAdresse,
             adresseDetSkalFlyttesFra =
-                FaktaFlytteadresse(
+                FaktaAdresse(
                     gateadresse = detaljer.adresseDetSkalFlyttesFra.adresse,
                     postnummer = detaljer.adresseDetSkalFlyttesFra.postnummer,
                     poststed = detaljer.adresseDetSkalFlyttesFra.poststed,
@@ -606,20 +606,20 @@ class BehandlingFaktaService(
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
 
-    private fun mapDokumentasjonUtenBarn(
-        dokumentasjonListe: List<SøknadDokumentasjon>,
-        journalpostId: String,
-    ): FaktaDokumentasjon =
-        FaktaDokumentasjon(
-            journalpostId = journalpostId,
-            dokumentasjon =
-                dokumentasjonListe.map { dokumentasjon ->
-                    Dokumentasjon(
-                        type = dokumentasjon.type.tittel,
-                        dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
-                    )
-                },
-        )
+//    private fun mapDokumentasjon(
+//        dokumentasjonListe: List<SøknadDokumentasjon>,
+//        journalpostId: String,
+//    ): FaktaDokumentasjon =
+//        FaktaDokumentasjon(
+//            journalpostId = journalpostId,
+//            dokumentasjon =
+//                dokumentasjonListe.map { dokumentasjon ->
+//                    Dokumentasjon(
+//                        type = dokumentasjon.type.tittel,
+//                        dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+//                    )
+//                },
+//        )
 
     private fun mapDokumentasjonDagligReise(
         dokumentasjonListe: List<DokumentasjonDagligReise>,

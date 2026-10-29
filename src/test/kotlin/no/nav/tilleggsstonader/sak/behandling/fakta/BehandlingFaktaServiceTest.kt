@@ -647,9 +647,9 @@ internal class BehandlingFaktaServiceTest {
         assertThat(fakta.adresser?.periodeMidlertidigBosted?.tomFlyttedato).isNull()
         assertThat(fakta.adresser?.adresseOriginaltBosted?.skalReiseFraFolkeregistrertAdresse).isEqualTo(JaNei.NEI)
         assertThat(fakta.adresser?.adresseOriginaltBosted?.adresseOriginaltBosted)
-            .isEqualTo(FaktaROAHAdresse("Testgata 1", "0001", "Teststed", "NOR"))
+            .isEqualTo(FaktaAdresse("Testgata 1", "0001", "Teststed", "NOR"))
         assertThat(fakta.adresser?.adresseMidlertidigBosted)
-            .isEqualTo(FaktaROAHAdresse("Testveien 2", null, null, "SWE"))
+            .isEqualTo(FaktaAdresse("Testveien 2", null, null, "SWE"))
         assertThat(fakta.barnOgSærligeBehov)
             .isEqualTo(FaktaROAHBarnOgSærligeBehov(JaNei.JA, listOf("barn-1"), JaNei.NEI, JaNei.JA))
         assertThat(fakta.reiser).hasSize(2)
@@ -683,12 +683,6 @@ internal class BehandlingFaktaServiceTest {
                 ?.single()
                 ?.dokumenter,
         ).containsExactly(Dokument("roah-dokument"))
-        assertThat(
-            fakta.dokumentasjon
-                ?.dokumentasjon
-                ?.single()
-                ?.identBarn,
-        ).isNull()
         assertThat(fakta.arena?.vedtakTom).isEqualTo(1 januar 2024)
     }
 
@@ -775,7 +769,7 @@ internal class BehandlingFaktaServiceTest {
                 årsak = Flytteårsak.AKTIVITET,
                 flyttedato = 1 februar 2026,
                 adresse =
-                    FaktaFlytteadresse(
+                    FaktaAdresse(
                         gateadresse = "Gate 1",
                         postnummer = "0001",
                         poststed = "Oslo",
@@ -791,7 +785,7 @@ internal class BehandlingFaktaServiceTest {
                     ),
                 skalFlytteFraFolkeregistrertAdresse = JaNei.NEI,
                 adresseDetSkalFlyttesFra =
-                    FaktaFlytteadresse(
+                    FaktaAdresse(
                         gateadresse = "Hjemveien 2",
                         postnummer = "0002",
                         poststed = "Oslo",
