@@ -113,6 +113,9 @@ class SkjemaRoutingService(
         if (!unleashService.isEnabled(kontekst.featureToggle)) {
             return SkjemaRoutingAksjon.GAMMEL_LØSNING
         }
+        if (kontekst.kreverUgradertAdresse && harFortroligEllerStrengtFortroligAdresse(ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
         if (harBehandling(ident, skjematype)) {
             lagreRoutingHvisIkkeLagret(ident, skjematype, mapOf("harBehandling" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
