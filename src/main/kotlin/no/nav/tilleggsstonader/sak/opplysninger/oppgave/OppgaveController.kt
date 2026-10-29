@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -56,7 +57,7 @@ class OppgaveController(
         return oppgaveService.fordelOppgave(oppgaveId, tildeltSaksbehandler, versjon).tilDto()
     }
 
-    @PostMapping("/{oppgaveId}/aktivitetspenger")
+    @PutMapping("/{oppgaveId}/aktivitetspenger")
     fun endreAktivitetspengerMarkering(
         @PathVariable oppgaveId: Long,
         @RequestBody request: EndreAktivitetspengerMarkeringDto,
