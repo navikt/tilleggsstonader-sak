@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -23,6 +24,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import no.nav.tilleggsstonader.sak.privatbil.task.AutomatiskKjørelisteBehandlingTask
 import org.slf4j.LoggerFactory
@@ -74,8 +76,8 @@ class BehandleMottattKjørelisteService(
         val nyBehandling = opprettKjørelisteBehandling(kjøreliste)
 
         val skalOppretteAutomatiskTask =
-            nyBehandling.status != BehandlingStatus.SATT_PÅ_VENT && kanAutomatiskBehandles(nyBehandling.id)
-
+            nyBehandling.status != BehandlingStatus.SATT_PÅ_VENT &&
+                kanAutomatiskBehandles(nyBehandling.id, kjøreliste)
         if (skalOppretteAutomatiskTask) {
             logger.info(
                 "Ingen avvik funnet for behandling=${nyBehandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
@@ -152,13 +154,39 @@ class BehandleMottattKjørelisteService(
         }
     }
 
-    private fun kanAutomatiskBehandles(behandlingId: BehandlingId): Boolean {
+    private fun kanAutomatiskBehandles(
+        behandlingId: BehandlingId,
+        kjøreliste: Kjøreliste,
+    ): Boolean {
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
         val harAvvik = avklarteUker.finnesUkerMedAvvik()
+        val skalBehandlesManuelt =
+            erMarkertSomSkalBehandlesManueltFraRrammevedtak(kjøreliste, avklarteUker)
         val skalOppretteAutomatiskTask =
-            !harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
-
+            !harAvvik && !skalBehandlesManuelt && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
         return skalOppretteAutomatiskTask
+    }
+
+    private fun erMarkertSomSkalBehandlesManueltFraRrammevedtak(
+        kjøreliste: Kjøreliste,
+        avklarteUker: List<AvklartKjørtUke>,
+    ): Boolean {
+        val behandlingId =
+            behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(kjøreliste.fagsakId)?.id
+                ?: return false
+
+        val rammeForReise =
+            avklartKjørelisteService.henteReiseFraVedtak(behandlingId, kjøreliste.data.reiseId)
+
+        return avklarteUker.any { uke ->
+            uke.dager.any { dag ->
+                val harKjørt = dag.godkjentGjennomførtKjøring.toString() == "JA"
+                harKjørt &&
+                    rammeForReise
+                        .finnDelperiodeForPeriode(Datoperiode(dag.dato, dag.dato))
+                        .skalBehandlesManuelt
+            }
+        }
     }
 
     enum class KjørelisteBehandlingUtfall(

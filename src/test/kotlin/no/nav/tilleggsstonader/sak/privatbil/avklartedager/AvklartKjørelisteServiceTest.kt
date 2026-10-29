@@ -662,7 +662,8 @@ class AvklartKjørelisteServiceTest {
                 reiseId = reiseId,
                 fom = mandag,
                 tom = fredag,
-                erBehandleKjørelisteManuelt = true,
+                skalBehandleKjørelisteManuelt = true,
+                begrunnelseManuellBehandling = "Test",
             )
 
         val reisedager =
@@ -693,7 +694,8 @@ class AvklartKjørelisteServiceTest {
                 reiseId = reiseId,
                 fom = mandag,
                 tom = fredag,
-                erBehandleKjørelisteManuelt = false,
+                skalBehandleKjørelisteManuelt = false,
+                begrunnelseManuellBehandling = null,
             )
 
         val reisedager =

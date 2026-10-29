@@ -84,9 +84,6 @@ fun utledAvvikForUke(
             val uke = ukeIÅr ?: reisedager.minOf { it.dato }.tilUkeIÅr()
             dekkesReisedagAlleredeAvAnnenReise(avklarteUkerForAndreReiserISammeBehandling, rammevedtak.reiseId, uke)
         },
-        TypeAvvikUke.SKAL_BEHANDLES_MANUELT.takeIf {
-            delperiodeForUke.skalBehandlesManuelt
-        },
     )
 }
 

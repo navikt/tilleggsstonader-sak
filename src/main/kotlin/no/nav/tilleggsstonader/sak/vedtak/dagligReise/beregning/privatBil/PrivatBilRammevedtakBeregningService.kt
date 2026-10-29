@@ -206,6 +206,7 @@ class PrivatBilRammevedtakBeregningService(
                         reisedagerPerUke = delperiode.reisedagerPerUke,
                         satser = satser.sorted(),
                         skalBehandlesManuelt = delperiode.skalBehandlesManuelt,
+                        begrunnelseManuellBehandling = delperiode.begrunnelseManuellBehandling,
                     )
                 }
 

@@ -292,6 +292,7 @@ private fun rammevedtakPrivatBil(perioder: List<PrivatBilPeriode>) =
                                         ),
                                     ),
                                 skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             )
                         },
                 ),

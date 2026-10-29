@@ -758,6 +758,7 @@ object InterntVedtakTestdata {
                                                         ),
                                                     ),
                                                 skalBehandlesManuelt = false,
+                                                begrunnelseManuellBehandling = null,
                                             ),
                                             RammeForReiseMedPrivatBilDelperiode(
                                                 fom = førsteJan.plusDays(26),
@@ -779,6 +780,7 @@ object InterntVedtakTestdata {
                                                         ),
                                                     ),
                                                 skalBehandlesManuelt = false,
+                                                begrunnelseManuellBehandling = null,
                                             ),
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(40.0),

@@ -28,37 +28,37 @@ class ReisevurderingController(
     private val dagligReisePrivatBilService: DagligReisePrivatBilService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
 ) {
-    @GetMapping("{behandlingId}")
-    fun hentReisevurderingForBehandling(
-        @PathVariable behandlingId: BehandlingId,
-    ): List<ReisevurderingPrivatBilDto> {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        @GetMapping("{behandlingId}")
+        fun hentReisevurderingForBehandling(
+            @PathVariable behandlingId: BehandlingId,
+        ): List<ReisevurderingPrivatBilDto> {
+            tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+            tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        val behandling = behandlingService.hentBehandling(behandlingId)
+            val behandling = behandlingService.hentBehandling(behandlingId)
 
-        val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
-        val reiserIGjeldendeRammevedtak = dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
-        val reiserIForrigeRammevedtak =
-            behandling.forrigeIverksatteBehandlingId
-                ?.let { dagligReisePrivatBilService.hentRammevedtakForBehandlingId(it)?.reiser }
-        val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
-        val alleReiseIder =
-            ((reiserIGjeldendeRammevedtak ?: emptyList()) + (reiserIForrigeRammevedtak ?: emptyList()))
-                .map { it.reiseId }
-                .distinct()
+            val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
+            val reiserIGjeldendeRammevedtak = dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
+            val reiserIForrigeRammevedtak =
+                behandling.forrigeIverksatteBehandlingId
+                    ?.let { dagligReisePrivatBilService.hentRammevedtakForBehandlingId(it)?.reiser }
+            val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
+            val alleReiseIder =
+                ((reiserIGjeldendeRammevedtak ?: emptyList()) + (reiserIForrigeRammevedtak ?: emptyList()))
+                    .map { it.reiseId }
+                    .distinct()
 
-        return alleReiseIder.map { reiseId ->
-            val gjeldendeReise = reiserIGjeldendeRammevedtak?.singleOrNull { it.reiseId == reiseId }
-            val forrigeReise = reiserIForrigeRammevedtak?.singleOrNull { it.reiseId == reiseId }
-            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
-                gjeldendeRammevedtakForReise = gjeldendeReise,
-                forrigeRammevedtakForReise = forrigeReise,
-                avklarteUker = avklarteUker,
-                kjørelister = kjørelister,
-            )
+            return alleReiseIder.map { reiseId ->
+                val gjeldendeReise = reiserIGjeldendeRammevedtak?.singleOrNull { it.reiseId == reiseId }
+                val forrigeReise = reiserIForrigeRammevedtak?.singleOrNull { it.reiseId == reiseId }
+                ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                    gjeldendeRammevedtakForReise = gjeldendeReise,
+                    forrigeRammevedtakForReise = forrigeReise,
+                    avklarteUker = avklarteUker,
+                    kjørelister = kjørelister,
+                )
+            }
         }
-    }
 
     @PutMapping("{behandlingId}/{ukeId}")
     fun endreUke(
@@ -73,6 +73,11 @@ class ReisevurderingController(
 
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
+        val gjeldendeRammevedtak =
+            dagligReisePrivatBilService
+                .hentRammevedtakForBehandlingId(behandlingId)
+                ?.reiser
+                ?.singleOrNull { it.reiseId == oppdatertAvklartUke.reiseId }
 
         return lagUkeVurderingDto(
             uke = oppdatertAvklartUke.uke,
@@ -81,6 +86,7 @@ class ReisevurderingController(
             avklartUke = oppdatertAvklartUke,
             kjøreliste = kjøreliste,
             erUkeSlettet = false,
+            rammevedtak = gjeldendeRammevedtak,
         )
     }
 }
