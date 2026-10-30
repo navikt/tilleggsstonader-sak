@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
@@ -80,6 +81,8 @@ data class RammevedtakForReiseMedPrivatBil(
                 predicate = { it.inneholder(reiseperiode) },
             ) { "Kan ikke finne målgruppe for reiseperioden. Forventer nøyaktig en vedtaksperiode for reiseperioden." }
             .målgruppe
+
+    fun skalBehandlesManuelt(dato: LocalDate): Boolean = finnDelperiodeForPeriode(Datoperiode(dato, dato)).skalBehandlesManuelt
 }
 
 data class RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(

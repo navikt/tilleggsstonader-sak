@@ -1,6 +1,7 @@
 
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
@@ -175,12 +176,11 @@ object ReisevurderingPrivatBilMapper {
         rammevedtak: RammevedtakForReiseMedPrivatBil?,
     ): RammeForReiseMedPrivatBilDelperiode? {
         if (rammevedtak == null) return null
-
         return datoer.firstNotNullOfOrNull { dato ->
-            rammevedtak.grunnlag.delperioder.singleOrNull { delperiode ->
-                dato >= delperiode.fom &&
-                    dato <= delperiode.tom &&
-                    delperiode.skalBehandlesManuelt
+            if (rammevedtak.skalBehandlesManuelt(dato)) {
+                rammevedtak.finnDelperiodeForPeriode(Datoperiode(dato, dato))
+            } else {
+                null
             }
         }
     }

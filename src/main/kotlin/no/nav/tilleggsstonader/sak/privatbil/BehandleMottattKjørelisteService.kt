@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.privatbil
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -183,8 +182,7 @@ class BehandleMottattKjørelisteService(
                 val harKjørt = dag.godkjentGjennomførtKjøring.toString() == "JA"
                 harKjørt &&
                     rammeForReise
-                        .finnDelperiodeForPeriode(Datoperiode(dag.dato, dag.dato))
-                        .skalBehandlesManuelt
+                        .skalBehandlesManuelt(dag.dato)
             }
         }
     }
