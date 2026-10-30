@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.doma
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
@@ -146,6 +147,44 @@ data class FaktaPrivatBil(
         }
         brukerfeilHvis(piggdekkavgift != null && piggdekkavgift > MAKS_PIGGDEKKAVGIFT) {
             "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+    }
+}
+
+data class FaktaDrosje(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
+    val utgifterDrosje: BigDecimal,
+    val begrunnelse: String,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+) : FaktaReiseTilSamling {
+    override val type = TypeReiseTilSamling.DROSJE
+
+    init {
+        validerIngenNegativeUtgifter()
+        validerBegrunnelse()
+    }
+
+    override fun mapTilVilkårFakta() =
+        FaktaReiseTilSamlingDrosje(
+            reiseId = reiseId,
+            adresse = adresse,
+            nødvendigUtgift = nødvendigUtgift,
+            utgifterDrosje = utgifterDrosje,
+            begrunnelse = begrunnelse,
+            aktivitetId = aktivitetId,
+        )
+
+    private fun validerIngenNegativeUtgifter() {
+        brukerfeilHvis(utgifterDrosje <= 0.toBigDecimal()) {
+            "Utgifter til drosje må være større enn 0"
+        }
+    }
+
+    private fun validerBegrunnelse() {
+        brukerfeilHvis(begrunnelse.isBlank()) {
+            "Spesifikasjon av utgift må fylles ut"
         }
     }
 }

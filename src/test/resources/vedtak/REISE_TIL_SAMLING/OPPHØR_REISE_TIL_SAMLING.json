@@ -5,6 +5,7 @@
     "omfang": "FRA_DATO"
   },
   "beregningsresultat": {
+    "drosje": [ ],
     "offentligTransport": [ {
       "aktivitetId": null,
       "begrunnelse": "diurgierhug",

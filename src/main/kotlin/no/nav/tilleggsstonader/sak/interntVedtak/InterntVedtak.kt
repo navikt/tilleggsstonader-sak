@@ -200,6 +200,17 @@ data class VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
     override val type = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
 }
 
+data class VilkårFaktaReiseTilSamlingDrosjeInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
+    val utgifterDrosje: BigDecimal,
+    val begrunnelse: String,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+) : ReiseVilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.REISE_TIL_SAMLING_DROSJE
+}
+
 data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,

@@ -46,6 +46,22 @@
         }
       }
     },
+    "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE": {
+      "erHovedregel": false,
+      "regelId": "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "REISE_TIL_SAMLING_DROSJE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
     "HAR_UTGIFTER_TIL_REISEN": {
       "erHovedregel": true,
       "regelId": "HAR_UTGIFTER_TIL_REISEN",
@@ -53,6 +69,21 @@
         "JA": {
           "begrunnelseType": "VALGFRI",
           "regelId": "AVSTAND_OVER_TRETTI_KM"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
+    "KAN_REISE_MED_DROSJE": {
+      "erHovedregel": false,
+      "regelId": "KAN_REISE_MED_DROSJE",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
@@ -72,8 +103,7 @@
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
-          "regelId": "SLUTT_NODE",
-          "tilhørendeFaktaType": null
+          "regelId": "KAN_REISE_MED_DROSJE"
         }
       }
     },

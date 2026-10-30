@@ -21,6 +21,7 @@ import java.time.LocalDate
     JsonSubTypes.Type(FaktaDagligReiseUbestemt::class, name = "DAGLIG_REISE_UBESTEMT"),
     JsonSubTypes.Type(FaktaReiseTilSamlingOffentligTransport::class, name = "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaReiseTilSamlingPrivatBil::class, name = "REISE_TIL_SAMLING_PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingDrosje::class, name = "REISE_TIL_SAMLING_DROSJE"),
     JsonSubTypes.Type(FaktaReiseTilSamlingUbestemt::class, name = "REISE_TIL_SAMLING_UBESTEMT"),
     JsonSubTypes.Type(
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport::class,
@@ -99,6 +100,15 @@ data class FaktaReiseTilSamlingPrivatBil(
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
+) : ReiseVilkårFakta
+
+data class FaktaReiseTilSamlingDrosje(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
+    val utgifterDrosje: BigDecimal,
+    val begrunnelse: String,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : ReiseVilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(
@@ -195,6 +205,7 @@ enum class TypeVilkårFakta {
     DAGLIG_REISE_UBESTEMT,
     REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
     REISE_TIL_SAMLING_PRIVAT_BIL,
+    REISE_TIL_SAMLING_DROSJE,
     REISE_TIL_SAMLING_UBESTEMT,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL,

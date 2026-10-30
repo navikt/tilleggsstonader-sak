@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
@@ -24,7 +26,25 @@ fun BeregningsresultatReiseTilSamling.mapTilAndelTilkjentYtelse(
     hentTiltaksvariant: (VilkårperiodeGlobalId?) -> TypeAktivitet?,
 ): List<AndelTilkjentYtelse> =
     offentligTransport.map { it.mapTilAndelTilkjentYtelse(saksbehandling, hentTiltaksvariant(it.aktivitetId)) } +
-        privatBil.map { it.mapTilAndelTilkjentYtelse(saksbehandling, hentTiltaksvariant(it.aktivitetId)) }
+        privatBil.map { it.mapTilAndelTilkjentYtelse(saksbehandling, hentTiltaksvariant(it.aktivitetId)) } +
+        drosje.map { it.mapTilAndelTilkjentYtelse(saksbehandling, hentTiltaksvariant(it.aktivitetId)) }
+
+fun BeregningsresultatDrosje.mapTilAndelTilkjentYtelse(
+    saksbehandling: Saksbehandling,
+    tiltaksvariant: TypeAktivitet?,
+): AndelTilkjentYtelse {
+    val målgrupper = grunnlag.vedtaksperioder.map { it.målgruppe }
+
+    return lagAndelForReiseTilSamling(
+        saksbehandling = saksbehandling,
+        fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+        beløp = beløp.avrundetStønadsbeløp().toInt(),
+        målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
+        tiltaksvariant = tiltaksvariant,
+        brukersNavKontor = grunnlag.brukersNavKontor,
+        reiseId = reiseId,
+    )
+}
 
 fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
     saksbehandling: Saksbehandling,
@@ -35,7 +55,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
     return lagAndelForReiseTilSamling(
         saksbehandling = saksbehandling,
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        beløp = beløp.toInt(),
+        beløp = beløp.avrundetStønadsbeløp().toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
         brukersNavKontor = grunnlag.brukersNavKontor,
@@ -52,7 +72,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
     return lagAndelForReiseTilSamling(
         saksbehandling = saksbehandling,
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        beløp = beløp.toInt(),
+        beløp = beløp.avrundetStønadsbeløp().toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
         satsBekreftet = grunnlag.satsBekreftet,
@@ -147,6 +167,15 @@ fun finnPeriodeFraAndel(
 
     if (privatGrunnlag != null) {
         return Datoperiode(fom = privatGrunnlag.fom, tom = privatGrunnlag.tom)
+    }
+
+    val drosjeGrunnlag =
+        beregningsresultat.drosje
+            .find { it.reiseId == andelTilkjentYtelse.reiseId }
+            ?.grunnlag
+
+    if (drosjeGrunnlag != null) {
+        return Datoperiode(fom = drosjeGrunnlag.fom, tom = drosjeGrunnlag.tom)
     }
 
     error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")

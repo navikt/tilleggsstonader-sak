@@ -4,6 +4,7 @@
     "omfang": "ALLE_PERIODER"
   },
   "beregningsresultat": {
+    "drosje": [ ],
     "offentligTransport": [ {
       "aktivitetId": null,
       "begrunnelse": "diurgierhug",

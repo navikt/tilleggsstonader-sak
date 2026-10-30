@@ -12,8 +12,9 @@ import java.time.LocalDate
 data class BeregningsresultatReiseTilSamling(
     val offentligTransport: List<BeregningsresultatOffentligTransport>,
     val privatBil: List<BeregningsresultatPrivatBil>,
+    val drosje: List<BeregningsresultatDrosje> = emptyList(),
 ) {
-    fun alleSamlinger(): Collection<BeregningsresultatForSamling> = offentligTransport + privatBil
+    fun alleSamlinger(): Collection<BeregningsresultatForSamling> = offentligTransport + privatBil + drosje
 }
 
 sealed interface BeregningsresultatForSamling {
@@ -46,6 +47,15 @@ data class BeregningsresultatPrivatBil(
     val fraTidligereVedtak: Boolean = false,
 ) : BeregningsresultatForSamling
 
+data class BeregningsresultatDrosje(
+    override val reiseId: ReiseId,
+    override val grunnlag: BeregningsgrunnlagDrosjeForSamling,
+    val beløp: BigDecimal,
+    val begrunnelse: String,
+    val aktivitetId: VilkårperiodeGlobalId?,
+    val fraTidligereVedtak: Boolean = false,
+) : BeregningsresultatForSamling
+
 interface BeregningsgrunnlagForSamling {
     val fom: LocalDate
     val tom: LocalDate
@@ -68,6 +78,14 @@ data class BeregningsgrunnlagPrivatBilForSamling(
 ) : BeregningsgrunnlagForSamling
 
 data class BeregningsgrunnlagOffentligTransportForSamling(
+    val adresse: String?,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    override val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    val brukersNavKontor: String?,
+) : BeregningsgrunnlagForSamling
+
+data class BeregningsgrunnlagDrosjeForSamling(
     val adresse: String?,
     override val fom: LocalDate,
     override val tom: LocalDate,

@@ -147,6 +147,7 @@ class OpprettAndelerReiseTilSamlingServiceTest {
                             BeregningsresultatReiseTilSamling(
                                 offentligTransport = offentligTransport,
                                 privatBil = emptyList(),
+                                drosje = emptyList(),
                             ),
                         vedtaksperioder = emptyList(),
                         beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
