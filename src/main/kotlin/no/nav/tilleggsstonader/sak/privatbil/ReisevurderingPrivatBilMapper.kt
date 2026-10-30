@@ -99,7 +99,7 @@ object ReisevurderingPrivatBilMapper {
     ): UkeVurderingDto {
         val manuellBehandling =
             finnManuellBehandlingForUke(
-                datoer = datoer,
+                datoer = gjeldendeDatoerForUke,
                 rammevedtak = rammevedtak,
             )
 

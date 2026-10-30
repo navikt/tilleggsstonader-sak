@@ -656,7 +656,7 @@ class AvklartKjørelisteServiceTest {
     }
 
     @Test
-    fun `uke skal ha status AVVIK når kjøreliste skal behandles manuelt`() {
+    fun `uke skal ikke ha status AVVIK når kjøreliste skal behandles manuelt`() {
         val rammevedtak =
             rammeForReiseMedPrivatBil(
                 reiseId = reiseId,
@@ -684,7 +684,7 @@ class AvklartKjørelisteServiceTest {
                 rammevedtak = rammevedtak,
             )
 
-        assertThat(avklartUke.status).isEqualTo(UkeStatus.AVVIK)
+        assertThat(avklartUke.status).isEqualTo(UkeStatus.OK_AUTOMATISK)
     }
 
     @Test
