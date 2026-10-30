@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.førstePeriodeEtter
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -275,6 +276,8 @@ data class TidligsteEndringIBehandlingUtleder(
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
         when {
+            vilkårNå.fakta == null && vilkårTidligereBehandling.fakta == null -> false
+
             vilkårNå.fakta is FlyttingVilkårFakta || vilkårTidligereBehandling.fakta is FlyttingVilkårFakta ->
                 vilkårNå.fakta != vilkårTidligereBehandling.fakta
 
@@ -352,7 +355,11 @@ data class TidligsteEndringIBehandlingUtleder(
             }
 
             else -> {
-                false
+                feil(
+                    "Mangler sammenligning av vilkårsfakta: " +
+                        "nå=${vilkårNå.fakta?.javaClass?.simpleName}, " +
+                        "tidligere=${vilkårTidligereBehandling.fakta?.javaClass?.simpleName}",
+                )
             }
         }
 
