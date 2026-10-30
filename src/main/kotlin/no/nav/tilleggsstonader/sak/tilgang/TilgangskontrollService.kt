@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.tilgang
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
+import no.nav.tilleggsstonader.sak.felles.domain.skalVurdereEvtBarnSinAdressebeskyttelse
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
@@ -64,7 +64,7 @@ class TilgangskontrollService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): AdressebeskyttelseForPerson =
-        if (stønadstype.gjelderBarn()) {
+        if (stønadstype.skalVurdereEvtBarnSinAdressebeskyttelse()) {
             personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
         } else {
             personService.hentAdressebeskyttelse(personIdent)
