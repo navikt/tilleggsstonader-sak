@@ -773,6 +773,8 @@ object InterntVedtakTestdata {
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                                         ),
                                                     ),
+                                                skalBehandlesManuelt = false,
+                                                begrunnelseManuellBehandling = null,
                                             ),
                                             RammeForReiseMedPrivatBilDelperiode(
                                                 fom = førsteJan.plusDays(26),
@@ -793,6 +795,8 @@ object InterntVedtakTestdata {
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                                         ),
                                                     ),
+                                                skalBehandlesManuelt = false,
+                                                begrunnelseManuellBehandling = null,
                                             ),
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(40.0),
@@ -1035,6 +1039,7 @@ object InterntVedtakTestdata {
                                         reisedagerPerUke = 3,
                                         bompengerPerDag = BigDecimal("40"),
                                         fergekostnadPerDag = BigDecimal("50"),
+                                        skalBehandlesManuelt = false,
                                     ),
                                     FaktaDelperiodePrivatBil(
                                         fom = 27 januar 2025,
@@ -1042,6 +1047,7 @@ object InterntVedtakTestdata {
                                         reisedagerPerUke = 5,
                                         bompengerPerDag = BigDecimal("40"),
                                         fergekostnadPerDag = BigDecimal("50"),
+                                        skalBehandlesManuelt = false,
                                     ),
                                 ),
                             aktivitetId = dummyAktivitetId,

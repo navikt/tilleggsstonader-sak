@@ -173,7 +173,7 @@ class AvklartKjørelisteService(
         }
     }
 
-    private fun henteReiseFraVedtak(
+    fun henteReiseFraVedtak(
         behandlingId: BehandlingId,
         reiseId: ReiseId,
     ): RammevedtakForReiseMedPrivatBil {

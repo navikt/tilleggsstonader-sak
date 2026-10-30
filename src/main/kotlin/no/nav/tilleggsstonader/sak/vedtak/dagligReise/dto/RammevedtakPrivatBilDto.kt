@@ -30,6 +30,8 @@ data class DelperiodeDto(
     val bompengerPerDag: BigDecimal?,
     val fergekostnadPerDag: BigDecimal?,
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
+    val skalBehandlesManuelt: Boolean,
+    val begrunnelseManuellBehandling: String?,
 ) : Periode<LocalDate>
 
 data class RammeForReiseMedPrivatBilDelperiodeSatserDto(
@@ -60,6 +62,8 @@ fun RammevedtakForReiseMedPrivatBil.tilDto(beregningsplan: Beregningsplan?): Ram
                     fergekostnadPerDag = delperiode.ekstrakostnader.fergekostnadPerDag,
                     reisedagerPerUke = delperiode.reisedagerPerUke,
                     satser = delperiode.satser.map { it.tilDto() },
+                    skalBehandlesManuelt = delperiode.skalBehandlesManuelt,
+                    begrunnelseManuellBehandling = delperiode.begrunnelseManuellBehandling,
                 )
             },
         reiseavstandEnVei = grunnlag.reiseavstandEnVei,

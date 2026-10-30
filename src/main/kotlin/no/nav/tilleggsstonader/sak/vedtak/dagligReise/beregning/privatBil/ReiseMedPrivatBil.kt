@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
+import kotlin.Boolean
 
 data class ReiseMedPrivatBil(
     override val fom: LocalDate,
@@ -36,6 +37,8 @@ data class ReiseMedPrivatBilDelperiode(
     val reisedagerPerUke: Int,
     val bompengerPerDag: BigDecimal?,
     val fergekostnadPerDag: BigDecimal?,
+    val skalBehandlesManuelt: Boolean,
+    val begrunnelseManuellBehandling: String?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBilDelperiode> {
     override fun medPeriode(
@@ -47,6 +50,8 @@ data class ReiseMedPrivatBilDelperiode(
         reisedagerPerUke = reisedagerPerUke,
         bompengerPerDag = bompengerPerDag,
         fergekostnadPerDag = fergekostnadPerDag,
+        skalBehandlesManuelt = skalBehandlesManuelt,
+        begrunnelseManuellBehandling = begrunnelseManuellBehandling,
     )
 }
 
@@ -77,6 +82,8 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(
                     reisedagerPerUke = delperiode.reisedagerPerUke,
                     bompengerPerDag = delperiode.bompengerPerDag,
                     fergekostnadPerDag = delperiode.fergekostnadPerDag,
+                    skalBehandlesManuelt = delperiode.skalBehandlesManuelt,
+                    begrunnelseManuellBehandling = delperiode.begrunnelseManuellBehandling,
                 )
             },
         aktivitetType = aktivitetType,

@@ -320,6 +320,8 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
                     reisedagerPerUke = 5,
                     bompengerPerDag = bompengerPerDag,
                     fergekostnadPerDag = fergekostnadPerDag,
+                    skalBehandlesManuelt = false,
+                    begrunnelseManuellBehandling = null,
                 ),
             ),
         aktivitetId = aktivitet.globalId,

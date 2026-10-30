@@ -631,6 +631,7 @@ fun faktaPrivatBil(
                 reisedagerPerUke = 5,
                 bompengerPerDag = BigDecimal("80"),
                 fergekostnadPerDag = null,
+                skalBehandlesManuelt = false,
             ),
             FaktaDelperiodePrivatBil(
                 fom = 16 januar 2025,
@@ -638,6 +639,7 @@ fun faktaPrivatBil(
                 reisedagerPerUke = 3,
                 bompengerPerDag = BigDecimal("50"),
                 fergekostnadPerDag = BigDecimal("20"),
+                skalBehandlesManuelt = false,
             ),
         ),
 ) = FaktaPrivatBil(
@@ -883,6 +885,8 @@ fun lagreDagligReisePrivatBilDto(
                 reisedagerPerUke = 5,
                 bompengerPerDag = null,
                 fergekostnadPerDag = null,
+                skalBehandlesManuelt = false,
+                begrunnelseManuellBehandling = null,
             ),
         ),
     svar: Map<RegelId, SvarOgBegrunnelseDto> =

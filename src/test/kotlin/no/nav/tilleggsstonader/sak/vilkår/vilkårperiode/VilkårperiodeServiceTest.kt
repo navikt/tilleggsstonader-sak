@@ -473,6 +473,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                                         reisedagerPerUke = 5,
                                         bompengerPerDag = null,
                                         fergekostnadPerDag = null,
+                                        skalBehandlesManuelt = false,
                                     ),
                                 ),
                             adresse = "Tiltaksveien 1",

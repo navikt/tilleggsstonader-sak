@@ -27,6 +27,8 @@ object RammevedtakPrivatBilUtil {
         dagsatsUtenParkering: BigDecimal = 100.toBigDecimal(),
         vedtaksperioder: List<Vedtaksperiode> = listOf(vedtaksperiode(fom, tom)),
         delperioder: List<RammeForReiseMedPrivatBilDelperiode>? = null,
+        skalBehandleKjørelisteManuelt: Boolean = false,
+        begrunnelseManuellBehandling: String? = null,
     ): RammevedtakForReiseMedPrivatBil =
         RammevedtakForReiseMedPrivatBil(
             reiseId = reiseId,
@@ -54,6 +56,8 @@ object RammevedtakPrivatBilUtil {
                                             dagsatsUtenParkering = dagsatsUtenParkering,
                                         ),
                                     ),
+                                skalBehandlesManuelt = skalBehandleKjørelisteManuelt,
+                                begrunnelseManuellBehandling = begrunnelseManuellBehandling,
                             ),
                         ),
                     reiseavstandEnVei = reiseavstandEnVei,

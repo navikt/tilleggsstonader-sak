@@ -46,8 +46,8 @@ fun utledAvklartUke(
     avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
 ): AvklartKjørtUke {
     val avvikUke = utledAvvikForUke(rammevedtak, reisedager, avklarteUkerForAndreReiserISammeBehandling, ukeIÅr)
-
     val avklarteDager = reisedager.map { utledAvklartDag(it, avvikUke) }
+    val status = utledAutomatiskStatusForUke(avklarteDager, avvikUke)
 
     return AvklartKjørtUke(
         behandlingId = behandlingId,
@@ -58,7 +58,7 @@ fun utledAvklartUke(
         uke = ukeIÅr,
         // Trengs denne? Kan lages i visningslogikk
         // Rart at den er avhengig av både ukeavvik og dagavvik
-        status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),
+        status = status,
         avvik = avvikUke.tilAvklartKjørtUkeAvvik(),
         dager = avklarteDager.toSet(),
         avklartKjørtUkeStatus = avklartKjørtUkeStatus,
