@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
-import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
+import no.nav.tilleggsstonader.sak.felles.domain.skalVurdereEvtBarnSinAdressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPerson
@@ -111,7 +111,7 @@ class ArbeidsfordelingService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): AdressebeskyttelseForPerson =
-        if (stønadstype.gjelderBarn()) {
+        if (stønadstype.skalVurdereEvtBarnSinAdressebeskyttelse()) {
             personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
         } else {
             personService.hentAdressebeskyttelse(personIdent)
