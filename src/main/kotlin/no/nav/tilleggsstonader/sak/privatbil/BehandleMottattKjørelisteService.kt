@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import no.nav.tilleggsstonader.sak.privatbil.task.AutomatiskKjørelisteBehandlingTask
 import org.slf4j.LoggerFactory
@@ -170,19 +171,24 @@ class BehandleMottattKjørelisteService(
         kjøreliste: Kjøreliste,
         avklarteUker: List<AvklartKjørtUke>,
     ): Boolean {
-        val behandlingId =
-            behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(kjøreliste.fagsakId)?.id
+        val behandling =
+            behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(kjøreliste.fagsakId)
                 ?: return false
 
         val rammeForReise =
-            avklartKjørelisteService.henteReiseFraVedtak(behandlingId, kjøreliste.data.reiseId)
+            avklartKjørelisteService.henteReiseFraVedtak(
+                behandling.id,
+                kjøreliste.data.reiseId,
+            )
 
         return avklarteUker.any { uke ->
             uke.dager.any { dag ->
-                val harKjørt = dag.godkjentGjennomførtKjøring.toString() == "JA"
+                val harKjørt =
+                    dag.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA
+
                 harKjørt &&
-                    rammeForReise
-                        .skalBehandlesManuelt(dag.dato)
+                    rammeForReise.grunnlag.inneholder(dag.dato) &&
+                    rammeForReise.skalBehandlesManuelt(dag.dato)
             }
         }
     }
