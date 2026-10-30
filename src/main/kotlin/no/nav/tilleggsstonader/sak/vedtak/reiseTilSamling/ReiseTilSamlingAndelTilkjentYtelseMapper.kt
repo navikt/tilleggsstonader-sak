@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
@@ -37,7 +38,7 @@ fun BeregningsresultatDrosje.mapTilAndelTilkjentYtelse(
     return lagAndelForReiseTilSamling(
         saksbehandling = saksbehandling,
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        beløp = beløp.toInt(),
+        beløp = beløp.avrundetStønadsbeløp().toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
         brukersNavKontor = grunnlag.brukersNavKontor,
@@ -54,7 +55,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
     return lagAndelForReiseTilSamling(
         saksbehandling = saksbehandling,
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        beløp = beløp.toInt(),
+        beløp = beløp.avrundetStønadsbeløp().toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
         brukersNavKontor = grunnlag.brukersNavKontor,
@@ -71,7 +72,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
     return lagAndelForReiseTilSamling(
         saksbehandling = saksbehandling,
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        beløp = beløp.toInt(),
+        beløp = beløp.avrundetStønadsbeløp().toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
         satsBekreftet = grunnlag.satsBekreftet,

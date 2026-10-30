@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
@@ -313,12 +314,26 @@ data class TidligsteEndringIBehandlingUtleder(
             }
 
             vilkårNå.fakta is FaktaReiseTilSamlingOffentligTransport &&
-                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil -> {
+                (
+                    vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil ||
+                        vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingDrosje
+                ) -> {
                 true
             }
 
             vilkårNå.fakta is FaktaReiseTilSamlingPrivatBil &&
-                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport -> {
+                (
+                    vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport ||
+                        vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingDrosje
+                ) -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaReiseTilSamlingDrosje &&
+                (
+                    vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport ||
+                        vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil
+                ) -> {
                 true
             }
 
@@ -329,6 +344,10 @@ data class TidligsteEndringIBehandlingUtleder(
 
             vilkårNå.fakta is FaktaReiseTilSamlingPrivatBil &&
                 vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil -> {
+                vilkårNå.fakta != vilkårTidligereBehandling.fakta
+            }
+            vilkårNå.fakta is FaktaReiseTilSamlingDrosje &&
+                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingDrosje -> {
                 vilkårNå.fakta != vilkårTidligereBehandling.fakta
             }
 
