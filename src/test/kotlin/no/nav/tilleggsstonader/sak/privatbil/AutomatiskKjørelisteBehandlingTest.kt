@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -45,6 +46,19 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
 
     val fom: LocalDate = 1 januar 2026
     val tom: LocalDate = 31 januar 2026
+
+    val delperiode =
+        listOf(
+            FaktaDelperiodePrivatBilDto(
+                fom = fom,
+                tom = tom,
+                reisedagerPerUke = 5,
+                bompengerPerDag = null,
+                fergekostnadPerDag = null,
+                skalBehandlesManuelt = true,
+                begrunnelseManuellBehandling = "Begrunnelse",
+            ),
+        )
 
     @BeforeEach
     fun setUp() {
@@ -77,6 +91,31 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
         KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+    }
+
+    @Test
+    fun `mottatt kjøreliste som skal behandles manuelt oppretter manuell behandling`() {
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom, 10.toBigDecimal(), delperiode)
+
+                sendInnKjøreliste {
+                    periode = Datoperiode(fom, 4 januar 2026)
+                    kjørteDager =
+                        listOf(
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
+                        )
+                }
+            }
+        val behandlinger = behandlingService.hentBehandlinger(behandlingContext.fagsakId)
+
+        val kjørelistebehandling = behandlinger.single { it.type == BehandlingType.KJØRELISTE }
+
+        assertThat(behandlinger).hasSize(2)
+        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
+        assertThat(kjørelistebehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
     }
 
     @Test
