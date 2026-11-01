@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.10.29-160358-b09b544",
-  "source_sha": "83fb61c2b2973b845655224d72a950d1347cfaeb",
+  "version": "2026.10.31-184428-db7a33c",
+  "source_sha": "7ec5c7eeeaad2be053002d24884f6810f057b2fe",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -213,6 +213,10 @@
       "hash": "ebb952121b180fac"
     },
     {
+      "path": ".github/skills/innblikk/",
+      "hash": "9739597f3c0a2313"
+    },
+    {
       "path": ".github/skills/jackson-3-migration/",
       "hash": "9b4932b7b9d4a076"
     },
@@ -259,8 +263,8 @@
     },
     {
       "path": ".github/skills/nav-dekoratoren/",
-      "hash": "6021ae23a432b555",
-      "revision": "12f7d1fa9ca902ab47130fa44842077717424cd5"
+      "hash": "dea560a0615a3e39",
+      "revision": "7ec5c7eeeaad2be053002d24884f6810f057b2fe"
     },
     {
       "path": ".github/skills/nav-plan/",
