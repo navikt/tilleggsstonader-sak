@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljerAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FraAdresseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.TilAdresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterEgenFlyttingAvsnitt
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -56,7 +57,7 @@ object SøknadFlyttingUtil {
                                 ),
                             flyttemåte = EnumFelt("Hvordan flytter du?", flyttemåte, flyttemåte.name, emptyList()),
                             utgifterDekketPåAnnenMåte =
-                                EnumFelt("Får du dekket utgiftene på annen måte?", JaNei.NEI, "Nei", emptyList()),
+                                EnumFelt("Får du dekket utgiftene på annen måte?", UtgifterDekketPåAnnenMåte.NEI, "Nei", emptyList()),
                             skalFlytteFraFolkeregistrertAdresse =
                                 EnumFelt("Flytter du fra folkeregistrert adresse?", JaNei.NEI, "Nei", emptyList()),
                             adresseDetSkalFlyttesFra =
