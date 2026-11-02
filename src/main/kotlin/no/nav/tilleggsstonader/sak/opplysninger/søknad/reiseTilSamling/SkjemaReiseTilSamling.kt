@@ -10,16 +10,17 @@ import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeB
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknadsdata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDate
 
 data class SkjemaReiseTilSamling(
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetReiseTilSamlingAvsnitt,
     val samlinger: List<Samling>,
     val avreiseadresse: Avreiseadresse,
     val dokumentasjon: List<Dokumentasjon>,
-)
+) : Søknadsdata
 
 data class AktivitetReiseTilSamlingAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,

@@ -29,7 +29,7 @@ class SøknadMetrikker {
             "taxi",
         )
 
-    fun registrerSøknadMetrikker(søknad: Søknad<out Any>) {
+    fun registrerSøknadMetrikker(søknad: Søknad<*>) {
         when (søknad) {
             is SøknadDagligReise -> registrerDagligReiseTransportmetoder(søknad)
             else -> {}

@@ -6,14 +6,15 @@ import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknadsdata
 import java.math.BigDecimal
 import java.time.LocalDate
 
 data class SkjemaFlytting(
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val flyttingDetaljer: FlyttingDetaljer?,
     val dokumentasjon: List<Dokumentasjon>,
-)
+) : Søknadsdata
 
 data class FlyttingDetaljer(
     val årsak: Flytteårsak,
