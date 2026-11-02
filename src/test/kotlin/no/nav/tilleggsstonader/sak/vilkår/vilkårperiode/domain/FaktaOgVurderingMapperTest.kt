@@ -11,8 +11,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFlyttingTsrType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -79,6 +83,31 @@ class FaktaOgVurderingMapperTest {
 
         assertThat(faktaOgVurdering.vurderinger).isInstanceOf(AldersvilkårVurdering::class.java)
         assertThat((faktaOgVurdering.vurderinger as AldersvilkårVurdering).aldersvilkår.svar).isEqualTo(SvarJaNei.JA)
+        assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+    }
+
+    @Test
+    fun `arbeidssøker for flytting TSR mappes uten fakta og vurderinger`() {
+        val målgruppe =
+            LagreVilkårperiode(
+                behandlingId = behandlingId,
+                type = MålgruppeType.ARBEIDSSØKER,
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                faktaOgSvar = FaktaOgSvarMålgruppeDto(),
+            )
+
+        val faktaOgVurdering =
+            mapFaktaOgSvarDto(
+                vilkårperiode = målgruppe,
+                stønadstype = Stønadstype.FLYTTING_TSR,
+                fødselFaktaGrunnlag = null,
+            )
+
+        assertThat(faktaOgVurdering).isEqualTo(ArbeidssøkerFlyttingTsr())
+        assertThat(faktaOgVurdering.type).isEqualTo(MålgruppeFlyttingTsrType.ARBEIDSSØKER_FLYTTING_TSR)
+        assertThat(faktaOgVurdering.fakta).isEqualTo(IngenFakta)
+        assertThat(faktaOgVurdering.vurderinger).isEqualTo(IngenVurderinger)
         assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 

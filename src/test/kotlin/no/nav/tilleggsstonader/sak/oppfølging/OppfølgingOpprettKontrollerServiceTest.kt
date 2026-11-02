@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -14,6 +15,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
@@ -33,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -102,6 +105,32 @@ class OppfølgingOpprettKontrollerServiceTest {
         mockHentYtelser()
         mockHentAktiviteter()
         mockHentAktiviteter()
+    }
+
+    @Test
+    fun `arbeidssøker for flytting TSR skal ikke hente ytelser fra eksternt system`() {
+        val arbeidssøker =
+            målgruppe(
+                fom = vedtaksperiode.fom,
+                tom = vedtaksperiode.tom,
+                faktaOgVurdering = ArbeidssøkerFlyttingTsr(),
+            )
+        every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns listOf(arbeidssøker)
+        every { fagsakService.hentMetadata(any()) } returns
+            mapOf(
+                behandling.fagsakId to
+                    FagsakMetadata(behandling.fagsakId, 1, Stønadstype.FLYTTING_TSR, "1"),
+            )
+
+        assertThat(
+            OppfølgingInngangsvilkårMålgruppe(
+                fom = vedtaksperiode.fom,
+                tom = vedtaksperiode.tom,
+                målgruppe = MålgruppeType.ARBEIDSSØKER,
+            ).hentesFraEksterntSystem(),
+        ).isFalse
+        assertThat(opprettOppfølging()).isNull()
+        verify(exactly = 0) { ytelseService.hentYtelser(any(), any(), any(), any()) }
     }
 
     @Nested

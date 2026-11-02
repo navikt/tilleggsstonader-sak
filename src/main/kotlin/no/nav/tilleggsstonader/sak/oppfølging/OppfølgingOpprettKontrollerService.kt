@@ -245,6 +245,7 @@ class OppfølgingOpprettKontrollerService(
                     TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                 )
             MålgruppeType.UNGDOMSPROGRAMMET,
+            MålgruppeType.ARBEIDSSØKER,
             MålgruppeType.AKTIVITETSPENGER,
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,

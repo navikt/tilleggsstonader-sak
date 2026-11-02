@@ -67,6 +67,12 @@ class MålgruppeTypeTest {
         assertThat(opphørteStønader).noneMatch { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }
     }
 
+    @Test
+    fun `arbeidssøker er bare tilgjengelig for flytting TSR`() {
+        assertThat(Stønadstype.entries.filter { MålgruppeType.ARBEIDSSØKER.kanBrukesForStønad(it) })
+            .containsExactly(Stønadstype.FLYTTING_TSR)
+    }
+
     @Nested
     inner class MappingTilFaktiskMålgruppe {
         @Test
@@ -88,6 +94,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.KVALIFISERINGSSTØNAD -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.INNSATT_I_FENGSEL -> FaktiskMålgruppe.ARBEIDSSØKER
+                            MålgruppeType.ARBEIDSSØKER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.UNGDOMSPROGRAMMET -> FaktiskMålgruppe.UNGDOMSPROGRAMMET
                             MålgruppeType.AKTIVITETSPENGER -> FaktiskMålgruppe.AKTIVITETSPENGER
                         }
