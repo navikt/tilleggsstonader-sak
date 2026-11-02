@@ -75,9 +75,7 @@ class ReisevurderingController(
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
         val gjeldendeRammevedtak =
             dagligReisePrivatBilService
-                .hentRammevedtakForBehandlingId(behandlingId)
-                ?.reiser
-                ?.singleOrNull { it.reiseId == oppdatertAvklartUke.reiseId }
+                .hentRammevedtakForReiseIBehandling(behandlingId, oppdatertAvklartUke.reiseId)
 
         return lagUkeVurderingDto(
             uke = oppdatertAvklartUke.uke,
