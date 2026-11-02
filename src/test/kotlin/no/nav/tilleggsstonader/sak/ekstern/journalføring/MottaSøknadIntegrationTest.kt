@@ -376,8 +376,9 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `mottar ROAH-TSO-søknad, lagrer skjema og kobler det til behandling`() {
+    fun `mottar ROAH-søknad hvor bruker mottar AAP, lagrer skjema og kobler det til behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE) } returns true
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
         val søknad = søknadROAH(ident = ident)
         val vedleggsId =
@@ -391,7 +392,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
                 dokumentInfoId = "roah-vedlegg-1",
                 dokumentvarianter = listOf(dokumentvariant(filnavn = vedleggsId.toString())),
             )
-        val hendelse = journalfoeringHendelseRecord(tema = Tema.TSO)
+        val hendelse = journalfoeringHendelseRecord()
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
             mockk<Acknowledgment>(relaxed = true),
@@ -496,6 +497,43 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         fakta.jsonPath("$.reiser[2].fom").isEqualTo("2026-03-07")
         fakta.jsonPath("$.reiser[2].tom").isEmpty
         fakta.jsonPath("$.reiser[2].reisemåte").isEmpty
+    }
+
+    @Test
+    fun `mottar ROAH-søknad hvor bruker mottar tiltakspenger, blir TSR-sak`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE) } returns true
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
+
+        val søknad = søknadROAH(ident = ident)
+        val vedleggsId =
+            søknad.skjema.dokumentasjon
+                .single()
+                .opplastedeVedlegg
+                .single()
+                .id
+        val vedlegg =
+            dokumentInfo(
+                dokumentInfoId = "roah-vedlegg-1",
+                dokumentvarianter = listOf(dokumentvariant(filnavn = vedleggsId.toString())),
+            )
+        val hendelse = journalfoeringHendelseRecord()
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        mockJournalpost(
+            brevkode = DokumentBrevkode.REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE,
+            søknad = søknad,
+            vedlegg = listOf(vedlegg),
+        )
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        val journalhendelseTasks = taskService.finnAlleTaskerMedType(JournalhendelseKafkaHåndtererTask.TYPE)
+        assertThat(journalhendelseTasks).hasSize(1)
+        assertThat(journalhendelseTasks.single().status).isEqualTo(Status.FERDIG)
+
+        val fagsak = fagsakRepository.findBySøkerIdent(setOf(ident)).single()
+        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR)
     }
 
     @ParameterizedTest
