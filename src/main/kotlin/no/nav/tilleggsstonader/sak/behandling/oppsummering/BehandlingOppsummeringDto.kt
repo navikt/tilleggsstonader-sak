@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBostedPeriode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
@@ -119,6 +120,7 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
                 is FaktaReiseTilSamlingOffentligTransport -> TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
                 is FaktaReiseTilSamlingPrivatBil -> TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
                 is FaktaReiseTilSamlingUbestemt -> TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
+                is FaktaROAHMidlertidigBostedPeriode -> TypeVilkårFakta.ROAH_MIDLERTIDIG_BOSTED_PERIODE
                 is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport ->
                     TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT
                 is FaktaReiseOppstartAvslutningHjemreisePrivatBil ->

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,6 +24,35 @@ import java.util.UUID
 internal class VilkårRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var vilkårRepository: VilkårRepository
+
+    @Test
+    fun `midlertidig bostedsperiode med fakta og opphav kan lagres og leses`() {
+        val behandling = testoppsettService.lagre(behandling(testoppsettService.lagreFagsak(fagsak())))
+        val fakta = FaktaROAHMidlertidigBostedPeriode(VilkårperiodeGlobalId.random(), "Testveien 1", "Testveien 2")
+        val lagret =
+            vilkårRepository.insert(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                    fom = 5 januar 2026,
+                    tom = 15 januar 2026,
+                    utgift = null,
+                    fakta = fakta,
+                    status = VilkårStatus.UENDRET,
+                    opphavsvilkår = Opphavsvilkår(behandling.id, SporbarUtils.now()),
+                    delvilkår =
+                        listOf(
+                            Delvilkår(Vilkårsresultat.OPPFYLT, listOf(Vurdering(RegelId.ROAH_MÅ_BO_MIDLERTIDIG_BORTE, SvarId.JA))),
+                        ),
+                ),
+            )
+        val hentet = vilkårRepository.findByIdOrThrow(lagret.id)
+        assertThat(hentet).isEqualTo(lagret)
+        assertThat(hentet.fakta).isEqualTo(fakta)
+        val oppdatert = vilkårRepository.update(hentet.copy(tom = 16 januar 2026, status = VilkårStatus.ENDRET))
+        assertThat(vilkårRepository.findByIdOrThrow(lagret.id)).isEqualTo(oppdatert)
+        assertThat(oppdatert.opphavsvilkår).isEqualTo(lagret.opphavsvilkår)
+    }
 
     @Test
     internal fun findByBehandlingId() {

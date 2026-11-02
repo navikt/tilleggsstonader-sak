@@ -18,9 +18,11 @@ import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBostedPeriode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -55,6 +57,49 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
     fun setup() {
         justRun {
             vedtaksperiodeValideringService.validerVedtaksperioder(any(), any(), any())
+        }
+
+        @Test
+        fun `blandet lagring beholder reisekostnaden og inkluderer ikke bostedsperioden`() {
+            val repository = mockk<VilkårRepository>()
+            val ekteVilkårService = VilkårService(mockk(), repository, mockk())
+            val service =
+                ReiseOppstartAvslutningHjemreiseBeregningService(ekteVilkårService, vedtaksperiodeValideringService, satsPrivatBilProvider)
+            val aktivitetId = VilkårperiodeGlobalId.random()
+            val reise =
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    fom = 10 januar 2025,
+                    tom = 10 januar 2025,
+                    fakta =
+                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                            reiseId = dummyReiseId,
+                            aktivitetId = aktivitetId,
+                            typeReiseformål = TypeReiseformål.OPPSTART,
+                            nødvendigUtgift = nødvendigUtgift,
+                            utgifterOffentligTransport = 500.toBigDecimal(),
+                            begrunnelse = null,
+                        ),
+                )
+            every { repository.findByBehandlingId(behandling.id) } returns listOf(reise)
+            val plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER)
+            val før = service.beregn(behandling, vedtaksperioder, TypeVedtak.INNVILGELSE, plan)
+            every { repository.findByBehandlingId(behandling.id) } returns
+                listOf(
+                    reise,
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                        fom = 1 januar 2025,
+                        tom = 31 januar 2025,
+                        utgift = null,
+                        fakta = FaktaROAHMidlertidigBostedPeriode(aktivitetId, "Testveien 1", "Testveien 2"),
+                    ),
+                )
+            val etter = service.beregn(behandling, vedtaksperioder, TypeVedtak.INNVILGELSE, plan)
+            assertThat(etter).isEqualTo(før)
+            assertThat(etter.offentligTransport.single().beløp).isEqualTo(500.toBigDecimal())
         }
     }
 

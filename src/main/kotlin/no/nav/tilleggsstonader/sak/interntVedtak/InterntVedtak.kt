@@ -243,6 +243,12 @@ data class VilkårFaktaFlyttingUbestemtInterntVedtak(
     override val type = TypeVilkårFakta.FLYTTING_UBESTEMT
 }
 
+data class VilkårFaktaMidlertidigBostedPeriodeInterntVedtak(
+    val aktivitetId: VilkårperiodeGlobalId,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.ROAH_MIDLERTIDIG_BOSTED_PERIODE
+}
+
 data class VurderingInterntVedtak(
     val regel: String,
     val svar: String?,

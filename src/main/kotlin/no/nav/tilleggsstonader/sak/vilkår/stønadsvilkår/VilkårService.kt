@@ -46,6 +46,7 @@ class VilkårService(
     @Transactional
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): Vilkår {
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
+        validerGeneriskVilkårtype(vilkår.type)
         val behandlingId = vilkår.behandlingId
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -59,6 +60,7 @@ class VilkårService(
 
     @Transactional
     fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
+        validerGeneriskVilkårtype(opprettVilkårDto.vilkårType)
         val behandlingId = opprettVilkårDto.behandlingId
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -137,6 +139,7 @@ class VilkårService(
     @Transactional
     fun settVilkårTilSkalIkkeVurderes(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
         val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+        validerGeneriskVilkårtype(vilkår.type)
         val behandlingId = vilkår.behandlingId
 
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
@@ -303,5 +306,15 @@ class VilkårService(
     fun hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
-            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+            .filter { it.type.erROAHReise() && it.resultat == Vilkårsresultat.OPPFYLT }
+
+    fun validerKanEndresGenerisk(vilkårId: VilkårId) {
+        validerGeneriskVilkårtype(vilkårRepository.findByIdOrThrow(vilkårId).type)
+    }
+
+    private fun validerGeneriskVilkårtype(type: VilkårType) {
+        brukerfeilHvis(type == VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE || type.erROAHReise()) {
+            "ROAH-vilkår må endres via ROAH-endepunktene"
+        }
+    }
 }

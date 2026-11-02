@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.HjemreiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.MidlertidigBostedPeriodeRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.OppstartAvslutningRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
@@ -40,6 +41,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
             oppstart = reglerOppstartAvslutning,
             avslutning = reglerOppstartAvslutning,
             hjemreise = HjemreiseRegel().tilRegelstruktur(),
+            midlertidigBostedPeriode = MidlertidigBostedPeriodeRegel().tilRegelstruktur(),
         )
     }
 

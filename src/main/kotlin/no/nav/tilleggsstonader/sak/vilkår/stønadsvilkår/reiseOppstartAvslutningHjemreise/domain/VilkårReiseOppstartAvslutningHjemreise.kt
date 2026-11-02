@@ -14,18 +14,19 @@ import java.time.LocalDate
 data class VilkårReiseOppstartAvslutningHjemreise(
     val id: VilkårId = VilkårId.random(),
     val behandlingId: BehandlingId,
-    val aktivitetId: VilkårperiodeGlobalId,
-    val reiseId: ReiseId,
-    val typeReiseformål: TypeReiseformål,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<Delvilkår>,
-    val fakta: FaktaReiseOppstartAvslutningHjemreise,
+    val fakta: ReiseFaktaROAH,
     val slettetKommentar: String? = null,
 ) : Periode<LocalDate>,
     Mergeable<LocalDate, VilkårReiseOppstartAvslutningHjemreise> {
+    val aktivitetId: VilkårperiodeGlobalId get() = fakta.aktivitetId
+    val reiseId: ReiseId get() = fakta.reiseId
+    val typeReiseformål: TypeReiseformål get() = fakta.typeReiseformål
+
     init {
         validatePeriode()
         validerFaktaErForventetType()

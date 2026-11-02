@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
@@ -16,4 +17,5 @@ data class AktivitetMedReiser(
     val fom: LocalDate,
     val tom: LocalDate,
     val reiser: List<VilkårReiseOppstartAvslutningHjemreise>,
+    val midlertidigeBostedsperioder: List<Vilkår> = emptyList(),
 )

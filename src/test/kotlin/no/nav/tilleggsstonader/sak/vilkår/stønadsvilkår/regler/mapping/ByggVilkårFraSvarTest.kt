@@ -1,14 +1,28 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
 
+import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.MidlertidigBostedPeriodeRegel
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 class ByggVilkårFraSvarTest {
+    @Test
+    fun `manglende påkrevd begrunnelse avvises`() {
+        listOf(null, "", " \n\t").forEach { begrunnelse ->
+            val svar = mapOf(RegelId.ROAH_MÅ_BO_MIDLERTIDIG_BORTE to SvarOgBegrunnelse(SvarId.NEI, begrunnelse))
+            Assertions
+                .assertThatThrownBy {
+                    ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(MidlertidigBostedPeriodeRegel(), svar)
+                }.isInstanceOf(Feil::class.java)
+                .hasMessageContaining("Påkrevd begrunnelse")
+        }
+    }
+
     @Test
     fun `svar som ikke er satt skal ikke legges inn som en vurdering`() {
         val svar =

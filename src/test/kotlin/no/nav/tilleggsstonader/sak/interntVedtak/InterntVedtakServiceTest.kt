@@ -2,13 +2,17 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.behandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.util.dummyAktivitetId
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -16,6 +20,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBostedPeriode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -71,6 +77,24 @@ class InterntVedtakServiceTest {
             every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandlingBarn
             every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vilkår
             every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vedtak
+        }
+
+        @Test
+        fun `bostedsfakta mapper kun aktivitet uten nye adresseverdier`() {
+            val fakta = FaktaROAHMidlertidigBostedPeriode(dummyAktivitetId, "Kun-i-bostedsfakta 1", "Kun-i-bostedsfakta 2")
+            every { vilkårService.hentVilkår(behandlingId) } returns
+                listOf(
+                    vilkår(
+                        behandlingId = behandlingId,
+                        type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                        fom = 1 januar 2026,
+                        tom = 2 januar 2026,
+                        fakta = fakta,
+                    ),
+                )
+            val internt = service.lagInterntVedtak(behandlingId)
+            assertThat(internt.vilkår.single().fakta).isEqualTo(VilkårFaktaMidlertidigBostedPeriodeInterntVedtak(dummyAktivitetId))
+            assertThat(jsonMapper.writeValueAsString(internt)).doesNotContain("Kun-i-bostedsfakta", "midlertidigAdresse", "hjemstedAdresse")
         }
 
         @Test

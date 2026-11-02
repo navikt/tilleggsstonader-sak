@@ -16,6 +16,7 @@ import java.time.LocalDate
     property = "type",
 )
 @JsonSubTypes(
+    JsonSubTypes.Type(FaktaROAHMidlertidigBostedPeriode::class, name = "ROAH_MIDLERTIDIG_BOSTED_PERIODE"),
     JsonSubTypes.Type(FaktaDagligReiseOffentligTransport::class, name = "DAGLIG_REISE_OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DAGLIG_REISE_PRIVAT_BIL"),
     JsonSubTypes.Type(FaktaDagligReiseUbestemt::class, name = "DAGLIG_REISE_UBESTEMT"),
@@ -104,7 +105,15 @@ data class FaktaReiseTilSamlingUbestemt(
     override val adresse: String?,
 ) : ReiseVilkårFakta
 
-sealed interface FaktaROAH : VilkårFakta {
+data class FaktaROAHMidlertidigBostedPeriode(
+    val aktivitetId: VilkårperiodeGlobalId,
+    val midlertidigAdresse: String,
+    val hjemstedAdresse: String,
+) : VilkårFakta {
+    override fun toString() = "FaktaROAHMidlertidigBostedPeriode(aktivitetId=$aktivitetId, midlertidigAdresse=***, hjemstedAdresse=***)"
+}
+
+sealed interface FaktaROAHReise : VilkårFakta {
     val reiseId: ReiseId
     val aktivitetId: VilkårperiodeGlobalId
     val typeReiseformål: TypeReiseformål
@@ -117,7 +126,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String?,
-) : FaktaROAH
+) : FaktaROAHReise
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
@@ -130,13 +139,13 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String?,
-) : FaktaROAH
+) : FaktaROAHReise
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
-) : FaktaROAH
+) : FaktaROAHReise
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,
@@ -194,6 +203,7 @@ enum class TypeVilkårFakta {
     REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
     REISE_TIL_SAMLING_PRIVAT_BIL,
     REISE_TIL_SAMLING_UBESTEMT,
+    ROAH_MIDLERTIDIG_BOSTED_PERIODE,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT,

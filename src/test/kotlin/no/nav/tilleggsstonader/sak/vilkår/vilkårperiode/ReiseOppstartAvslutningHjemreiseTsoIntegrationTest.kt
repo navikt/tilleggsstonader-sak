@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.ReiseFaktaROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -72,9 +73,9 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
 
         val reiseVilkår = aktivitetMedReiser.reiser.single()
         assertThat(reiseVilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(reiseVilkår.typeReiseformål).isEqualTo(TypeReiseformål.OPPSTART)
+        assertThat((reiseVilkår.fakta as ReiseFaktaROAHDto).typeReiseformål).isEqualTo(TypeReiseformål.OPPSTART)
         assertThat(reiseVilkår.fakta).isInstanceOf(FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto::class.java)
-        assertThat(reiseVilkår.aktivitetId).isEqualTo(aktivitet.globalId)
+        assertThat(reiseVilkår.fakta.aktivitetId).isEqualTo(aktivitet.globalId)
 
         val vedtak =
             kall.vedtak.apiRespons
@@ -183,6 +184,6 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
     ) {
         assertThat(lagretVilkår.fom).isEqualTo(forventetFom)
         assertThat(lagretVilkår.tom).isEqualTo(forventetTom)
-        assertThat(lagretVilkår.typeReiseformål).isEqualTo(forventetType)
+        assertThat((lagretVilkår.fakta as ReiseFaktaROAHDto).typeReiseformål).isEqualTo(forventetType)
     }
 }

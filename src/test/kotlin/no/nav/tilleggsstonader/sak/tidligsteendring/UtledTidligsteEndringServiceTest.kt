@@ -103,6 +103,22 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
+    fun `ROAH forslag ignorerer endret bostedsperiode også ved utledning av tidligste endring`() {
+        val reise = vilkår(type = VilkårType.ROAH_HJEMREISE, fom = 10 januar 2026, tom = 12 januar 2026)
+        val periode = vilkår(type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE, fom = 1 januar 2026, tom = 31 januar 2026)
+        vilkårSisteIverksatteBehandling = listOf(reise)
+        vilkår = listOf(reise, periode)
+        vilkårperioder = Vilkårperioder(emptyList(), emptyList())
+        vilkårperioderSisteIverksattBehandling = vilkårperioder
+        assertThat(utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id)).isEqualTo(1 januar 2026)
+        assertThat(utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id, kunROAHReiser = true)).isNull()
+        vilkår = listOf(reise.copy(fom = 9 januar 2026), periode)
+        assertThat(
+            utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id, kunROAHReiser = true),
+        ).isEqualTo(9 januar 2026)
+    }
+
+    @Test
     fun `flyttefakta oppdager pris dokumentasjon adresse og bytte av flyttemåte`() {
         val fom = 1 januar 2026
         val tom = 31 januar 2026

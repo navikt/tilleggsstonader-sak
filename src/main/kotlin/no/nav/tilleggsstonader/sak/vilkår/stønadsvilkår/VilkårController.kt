@@ -41,6 +41,7 @@ class VilkårController(
     ): VilkårDto {
         tilgangService.settBehandlingsdetaljerForRequest(svarPåVilkårDto.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
+        vilkårService.validerKanEndresGenerisk(svarPåVilkårDto.id)
         try {
             return vilkårService.oppdaterVilkår(svarPåVilkårDto).tilDto()
         } catch (e: Exception) {
@@ -70,6 +71,7 @@ class VilkårController(
     ): SlettVilkårResponse {
         tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
+        vilkårService.validerKanEndresGenerisk(request.id)
 
         return vilkårService.slettVilkår(request).tilDto()
     }

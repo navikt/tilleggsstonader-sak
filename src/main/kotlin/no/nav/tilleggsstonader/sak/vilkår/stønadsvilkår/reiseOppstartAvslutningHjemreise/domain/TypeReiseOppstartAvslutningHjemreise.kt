@@ -7,4 +7,5 @@ enum class TypeReiseOppstartAvslutningHjemreise {
     OFFENTLIG_TRANSPORT,
     PRIVAT_BIL,
     UBESTEMT,
+    MIDLERTIDIG_BOSTED_PERIODE,
 }

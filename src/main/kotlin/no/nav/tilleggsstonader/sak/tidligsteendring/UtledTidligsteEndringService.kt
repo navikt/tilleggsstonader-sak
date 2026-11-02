@@ -73,17 +73,22 @@ class UtledTidligsteEndringService(
      * - Om det ikke finnes noen tidligere iverksatte behandlinger, returneres null.
      * - Om det ikke utledes endringer, returnreres null.
      */
-    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): LocalDate? =
+    fun utledTidligsteEndringIgnorerVedtaksperioder(
+        behandlingId: BehandlingId,
+        kunROAHReiser: Boolean = false,
+    ): LocalDate? =
         utledTidligsteEndring(
             behandlingId = behandlingId,
             vedtaksperioder = emptyList(),
             hentVedtaksperioderTidligereBehandlingFunction = { _ -> emptyList() },
+            kunROAHReiser = kunROAHReiser,
         )?.tidligsteEndring
 
     private fun utledTidligsteEndring(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
         hentVedtaksperioderTidligereBehandlingFunction: (BehandlingId) -> List<Vedtaksperiode>,
+        kunROAHReiser: Boolean = false,
     ): TidligsteEndringResultat? {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
@@ -94,10 +99,14 @@ class UtledTidligsteEndringService(
             return null
         }
 
-        val vilkår = vilkårService.hentVilkår(behandlingId)
+        val vilkår = vilkårService.hentVilkår(behandlingId).filter { !kunROAHReiser || it.type.erROAHReise() }
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
-        val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
+        val vilkårTidligereBehandling =
+            vilkårService.hentVilkår(sisteIverksatteBehandling.id).filter {
+                !kunROAHReiser ||
+                    it.type.erROAHReise()
+            }
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)
 
         val vedtaksperioderTidligereBehandling =

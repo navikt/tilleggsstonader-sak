@@ -60,6 +60,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBostedPeriode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
@@ -447,6 +448,7 @@ class InterntVedtakService(
 
     private fun mapVilkårFakta(fakta: VilkårFakta?): VilkårFaktaInterntVedtak? =
         when (fakta) {
+            is FaktaROAHMidlertidigBostedPeriode -> VilkårFaktaMidlertidigBostedPeriodeInterntVedtak(fakta.aktivitetId)
             is FaktaFlyttebyrå ->
                 VilkårFaktaFlyttebyråInterntVedtak(
                     tilbud = fakta.tilbud,

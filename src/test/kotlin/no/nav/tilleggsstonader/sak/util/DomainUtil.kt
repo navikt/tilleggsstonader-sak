@@ -854,15 +854,15 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     svar: Map<RegelId, SvarOgBegrunnelseDto> = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
     fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+            reiseId = reiseId,
+            aktivitetId = aktivitetId,
+            typeReiseformål = typeReiseformål,
             nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
             utgifterOffentligTransport = utgifterOffentligTransport,
         ),
 ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
     fom = fom,
     tom = tom,
-    reiseId = reiseId,
-    aktivitetId = aktivitetId,
-    typeReiseformål = typeReiseformål,
     svar = svar,
     fakta = fakta,
 )

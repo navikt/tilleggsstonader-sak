@@ -105,6 +105,7 @@ data class Vilkår(
             }
 
             VilkårType.FLYTTING -> Unit
+            VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE -> Unit
 
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
@@ -306,6 +307,8 @@ enum class VilkårType(
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
+
+    fun erROAHReise(): Boolean = this == ROAH_OPPSTART_AVSLUTNING || this == ROAH_HJEMREISE
 
     fun erLøpendeUtgifterBo(): Boolean = (this == LØPENDE_UTGIFTER_EN_BOLIG || this == LØPENDE_UTGIFTER_TO_BOLIGER)
 

@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.justRun
@@ -10,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -35,9 +39,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
@@ -53,10 +60,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
+import java.util.Optional
 
 internal class VilkårServiceTest {
     private val behandlingService = mockk<BehandlingService>()
@@ -87,6 +98,110 @@ internal class VilkårServiceTest {
             årsak = BehandlingÅrsak.PAPIRSØKNAD,
         )
     private val behandlingId = behandling.id
+
+    @Test
+    fun `avvist generisk periodeoppdatering går ikke gjennom logging av svar`() {
+        val periode =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                fom = 1 januar 2026,
+                tom = 10 januar 2026,
+                utgift = null,
+            )
+        every { vilkårRepository.findById(periode.id) } returns Optional.of(periode)
+        val request =
+            SvarPåVilkårDto(
+                id = periode.id,
+                behandlingId = behandlingId,
+                delvilkårsett =
+                    listOf(
+                        DelvilkårDto(
+                            resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                            vurderinger = listOf(VurderingDto(RegelId.ROAH_MÅ_BO_MIDLERTIDIG_BORTE, SvarId.NEI, "kun-i-request")),
+                        ),
+                    ),
+                fom = periode.fom,
+                tom = periode.tom,
+                utgift = null,
+                erFremtidigUtgift = false,
+                offentligTransport = null,
+            )
+        val logger = LoggerFactory.getLogger("secureLogger") as Logger
+        val appender =
+            ListAppender<ILoggingEvent>().also {
+                it.start()
+                logger.addAppender(it)
+            }
+        try {
+            val controller = VilkårController(vilkårService, mockk(relaxed = true))
+            assertThatThrownBy { controller.oppdaterVilkår(request) }.isInstanceOf(ApiFeil::class.java)
+            assertThat(appender.list.map { it.formattedMessage }).noneMatch { it.contains("kun-i-request") || it.contains("svar=") }
+        } finally {
+            logger.detachAppender(appender)
+            appender.stop()
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(VilkårType::class, names = ["ROAH_MIDLERTIDIG_BOSTED_PERIODE", "ROAH_HJEMREISE", "ROAH_OPPSTART_AVSLUTNING"])
+    fun `generisk opprett oppdater ikkevurder og delete avviser ROAH før endring`(type: VilkårType) {
+        val periode =
+            vilkår(
+                behandlingId = behandlingId,
+                type = type,
+                fom = 1 januar 2026,
+                tom = 10 januar 2026,
+                utgift = null,
+            )
+        every { vilkårRepository.findById(periode.id) } returns Optional.of(periode)
+        val opprett =
+            OpprettVilkårDto(
+                vilkårType = periode.type,
+                behandlingId = behandlingId,
+                delvilkårsett = emptyList(),
+                fom = periode.fom,
+                tom = periode.tom,
+                utgift = null,
+                erFremtidigUtgift = false,
+                offentligTransport = null,
+            )
+        val oppdater =
+            SvarPåVilkårDto(
+                id = periode.id,
+                behandlingId = behandlingId,
+                delvilkårsett = emptyList(),
+                fom = periode.fom,
+                tom = periode.tom,
+                utgift = null,
+                erFremtidigUtgift = false,
+                offentligTransport = null,
+            )
+        listOf<() -> Any>(
+            { vilkårService.opprettNyttVilkår(opprett) },
+            { vilkårService.oppdaterVilkår(oppdater) },
+            { vilkårService.settVilkårTilSkalIkkeVurderes(OppdaterVilkårDto(periode.id, behandlingId)) },
+            { vilkårService.validerKanEndresGenerisk(periode.id) },
+            { VilkårController(vilkårService, mockk(relaxed = true)).slettVilkår(SlettVilkårRequest(periode.id, behandlingId)) },
+        ).forEach { kall ->
+            assertThatThrownBy { kall() }.isInstanceOf(ApiFeil::class.java).hasMessageContaining("ROAH-endepunktene")
+        }
+        verify(exactly = 0) {
+            vilkårRepository.insert(any<Vilkår>())
+            vilkårRepository.update(any<Vilkår>())
+        }
+    }
+
+    @Test
+    fun `reisehenting til beregning inkluderer kun oppfylte ekte reiser`() {
+        val reise =
+            vilkår(behandlingId = behandlingId, type = VilkårType.ROAH_OPPSTART_AVSLUTNING, fom = 1 januar 2026, tom = 1 januar 2026)
+        val hjemreise = reise.copy(id = VilkårId.random(), type = VilkårType.ROAH_HJEMREISE)
+        val periode = reise.copy(id = VilkårId.random(), type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE)
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns
+            listOf(reise, hjemreise, periode, reise.copy(id = VilkårId.random(), resultat = Vilkårsresultat.IKKE_OPPFYLT))
+        assertThat(vilkårService.hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandlingId)).containsExactly(reise, hjemreise)
+    }
 
     @BeforeEach
     fun setUp() {

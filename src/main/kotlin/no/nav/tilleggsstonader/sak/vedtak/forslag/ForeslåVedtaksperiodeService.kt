@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
@@ -24,6 +25,7 @@ class ForeslåVedtaksperiodeService(
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val erROAH = saksbehandling.stønadstype in VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE.gjelderStønader
 
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
         val forrigeVedtaksperioder =
@@ -31,12 +33,15 @@ class ForeslåVedtaksperiodeService(
                 vedtakService.hentVedtaksperioder(it)
             } ?: emptyList()
         val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
+            utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id, kunROAHReiser = erROAH)
         return when (saksbehandling.stønadstype.grunnlagForVedtaksperiode) {
             GrunnlagForVedtaksperiode.MÅLGRUPPE_AKTIVITET_OG_VILKÅR ->
                 ForeslåVedtaksperiode.finnVedtaksperiode(
                     vilkårperioder = vilkårperioder,
-                    vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                    vilkår =
+                        vilkårService.hentVilkår(saksbehandling.id).filter {
+                            !erROAH || it.type.erROAHReise()
+                        },
                     forrigeVedtaksperioder = forrigeVedtaksperioder,
                     tidligsteEndring = tidligsteEndring,
                 )
