@@ -13,6 +13,10 @@
       "resultat": "OPPFYLT",
       "svar": "NEI"
     },
+    "lønnet": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    },
     "medlemskap": {
       "resultat": "OPPFYLT",
       "svar": "JA_IMPLISITT"

@@ -253,6 +253,7 @@ object VilkårperiodeTestUtil {
         FaktaOgSvarMålgruppeDto(
             svarMedlemskap = null,
             svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
+            svarLønnet = SvarJaNei.NEI,
         )
 
     fun aktivitet(

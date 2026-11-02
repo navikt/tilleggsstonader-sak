@@ -38,6 +38,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MottarSykepengerForFulltidsstillingVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
@@ -103,6 +104,7 @@ fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)
 @JsonSubTypes(
     JsonSubTypes.Type(MålgruppeFaktaOgVurderingerDto::class, name = "MÅLGRUPPE"),
     JsonSubTypes.Type(MålgruppeLæremidlerFaktaOgVurderingerDto::class, name = "MÅLGRUPPE_LÆREMIDLER"),
+    JsonSubTypes.Type(MålgruppeFlyttingTsoFaktaOgVurderingerDto::class, name = "MÅLGRUPPE_FLYTTING_TSO"),
     JsonSubTypes.Type(AktivitetPassAvBarnFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(AktivitetLæremidlerFaktaOgVurderingerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(AktivitetBoutgifterFaktaOgVurderingerDto::class, name = "AKTIVITET_BOUTGIFTER"),
@@ -132,6 +134,14 @@ data class MålgruppeLæremidlerFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
     val aldersvilkår: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class MålgruppeFlyttingTsoFaktaOgVurderingerDto(
+    val medlemskap: VurderingDto? = null,
+    val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+    val aldersvilkår: VurderingDto? = null,
+    val mottarSykepengerForFulltidsstilling: VurderingDto? = null,
+    val lønnet: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetPassAvBarnFaktaOgVurderingerDto(
@@ -188,6 +198,26 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 ?.aldersvilkår
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
                                 ?.tilDto(),
+                    )
+
+                is MålgruppeFlyttingTso ->
+                    MålgruppeFlyttingTsoFaktaOgVurderingerDto(
+                        medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
+                        utgifterDekketAvAnnetRegelverk =
+                            vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
+                        aldersvilkår =
+                            vurderinger
+                                .takeIfVurderinger<AldersvilkårVurdering>()
+                                ?.aldersvilkår
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.tilDto(),
+                        mottarSykepengerForFulltidsstilling =
+                            vurderinger
+                                .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
+                                ?.mottarSykepengerForFulltidsstilling
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.tilDto(),
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
 
                 else ->

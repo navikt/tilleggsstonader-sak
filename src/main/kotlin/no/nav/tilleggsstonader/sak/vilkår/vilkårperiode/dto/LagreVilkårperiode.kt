@@ -68,6 +68,7 @@ data class FaktaOgSvarMålgruppeDto(
     val svarMedlemskap: SvarJaNei? = null,
     val svarUtgifterDekketAvAnnetRegelverk: SvarJaNei? = null,
     val svarMottarSykepengerForFulltidsstilling: SvarJaNei? = null,
+    val svarLønnet: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetPassAvBarnDto(
@@ -127,6 +128,11 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                     this.vurderinger
                         .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
                         ?.mottarSykepengerForFulltidsstilling
+                        ?.svar,
+                svarLønnet =
+                    this.vurderinger
+                        .takeIfVurderinger<LønnetVurdering>()
+                        ?.lønnet
                         ?.svar,
             )
 
