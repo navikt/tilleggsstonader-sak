@@ -125,7 +125,6 @@ object ReisevurderingPrivatBilMapper {
                     )
                 },
             skalBehandlesManuelt = manuellBehandling?.skalBehandlesManuelt == true,
-            begrunnelseManuellBehandling = manuellBehandling?.begrunnelseManuellBehandling,
         )
     }
 
