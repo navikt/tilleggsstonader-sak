@@ -6,17 +6,18 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknadsdata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import java.time.LocalDate
 
 data class SkjemaROAH(
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
     val adresser: ROAHAdresseAvsnitt,
     val barnOgSærligeBehov: ROAHBarnOgSærligeBehovAvsnitt,
     val reiser: List<ROAHReise>,
     val dokumentasjon: List<Dokumentasjon>,
-)
+) : Søknadsdata
 
 data class ROAHAdresseAvsnitt(
     val måBoBorteHjemmefra: JaNei?,

@@ -26,6 +26,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadF
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadFlyttingUtil.søknadFlytting
+import no.nav.tilleggsstonader.sak.util.SøknadROAHUtil.søknadROAH
 import no.nav.tilleggsstonader.sak.util.SøknadReiseTilSamlingUtil.søknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
@@ -110,11 +112,14 @@ private fun søknadForStønadstype(
     Stønadstype.REISE_TIL_SAMLING_TSO,
     Stønadstype.REISE_TIL_SAMLING_TSR,
     -> søknadReiseTilSamling(ident = ident)
+
     Stønadstype.FLYTTING_TSO,
     Stønadstype.FLYTTING_TSR,
+    -> søknadFlytting(ident = ident)
+
     Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
     Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-    -> error("Søknad for $stønadstype er ikke implementert i testdata")
+    -> søknadROAH(ident = ident)
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(
