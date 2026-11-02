@@ -1,7 +1,6 @@
 
 package no.nav.tilleggsstonader.sak.privatbil
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
@@ -9,7 +8,6 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.typeAvvik
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -96,14 +94,8 @@ object ReisevurderingPrivatBilMapper {
         kjøreliste: Kjøreliste?,
         erUkeSlettet: Boolean,
         rammevedtak: RammevedtakForReiseMedPrivatBil?,
-    ): UkeVurderingDto {
-        val manuellBehandling =
-            finnManuellBehandlingForUke(
-                datoer = gjeldendeDatoerForUke,
-                rammevedtak = rammevedtak,
-            )
-
-        return UkeVurderingDto(
+    ): UkeVurderingDto =
+        UkeVurderingDto(
             ukenummer = uke.ukenummer,
             fraDato = datoer.min(),
             tilDato = datoer.max(),
@@ -124,9 +116,8 @@ object ReisevurderingPrivatBilMapper {
                         avklartUke = avklartUke,
                     )
                 },
-            skalBehandlesManuelt = manuellBehandling?.skalBehandlesManuelt == true,
+            skalBehandlesManuelt = skalBehandlesManuelt(datoer = gjeldendeDatoerForUke, rammevedtak = rammevedtak),
         )
-    }
 
     private fun lagDagDto(
         dato: LocalDate,
@@ -170,17 +161,13 @@ object ReisevurderingPrivatBilMapper {
         forrigeUker: Map<UkeIÅr, List<LocalDate>>,
     ): Boolean = !gjeldendeUker.containsKey(uke) && forrigeUker.containsKey(uke)
 
-    private fun finnManuellBehandlingForUke(
+    private fun skalBehandlesManuelt(
         datoer: List<LocalDate>,
         rammevedtak: RammevedtakForReiseMedPrivatBil?,
-    ): RammeForReiseMedPrivatBilDelperiode? {
+    ): Boolean? {
         if (rammevedtak == null) return null
-        return datoer.firstNotNullOfOrNull { dato ->
-            if (rammevedtak.skalBehandlesManuelt(dato)) {
-                rammevedtak.finnDelperiodeForPeriode(Datoperiode(dato, dato))
-            } else {
-                null
-            }
+        return datoer.any { dato ->
+            rammevedtak.skalBehandlesManuelt(dato)
         }
     }
 }
