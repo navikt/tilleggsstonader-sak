@@ -656,7 +656,7 @@ class AvklartKjørelisteServiceTest {
     }
 
     @Test
-    fun `uke skal ikke ha status AVVIK når kjøreliste skal behandles manuelt`() {
+    fun `kjøreliste skal behandles manuelt uavhengig av ukestatus`() {
         val rammevedtak =
             rammeForReiseMedPrivatBil(
                 reiseId = reiseId,
