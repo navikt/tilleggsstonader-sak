@@ -287,6 +287,7 @@ class UtledTidligsteEndringStepDefinitions {
                         bompengerPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.BOMPENGER, it),
                         fergekostnadPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
                         skalBehandlesManuelt = false,
+                        begrunnelseManuellBehandling = "",
                     )
             }.groupBy { it.first }
             .mapValues { it.value.map { it.second } }

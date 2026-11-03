@@ -1024,6 +1024,7 @@ object InterntVedtakTestdata {
                                         bompengerPerDag = BigDecimal("40"),
                                         fergekostnadPerDag = BigDecimal("50"),
                                         skalBehandlesManuelt = false,
+                                        begrunnelseManuellBehandling = "",
                                     ),
                                     FaktaDelperiodePrivatBil(
                                         fom = 27 januar 2025,
@@ -1032,6 +1033,7 @@ object InterntVedtakTestdata {
                                         bompengerPerDag = BigDecimal("40"),
                                         fergekostnadPerDag = BigDecimal("50"),
                                         skalBehandlesManuelt = false,
+                                        begrunnelseManuellBehandling = "",
                                     ),
                                 ),
                             aktivitetId = dummyAktivitetId,

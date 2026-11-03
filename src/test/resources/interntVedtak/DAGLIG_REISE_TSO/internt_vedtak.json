@@ -299,7 +299,7 @@
     "fakta": {
       "adresse": "Tiltaksgata 1",
       "faktaDelperioder": [ {
-        "begrunnelseManuellBehandling": null,
+        "begrunnelseManuellBehandling": "",
         "bompengerPerDag": 40,
         "fergekostnadPerDag": 50,
         "fom": "2025-01-01",
@@ -307,7 +307,7 @@
         "skalBehandlesManuelt": false,
         "tom": "2025-01-26"
       }, {
-        "begrunnelseManuellBehandling": null,
+        "begrunnelseManuellBehandling": "",
         "bompengerPerDag": 40,
         "fergekostnadPerDag": 50,
         "fom": "2025-01-27",

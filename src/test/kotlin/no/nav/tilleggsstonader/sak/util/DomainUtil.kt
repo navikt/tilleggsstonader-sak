@@ -629,6 +629,7 @@ fun faktaPrivatBil(
                 bompengerPerDag = BigDecimal("80"),
                 fergekostnadPerDag = null,
                 skalBehandlesManuelt = false,
+                begrunnelseManuellBehandling = "",
             ),
             FaktaDelperiodePrivatBil(
                 fom = 16 januar 2025,
@@ -637,6 +638,7 @@ fun faktaPrivatBil(
                 bompengerPerDag = BigDecimal("50"),
                 fergekostnadPerDag = BigDecimal("20"),
                 skalBehandlesManuelt = false,
+                begrunnelseManuellBehandling = "",
             ),
         ),
 ) = FaktaPrivatBil(

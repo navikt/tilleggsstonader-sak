@@ -156,8 +156,8 @@ data class FaktaDelperiodePrivatBil(
     val reisedagerPerUke: Int,
     val bompengerPerDag: BigDecimal?,
     val fergekostnadPerDag: BigDecimal?,
-    val skalBehandlesManuelt: Boolean = false,
-    val begrunnelseManuellBehandling: String? = null,
+    val skalBehandlesManuelt: Boolean,
+    val begrunnelseManuellBehandling: String?,
 ) : Periode<LocalDate> {
     init {
         brukerfeilHvis(reisedagerPerUke <= 0) {
