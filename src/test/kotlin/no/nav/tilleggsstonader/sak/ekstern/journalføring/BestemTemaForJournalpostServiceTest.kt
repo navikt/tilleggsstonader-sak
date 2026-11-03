@@ -2,61 +2,56 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.tomYtelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
-import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.journalpostMedStrukturertSøknad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class BestemTemaForJournalpostServiceTest {
     private val ytelseService = mockk<YtelseService>()
-    private val unleashService =
-        mockk<UnleashService> {
-            every { isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns false
-        }
-    private val service = BestemTemaForJournalpostService(ytelseService = ytelseService, unleashService = unleashService)
+    private val service = BestemTemaForJournalpostService(ytelseService = ytelseService)
 
     private val fom = 1 januar 2026
     private val tom = 31 desember 2026
 
     @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `skal bare hente aktivitetspenger fra register når togglen er på`(aktivert: Boolean) {
-        val journalpost = journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.REISE_TIL_SAMLING)
-        val typer = slot<List<TypeYtelsePeriode>>()
-        every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns aktivert
+    @MethodSource("stønadstypepar")
+    fun `skal la aktivitetspenger fra register overstyre søknad som tilsier TSR`(
+        stønadstypeTso: Stønadstype,
+        stønadstypeTsr: Stønadstype,
+    ) {
+        val aktivitetspenger = YtelsePeriode.Aktivitetspenger(fom = fom, tom = tom)
         every {
-            ytelseService.hentYtelser(journalpost.bruker!!.id, fom, tom, capture(typer))
-        } returns tomYtelsePerioderDto()
+            ytelseService.hentYtelser(any(), any(), any(), any())
+        } returns tomYtelsePerioderDto().copy(perioder = listOf(aktivitetspenger))
 
-        service.bestemStønadstype(
-            journalpost = journalpost,
-            stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
-            stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
-            fom = fom,
-            tom = tom,
-            målgrupperFraSøknad = setOf(MålgruppeType.AAP),
-        )
+        val stønadstype =
+            service.bestemStønadstype(
+                journalpost = journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.REISE_TIL_SAMLING),
+                stønadstypeTso = stønadstypeTso,
+                stønadstypeTsr = stønadstypeTsr,
+                fom = fom,
+                tom = tom,
+                målgrupperFraSøknad = setOf(MålgruppeType.TILTAKSPENGER),
+            )
 
-        val forventedeTyper = TypeYtelsePeriode.entries.filter { aktivert || it != TypeYtelsePeriode.AKTIVITETSPENGER }
-        assertThat(typer.captured).containsExactlyElementsOf(forventedeTyper)
+        assertThat(stønadstype).isEqualTo(stønadstypeTso)
     }
 
     @Test
@@ -243,5 +238,18 @@ class BestemTemaForJournalpostServiceTest {
             )
 
         assertThat(stønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSO)
+    }
+
+    companion object {
+        @JvmStatic
+        fun stønadstypepar() =
+            listOf(
+                Arguments.of(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+                Arguments.of(Stønadstype.REISE_TIL_SAMLING_TSO, Stønadstype.REISE_TIL_SAMLING_TSR),
+                Arguments.of(
+                    Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                    Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                ),
+            )
     }
 }
