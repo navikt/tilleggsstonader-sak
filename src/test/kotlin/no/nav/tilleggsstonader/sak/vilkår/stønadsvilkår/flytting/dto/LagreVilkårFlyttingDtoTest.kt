@@ -63,7 +63,7 @@ class LagreVilkårFlyttingDtoTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.NEI),
+                erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.NEI),
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
@@ -78,7 +78,7 @@ class LagreVilkårFlyttingDtoTest {
 
         assertThat(fakta).isEqualTo(
             FaktaFlytteSelvDto(
-                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 adresse = "Flytteveien 1",
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),

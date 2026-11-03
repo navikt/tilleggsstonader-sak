@@ -30,7 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
@@ -86,7 +86,7 @@ class StønadsvilkårTestdataDsl {
                             },
                         adresse = "Syntetisk adresse",
                         erUtgifterDokumentert =
-                            DokumenterteUtgifter(
+                            DokumenterteUtgifterDto(
                                 if (erUtgifterDokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                                 "Kvittering fra flyttebyrå",
                             ),
@@ -114,7 +114,7 @@ class StønadsvilkårTestdataDsl {
                 fakta =
                     FaktaFlytteSelvDto(
                         erUtgifterDokumentert =
-                            DokumenterteUtgifter(
+                            DokumenterteUtgifterDto(
                                 if (erUtgifterDokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                                 "Kvittering fra flyttebyrå",
                             ),

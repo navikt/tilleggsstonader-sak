@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingDto
@@ -76,14 +76,14 @@ object FaktaFlyttingMapper {
             begrunnelse = begrunnelse,
         )
 
-    private fun no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifter.tilDomene() =
+    private fun DokumenterteUtgifterDto.tilDomene() =
         DokumenterteUtgifter(
             erUtgifterDokumentert = erUtgifterDokumentert,
             begrunnelse = begrunnelse?.trim()?.takeIf { it.isNotEmpty() },
         )
 
     private fun DokumenterteUtgifter.tilDto() =
-        no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifter(
+        DokumenterteUtgifterDto(
             erUtgifterDokumentert = erUtgifterDokumentert,
             begrunnelse = begrunnelse,
         )
