@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.ErUtgifterDokumentertDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
@@ -49,7 +50,7 @@ class LagreVilkårFlyttingDtoTest {
                   "type": "FLYTTING_FLYTTEBYRÅ",
                   "tilbud": [{"navn": "Flyttebyrå A"}, {}],
                   "adresse": "Flytteveien 1",
-                  "erUtgifterDokumentert": false,
+                  "erUtgifterDokumentert": {"svar": "NEI"},
                   "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}
                 }
                 """.trimIndent(),
@@ -63,7 +64,7 @@ class LagreVilkårFlyttingDtoTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = false,
+                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.NEI),
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
@@ -73,11 +74,15 @@ class LagreVilkårFlyttingDtoTest {
     fun `skal deserialisere egen kjøring uten avstand og kostnader`() {
         val fakta =
             jsonMapper.readValue<FaktaFlyttingDto>(
-                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "erUtgifterDokumentert": true, "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
+                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "erUtgifterDokumentert": {"svar": "JA", "begrunnelse": "Kvittering fra flyttebyrå"}, "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
             )
 
         assertThat(fakta).isEqualTo(
-            FaktaFlytteSelvDto(erUtgifterDokumentert = true, adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
+            FaktaFlytteSelvDto(
+                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                adresse = "Flytteveien 1",
+                nødvendigUtgift = nødvendigUtgiftDto,
+            ),
         )
     }
 

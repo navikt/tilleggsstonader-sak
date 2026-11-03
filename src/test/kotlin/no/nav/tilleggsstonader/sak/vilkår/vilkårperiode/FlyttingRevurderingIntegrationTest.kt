@@ -25,7 +25,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingResponse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.ErUtgifterDokumentertDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -325,7 +327,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 vilkår {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(erUtgifterDokumentert = true))
+                        copy(fakta = byrå.copy(erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.JA, "Kvittering fra flyttebyrå")))
                     }
                 }
             }
@@ -411,7 +413,9 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 vilkår {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(erUtgifterDokumentert = false))
+                        copy(
+                            fakta = byrå.copy(erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
+                        )
                     }
                 }
             }

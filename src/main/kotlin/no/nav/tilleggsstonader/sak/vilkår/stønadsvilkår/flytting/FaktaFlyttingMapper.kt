@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ErUtgifterDokumentert
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
@@ -7,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.ErUtgifterDokumentertDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingDto
@@ -20,13 +22,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyrå(
                     tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erUtgifterDokumentert = erUtgifterDokumentert,
+                    erUtgifterDokumentert = erUtgifterDokumentert.tilDomene(),
                     nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
 
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
-                    erUtgifterDokumentert = erUtgifterDokumentert,
+                    erUtgifterDokumentert = erUtgifterDokumentert.tilDomene(),
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     leiebil = leiebil,
@@ -47,13 +49,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyråDto(
                     tilbud = tilbud.map { FlyttebyråTilbudDto(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erUtgifterDokumentert = erUtgifterDokumentert,
+                    erUtgifterDokumentert = erUtgifterDokumentert.tilDto(),
                     nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )
 
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
-                    erUtgifterDokumentert = erUtgifterDokumentert,
+                    erUtgifterDokumentert = erUtgifterDokumentert.tilDto(),
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     leiebil = leiebil,
@@ -71,6 +73,18 @@ object FaktaFlyttingMapper {
     private fun NødvendigUtgift.tilDto() =
         NødvendigUtgiftDto(
             erUtgiftenNødvendig = erUtgiftenNødvendig,
+            begrunnelse = begrunnelse,
+        )
+
+    private fun ErUtgifterDokumentertDto.tilDomene() =
+        ErUtgifterDokumentert(
+            erUtgifterDokumentert = erUtgifterDokumentert,
+            begrunnelse = begrunnelse?.trim()?.takeIf { it.isNotEmpty() },
+        )
+
+    private fun ErUtgifterDokumentert.tilDto() =
+        ErUtgifterDokumentertDto(
+            erUtgifterDokumentert = erUtgifterDokumentert,
             begrunnelse = begrunnelse,
         )
 }

@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.ErUtgifterDokumentertDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
@@ -84,7 +85,11 @@ class StønadsvilkårTestdataDsl {
                                 FlyttebyråTilbudDto(navn = "Syntetisk tilbud ${index + 1}", pris = pris)
                             },
                         adresse = "Syntetisk adresse",
-                        erUtgifterDokumentert = erUtgifterDokumentert,
+                        erUtgifterDokumentert =
+                            ErUtgifterDokumentertDto(
+                                if (erUtgifterDokumentert) SvarJaNei.JA else SvarJaNei.NEI,
+                                "Kvittering fra flyttebyrå",
+                            ),
                         nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
                     ),
             )
@@ -108,7 +113,11 @@ class StønadsvilkårTestdataDsl {
                 svar = oppfylteSvarFlytteSelvDto(),
                 fakta =
                     FaktaFlytteSelvDto(
-                        erUtgifterDokumentert = erUtgifterDokumentert,
+                        erUtgifterDokumentert =
+                            ErUtgifterDokumentertDto(
+                                if (erUtgifterDokumentert) SvarJaNei.JA else SvarJaNei.NEI,
+                                "Kvittering fra flyttebyrå",
+                            ),
                         avstandEnVei = avstandEnVei,
                         henger = henger,
                         leiebil = leiebil,

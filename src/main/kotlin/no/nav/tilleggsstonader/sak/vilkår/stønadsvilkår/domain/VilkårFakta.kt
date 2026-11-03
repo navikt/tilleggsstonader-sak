@@ -52,7 +52,7 @@ sealed interface FlyttingVilkårFakta : VilkårFakta {
 
 data class FaktaFlyttebyrå(
     val tilbud: List<FlyttebyråTilbud>,
-    val erUtgifterDokumentert: Boolean,
+    val erUtgifterDokumentert: ErUtgifterDokumentert,
     val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
 ) : FlyttingVilkårFakta
@@ -72,7 +72,7 @@ data class FaktaFlytteSelv(
     val annet: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
-    val erUtgifterDokumentert: Boolean,
+    val erUtgifterDokumentert: ErUtgifterDokumentert,
 ) : FlyttingVilkårFakta
 
 data class FaktaFlyttingUbestemt(

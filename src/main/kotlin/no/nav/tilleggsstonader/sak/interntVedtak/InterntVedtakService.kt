@@ -70,6 +70,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -450,14 +451,14 @@ class InterntVedtakService(
             is FaktaFlyttebyrå ->
                 VilkårFaktaFlyttebyråInterntVedtak(
                     tilbud = fakta.tilbud,
-                    erUtgifterDokumentert = fakta.erUtgifterDokumentert,
+                    erUtgifterDokumentert = fakta.erUtgifterDokumentert.erUtgifterDokumentert == SvarJaNei.JA,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     adresse = fakta.adresse,
                 )
 
             is FaktaFlytteSelv ->
                 VilkårFaktaFlytteSelvInterntVedtak(
-                    erUtgifterDokumentert = fakta.erUtgifterDokumentert,
+                    erUtgifterDokumentert = fakta.erUtgifterDokumentert.erUtgifterDokumentert == SvarJaNei.JA,
                     avstandEnVei = fakta.avstandEnVei,
                     henger = fakta.henger,
                     leiebil = fakta.leiebil,
