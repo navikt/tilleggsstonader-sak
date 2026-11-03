@@ -37,6 +37,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             -> true
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
+            MålgruppeType.ARBEIDSSØKER,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,

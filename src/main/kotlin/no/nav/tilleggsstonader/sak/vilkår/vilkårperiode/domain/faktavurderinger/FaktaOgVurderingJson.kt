@@ -198,6 +198,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = "DAGPENGER_FLYTTING_TSR",
     ),
     JsonSubTypes.Type(
+        ArbeidssøkerFlyttingTsr::class,
+        name = "ARBEIDSSØKER_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
         TiltakspengerFlyttingTsr::class,
         name = "TILTAKSPENGER_FLYTTING_TSR",
     ),

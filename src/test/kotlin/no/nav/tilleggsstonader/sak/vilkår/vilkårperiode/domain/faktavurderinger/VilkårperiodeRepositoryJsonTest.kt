@@ -416,6 +416,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             is MålgruppeFlyttingTsrType -> {
                 when (type) {
                     MålgruppeFlyttingTsrType.DAGPENGER_FLYTTING_TSR -> DagpengerFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.ARBEIDSSØKER_FLYTTING_TSR -> ArbeidssøkerFlyttingTsr::class
                     MålgruppeFlyttingTsrType.TILTAKSPENGER_FLYTTING_TSR -> TiltakspengerFlyttingTsr::class
                     MålgruppeFlyttingTsrType.KVALIFISERINGSSTØNAD_FLYTTING_TSR -> KvalifiseringsstønadFlyttingTsr::class
                     MålgruppeFlyttingTsrType.INNSATT_I_FENGSEL_FLYTTING_TSR -> InnsattIFengselFlyttingTsr::class

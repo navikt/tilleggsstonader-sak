@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
@@ -33,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -47,6 +49,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -288,6 +292,21 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
         assertThatThrownBy {
             vilkårperiodeService.opprettVilkårperiode(nyAktivitet)
         }.hasMessageContaining("Kan ikke registrere aktivitet for FLYTTING_TSO")
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Stønadstype::class, names = ["FLYTTING_TSO", "DAGLIG_REISE_TSR"])
+    fun `skal ikke kunne opprette arbeidssøker for andre stønader enn flytting TSR`(stønadstype: Stønadstype) {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = stønadstype)
+        val nyMålgruppe =
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandling.id,
+                målgruppeType = MålgruppeType.ARBEIDSSØKER,
+            )
+
+        assertThatThrownBy {
+            vilkårperiodeService.opprettVilkårperiode(nyMålgruppe)
+        }.hasMessageContaining("målgruppe=ARBEIDSSØKER er ikke gyldig for $stønadstype")
     }
 
     @Nested

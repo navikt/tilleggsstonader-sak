@@ -19,6 +19,10 @@ enum class MålgruppeType(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
+    ARBEIDSSØKER(
+        gyldigeAktiviter = emptySet(),
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+    ),
     OMSTILLINGSSTØNAD(
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.GJENLEVENDE,
@@ -99,6 +103,7 @@ enum class MålgruppeType(
             INGEN_MÅLGRUPPE,
             SYKEPENGER_100_PROSENT,
             DAGPENGER,
+            ARBEIDSSØKER,
             TILTAKSPENGER,
             KVALIFISERINGSSTØNAD,
             INNSATT_I_FENGSEL,
@@ -154,7 +159,6 @@ enum class MålgruppeType(
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.REISE_TIL_SAMLING_TSR,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            Stønadstype.FLYTTING_TSR,
             ->
                 this in
                     listOf(
@@ -164,6 +168,18 @@ enum class MålgruppeType(
                         KVALIFISERINGSSTØNAD,
                         DAGPENGER,
                         INNSATT_I_FENGSEL,
+                    )
+
+            Stønadstype.FLYTTING_TSR ->
+                this in
+                    listOf(
+                        INGEN_MÅLGRUPPE,
+                        TILTAKSPENGER,
+                        UNGDOMSPROGRAMMET,
+                        KVALIFISERINGSSTØNAD,
+                        DAGPENGER,
+                        INNSATT_I_FENGSEL,
+                        ARBEIDSSØKER,
                     )
         }
 }
