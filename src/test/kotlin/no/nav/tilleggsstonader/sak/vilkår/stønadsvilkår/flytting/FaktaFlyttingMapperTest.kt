@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.ErUtgifterDokumentertDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingDto
@@ -30,11 +30,11 @@ class FaktaFlyttingMapperTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
             FaktaFlytteSelvDto(
-                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 adresse = "Flytteveien 1",
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
@@ -53,11 +53,11 @@ class FaktaFlyttingMapperTest {
                         FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
                     ),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
+                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
             FaktaFlytteSelvDto(
-                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 avstandEnVei = 250,
                 henger = 1500,
                 leiebil = null,

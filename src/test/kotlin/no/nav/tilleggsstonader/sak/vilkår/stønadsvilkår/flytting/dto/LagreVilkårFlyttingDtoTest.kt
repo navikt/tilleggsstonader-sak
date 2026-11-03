@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.ErUtgifterDokumentertDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
@@ -64,7 +63,7 @@ class LagreVilkårFlyttingDtoTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.NEI),
+                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.NEI),
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
@@ -79,7 +78,7 @@ class LagreVilkårFlyttingDtoTest {
 
         assertThat(fakta).isEqualTo(
             FaktaFlytteSelvDto(
-                erUtgifterDokumentert = ErUtgifterDokumentertDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                erUtgifterDokumentert = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 adresse = "Flytteveien 1",
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
