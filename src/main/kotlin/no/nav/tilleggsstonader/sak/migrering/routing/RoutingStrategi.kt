@@ -20,6 +20,8 @@ sealed interface RoutingStrategi {
 
     data object KjørelisteRouting : RoutingStrategi
 
+    data object SendAlleBrukereUtenGradertAdresseTilNyLøsning : RoutingStrategi
+
     data class FlyttingOgROAH(
         val featureToggle: ToggleId,
         val kreverUgradertAdresse: Boolean,
