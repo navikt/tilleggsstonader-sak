@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ErUtgifterDokumentert
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
@@ -22,13 +22,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyrå(
                     tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erUtgifterDokumentert = erUtgifterDokumentert.tilDomene(),
+                    dokumenterteUtgifter = erUtgifterDokumentert.tilDomene(),
                     nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
 
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
-                    erUtgifterDokumentert = erUtgifterDokumentert.tilDomene(),
+                    dokumenterteUtgifter = erUtgifterDokumentert.tilDomene(),
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     leiebil = leiebil,
@@ -49,13 +49,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyråDto(
                     tilbud = tilbud.map { FlyttebyråTilbudDto(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erUtgifterDokumentert = erUtgifterDokumentert.tilDto(),
+                    erUtgifterDokumentert = dokumenterteUtgifter.tilDto(),
                     nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )
 
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
-                    erUtgifterDokumentert = erUtgifterDokumentert.tilDto(),
+                    erUtgifterDokumentert = dokumenterteUtgifter.tilDto(),
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     leiebil = leiebil,
@@ -77,12 +77,12 @@ object FaktaFlyttingMapper {
         )
 
     private fun ErUtgifterDokumentertDto.tilDomene() =
-        ErUtgifterDokumentert(
+        DokumenterteUtgifter(
             erUtgifterDokumentert = erUtgifterDokumentert,
             begrunnelse = begrunnelse?.trim()?.takeIf { it.isNotEmpty() },
         )
 
-    private fun ErUtgifterDokumentert.tilDto() =
+    private fun DokumenterteUtgifter.tilDto() =
         ErUtgifterDokumentertDto(
             erUtgifterDokumentert = erUtgifterDokumentert,
             begrunnelse = begrunnelse,

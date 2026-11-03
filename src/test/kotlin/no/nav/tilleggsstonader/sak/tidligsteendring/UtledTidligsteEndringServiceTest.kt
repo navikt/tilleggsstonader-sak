@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ErUtgifterDokumentert
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
@@ -110,7 +110,7 @@ class UtledTidligsteEndringServiceTest {
         val fakta =
             FaktaFlyttebyrå(
                 tilbud = listOf(FlyttebyråTilbud("A", 5000), FlyttebyråTilbud("B", 6000)),
-                erUtgifterDokumentert = ErUtgifterDokumentert(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgift,
                 adresse = "Syntetisk adresse",
             )
@@ -140,7 +140,7 @@ class UtledTidligsteEndringServiceTest {
                         if (index == 0) tilbud.copy(pris = 3000) else tilbud
                     },
             ),
-            fakta.copy(erUtgifterDokumentert = ErUtgifterDokumentert(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
+            fakta.copy(dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
             fakta.copy(adresse = "Ny syntetisk adresse"),
             FaktaFlytteSelv(
                 100,
@@ -152,7 +152,7 @@ class UtledTidligsteEndringServiceTest {
                 null,
                 nødvendigUtgift,
                 fakta.adresse,
-                erUtgifterDokumentert = ErUtgifterDokumentert(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
             ),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
@@ -175,7 +175,7 @@ class UtledTidligsteEndringServiceTest {
                 100,
                 nødvendigUtgift,
                 "Syntetisk adresse",
-                erUtgifterDokumentert = ErUtgifterDokumentert(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
             )
         val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING, fakta = fakta)
         val utleder =
@@ -196,7 +196,7 @@ class UtledTidligsteEndringServiceTest {
             fakta.copy(ferge = 200),
             fakta.copy(parkering = 200),
             fakta.copy(annet = 200),
-            fakta.copy(erUtgifterDokumentert = ErUtgifterDokumentert(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
+            fakta.copy(dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)

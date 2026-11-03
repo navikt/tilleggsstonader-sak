@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 
-data class ErUtgifterDokumentert(
+data class DokumenterteUtgifter(
     val erUtgifterDokumentert: SvarJaNei,
     val begrunnelse: String?,
 ) {

@@ -33,7 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyt
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ErUtgifterDokumentert
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
@@ -63,14 +63,14 @@ class InterntVedtakFlyttingMappingTest {
             val flyttebyråFakta =
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud("Byrå A", 1200), FlyttebyråTilbud("Byrå B", 1000)),
-                    erUtgifterDokumentert = ErUtgifterDokumentert(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                    dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
                     adresse = "Flytteveien 1",
                 )
             val flytteSelvFakta =
                 FaktaFlytteSelv(
-                    erUtgifterDokumentert =
-                        ErUtgifterDokumentert(
+                    dokumenterteUtgifter =
+                        DokumenterteUtgifter(
                             if (dokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                             "Kvittering fra flyttebyrå",
                         ),

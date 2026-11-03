@@ -451,14 +451,14 @@ class InterntVedtakService(
             is FaktaFlyttebyrå ->
                 VilkårFaktaFlyttebyråInterntVedtak(
                     tilbud = fakta.tilbud,
-                    erUtgifterDokumentert = fakta.erUtgifterDokumentert.erUtgifterDokumentert == SvarJaNei.JA,
+                    erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     adresse = fakta.adresse,
                 )
 
             is FaktaFlytteSelv ->
                 VilkårFaktaFlytteSelvInterntVedtak(
-                    erUtgifterDokumentert = fakta.erUtgifterDokumentert.erUtgifterDokumentert == SvarJaNei.JA,
+                    erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
                     avstandEnVei = fakta.avstandEnVei,
                     henger = fakta.henger,
                     leiebil = fakta.leiebil,
