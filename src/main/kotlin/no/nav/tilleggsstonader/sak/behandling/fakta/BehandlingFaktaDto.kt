@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
@@ -161,7 +162,7 @@ data class FaktaFlyttingDetaljer(
     val flyttedato: LocalDate,
     val adresse: FaktaAdresse,
     val flyttemåte: Flyttemåte,
-    val utgifterDekketPåAnnenMåte: JaNei,
+    val utgifterDekketPåAnnenMåte: UtgifterDekketPåAnnenMåte,
     val utgifterEgenFlytting: FaktaUtgifterEgenFlytting?,
     val flyttetilbud: List<FaktaFlyttetilbud>?,
     val skalFlytteFraFolkeregistrertAdresse: JaNei,

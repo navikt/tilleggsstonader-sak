@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHTypeReise
@@ -715,7 +716,7 @@ internal class BehandlingFaktaServiceTest {
                         landkode = "NOR",
                     ),
                 flyttemåte = Flyttemåte.FLYTTEBYRÅ,
-                utgifterDekketPåAnnenMåte = JaNei.NEI,
+                utgifterDekketPåAnnenMåte = UtgifterDekketPåAnnenMåte.NEI,
                 utgifterEgenFlytting = null,
                 flyttetilbud =
                     listOf(
@@ -776,7 +777,7 @@ internal class BehandlingFaktaServiceTest {
                         landkode = "NOR",
                     ),
                 flyttemåte = Flyttemåte.FLYTTEBYRÅ,
-                utgifterDekketPåAnnenMåte = JaNei.NEI,
+                utgifterDekketPåAnnenMåte = UtgifterDekketPåAnnenMåte.NEI,
                 utgifterEgenFlytting = null,
                 flyttetilbud =
                     listOf(

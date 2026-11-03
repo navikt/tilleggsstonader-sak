@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerReiseTilSamlingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerReiseOppstartAvslutningHjemreiseTsr
@@ -598,6 +599,7 @@ private fun mapMålgruppePassAvBarn(
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
         MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for pass av barn")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -666,6 +668,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
         MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for læremidler")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -676,6 +679,7 @@ private fun mapMålgruppeBoutgfiter(
 ): MålgruppeBoutgifter =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeBoutgifter
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for boutgifter")
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadBoutgifter(
                 vurderinger =
@@ -810,6 +814,7 @@ private fun mapMålgruppeDagligReiseTso(
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
         MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker")
     }
 
 private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligReiseTsr =
@@ -829,6 +834,7 @@ private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligR
         MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
         MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for daglig reise TSR")
     }
 
 private fun mapMålgruppeReiseTilSamlingTso(
@@ -901,6 +907,7 @@ private fun mapMålgruppeReiseTilSamlingTso(
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise til samling tso")
         MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad for reise til samling tso")
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise til samling tso")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise til samling TSO")
     }
 
 private fun mapAktiviteterReiseTilSamlingTsr(aktivitetType: AktivitetType): AktivitetReiseTilSamlingTsr =
@@ -928,6 +935,7 @@ private fun mapMålgruppeReiseTilSamlingTsr(type: MålgruppeType): MålgruppeRei
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise til samling TSR")
         MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad for reise til samling TSR")
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise til samling TSR")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise til samling TSR")
     }
 
 private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTso(
@@ -1026,6 +1034,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
             )
 
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise oppstart/avslutning/hjemreise TSO")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise oppstart/avslutning/hjemreise TSO")
     }
 
 private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(aktivitetType: AktivitetType): AktivitetReiseOppstartAvslutningHjemreiseTsr =
@@ -1063,6 +1072,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTsr(type: MålgruppeTyp
             )
 
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise oppstart/avslutning/hjemreise TSR")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise oppstart/avslutning/hjemreise TSR")
     }
 
 private fun mapMålgruppeFlyttingTso(
@@ -1140,11 +1150,13 @@ private fun mapMålgruppeFlyttingTso(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet for flytting TSO")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram for flytting TSO")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for flytting TSO")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for flytting TSO")
     }
 
 private fun mapMålgruppeFlyttingTsr(type: MålgruppeType): MålgruppeFlyttingTsr =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeFlyttingTsr
+        MålgruppeType.ARBEIDSSØKER -> ArbeidssøkerFlyttingTsr()
         MålgruppeType.DAGPENGER -> DagpengerFlyttingTsr()
         MålgruppeType.TILTAKSPENGER -> TiltakspengerFlyttingTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadFlyttingTsr()

@@ -25,6 +25,13 @@ data class DagpengerFlyttingTsr(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class ArbeidssøkerFlyttingTsr(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeFlyttingTsr {
+    override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.ARBEIDSSØKER_FLYTTING_TSR
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class TiltakspengerFlyttingTsr(
     override val vurderinger: IngenVurderinger = IngenVurderinger,
 ) : MålgruppeFlyttingTsr {
@@ -61,6 +68,7 @@ enum class MålgruppeFlyttingTsrType(
     TypeFaktaOgVurderingFlyttingTsr {
     INGEN_MÅLGRUPPE_FLYTTING_TSR(MålgruppeType.INGEN_MÅLGRUPPE),
     DAGPENGER_FLYTTING_TSR(MålgruppeType.DAGPENGER),
+    ARBEIDSSØKER_FLYTTING_TSR(MålgruppeType.ARBEIDSSØKER),
     TILTAKSPENGER_FLYTTING_TSR(MålgruppeType.TILTAKSPENGER),
     UNGDOMSPROGRAMMET_FLYTTING_TSR(MålgruppeType.UNGDOMSPROGRAMMET),
     KVALIFISERINGSSTØNAD_FLYTTING_TSR(MålgruppeType.KVALIFISERINGSSTØNAD),

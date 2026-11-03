@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
@@ -130,6 +131,7 @@ object VilkårperiodeTestUtil {
         mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
+            MålgruppeType.ARBEIDSSØKER -> ArbeidssøkerFlyttingTsr()
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppePassAvBarn
             MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerPassAvBarn
             MålgruppeType.OMSTILLINGSSTØNAD ->
@@ -193,6 +195,7 @@ object VilkårperiodeTestUtil {
         aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
+            MålgruppeType.ARBEIDSSØKER -> error("Arbeidssøker støttes kun for flytting TSR")
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
             MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerLæremidler
             MålgruppeType.OMSTILLINGSSTØNAD ->

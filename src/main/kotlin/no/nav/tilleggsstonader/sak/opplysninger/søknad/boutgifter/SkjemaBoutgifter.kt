@@ -4,16 +4,17 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknadsdata
 import java.time.LocalDate
 
 data class SkjemaBoutgifter(
     val personopplysninger: Personopplysninger,
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
     val boutgifter: BoligEllerOvernattingAvsnitt,
     val dokumentasjon: List<DokumentasjonBoutgifter>,
     val harNedsattArbeidsevne: JaNei?,
-)
+) : Søknadsdata
 
 data class BoligEllerOvernattingAvsnitt(
     val typeUtgifter: TypeUtgifter,

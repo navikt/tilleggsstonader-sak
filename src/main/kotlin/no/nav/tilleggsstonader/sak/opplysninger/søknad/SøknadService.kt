@@ -115,7 +115,7 @@ class SøknadService(
     fun mapSøknad(
         skjema: InnsendtSkjema<out Skjemadata>,
         journalpost: Journalpost,
-    ): Søknad<out Any> =
+    ): Søknad<*> =
         when (val søknadsskjema = skjema.skjema) {
             is SøknadsskjemaPassAvBarn ->
                 SøknadsskjemaPassAvBarnMapper.map(

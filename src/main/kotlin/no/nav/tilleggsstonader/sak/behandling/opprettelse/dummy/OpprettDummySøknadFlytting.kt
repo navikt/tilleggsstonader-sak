@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljerAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FraAdresseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.TilAdresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -66,7 +67,7 @@ class OpprettDummySøknadFlytting(
                         flyttemåte =
                             EnumFelt("Hvordan skal du flytte?", Flyttemåte.FLYTTEBYRÅ, "Med flyttebyrå", emptyList()),
                         utgifterDekketPåAnnenMåte =
-                            EnumFelt("Får du dekket utgiftene på annen måte?", JaNei.NEI, "Nei", emptyList()),
+                            EnumFelt("Får du dekket utgiftene på annen måte?", UtgifterDekketPåAnnenMåte.NEI, "Nei", emptyList()),
                         utgifterEgenFlytting = null,
                         flyttebyrå =
                             FlyttebyråAvsnitt(
