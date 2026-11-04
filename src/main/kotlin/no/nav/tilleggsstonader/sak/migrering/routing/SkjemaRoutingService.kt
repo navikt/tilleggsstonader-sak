@@ -66,6 +66,10 @@ class SkjemaRoutingService(
                     skalBrukerRoutesTilNyKjørelisteLøsning(ident, skjematype)
                 }
 
+                is RoutingStrategi.SendAlleBrukereUtenGradertAdresseTilNyLøsning -> {
+                    sendBrukerUtenGradertAdresseTilNyLøsning(ident)
+                }
+
                 is RoutingStrategi.FlyttingOgROAH -> {
                     skalBrukerRoutesTilNyLøsningFlyttingOgROAH(ident, skjematype, routingStrategi)
                 }
@@ -104,6 +108,13 @@ class SkjemaRoutingService(
         }
 
         return SkjemaRoutingAksjon.AVSJEKK
+    }
+
+    private fun sendBrukerUtenGradertAdresseTilNyLøsning(ident: String): SkjemaRoutingAksjon {
+        if (harFortroligEllerStrengtFortroligAdresse(ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
+        return SkjemaRoutingAksjon.NY_LØSNING
     }
 
     private fun skalBrukerRoutesTilNyLøsningFlyttingOgROAH(
