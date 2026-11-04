@@ -140,8 +140,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspenger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspengerFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
@@ -150,6 +152,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
@@ -160,6 +163,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
@@ -1100,9 +1104,10 @@ private fun mapMålgruppeFlyttingTso(
         MålgruppeType.AAP -> {
             AAPFlyttingTso(
                 vurderinger =
-                    VurderingAAP(
+                    VurderingAAPFlyttingTso(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
                     ),
             )
         }
@@ -1110,19 +1115,24 @@ private fun mapMålgruppeFlyttingTso(
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdFlyttingTso(
                 vurderinger =
-                    VurderingUføretrygd(
+                    VurderingUføretrygdFlyttingTso(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
                     ),
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerFlyttingTso()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerFlyttingTso(
+                vurderinger = VurderingAktivitetspengerFlyttingTso(lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet)),
+            )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneFlyttingTso(
                 vurderinger =
-                    VurderingNedsattArbeidsevne(
+                    VurderingNedsattArbeidsevneFlyttingTso(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
@@ -1130,6 +1140,7 @@ private fun mapMålgruppeFlyttingTso(
                             VurderingMottarSykepengerForFulltidsstilling(
                                 faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
                             ),
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
                     ),
             )
 

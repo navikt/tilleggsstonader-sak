@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFlyttingTsrType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
@@ -60,6 +61,63 @@ class FaktaOgVurderingMapperTest {
 
             assertThat(faktisk).isEqualTo(forventetFaktaOgVurdering)
             assertThat(faktisk.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+        }
+    }
+
+    @Nested
+    inner class LønnetFlyttingTso {
+        private val målgrupperMedLønnet =
+            listOf(
+                MålgruppeType.AAP,
+                MålgruppeType.UFØRETRYGD,
+                MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                MålgruppeType.AKTIVITETSPENGER,
+            )
+
+        private fun map(
+            type: MålgruppeType,
+            svarLønnet: SvarJaNei?,
+        ) = mapFaktaOgSvarDto(
+            vilkårperiode =
+                LagreVilkårperiode(
+                    behandlingId = behandlingId,
+                    type = type,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    faktaOgSvar =
+                        FaktaOgSvarMålgruppeDto(
+                            svarMedlemskap = SvarJaNei.JA,
+                            svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
+                            svarMottarSykepengerForFulltidsstilling = SvarJaNei.NEI,
+                            svarLønnet = svarLønnet,
+                        ),
+                ),
+            stønadstype = Stønadstype.FLYTTING_TSO,
+            fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(),
+        )
+
+        @Test
+        fun `nei på lønnet gir oppfylt`() {
+            målgrupperMedLønnet.forEach { type ->
+                val faktaOgVurdering = map(type, SvarJaNei.NEI)
+
+                assertThat((faktaOgVurdering.vurderinger as LønnetVurdering).lønnet.svar).isEqualTo(SvarJaNei.NEI)
+                assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+            }
+        }
+
+        @Test
+        fun `ja på lønnet gir ikke oppfylt`() {
+            målgrupperMedLønnet.forEach { type ->
+                assertThat(map(type, SvarJaNei.JA).utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            }
+        }
+
+        @Test
+        fun `manglende svar på lønnet gir ikke vurdert`() {
+            målgrupperMedLønnet.forEach { type ->
+                assertThat(map(type, null).utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
+            }
         }
     }
 

@@ -63,10 +63,14 @@
   "målgrupper": [ {
     "begrunnelse": "Målgruppen er dokumentert.",
     "faktaOgVurderinger": {
-      "@type": "MÅLGRUPPE",
+      "@type": "MÅLGRUPPE_FLYTTING_TSO",
       "aldersvilkår": {
         "resultat": "OPPFYLT",
         "svar": "JA"
+      },
+      "lønnet": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
       },
       "medlemskap": {
         "resultat": "OPPFYLT",

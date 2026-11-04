@@ -13,28 +13,28 @@ sealed interface MålgruppeFlyttingTso :
 }
 
 data class AAPFlyttingTso(
-    override val vurderinger: VurderingAAP,
+    override val vurderinger: VurderingAAPFlyttingTso,
 ) : MålgruppeFlyttingTso {
     override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.AAP_FLYTTING_TSO
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class UføretrygdFlyttingTso(
-    override val vurderinger: VurderingUføretrygd,
+    override val vurderinger: VurderingUføretrygdFlyttingTso,
 ) : MålgruppeFlyttingTso {
     override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.UFØRETRYGD_FLYTTING_TSO
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class NedsattArbeidsevneFlyttingTso(
-    override val vurderinger: VurderingNedsattArbeidsevne,
+    override val vurderinger: VurderingNedsattArbeidsevneFlyttingTso,
 ) : MålgruppeFlyttingTso {
     override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.NEDSATT_ARBEIDSEVNE_FLYTTING_TSO
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class AktivitetspengerFlyttingTso(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingAktivitetspengerFlyttingTso,
 ) : MålgruppeFlyttingTso {
     override val type: MålgruppeFlyttingTsoType = MålgruppeFlyttingTsoType.AKTIVITETSPENGER_FLYTTING_TSO
     override val fakta: IngenFakta = IngenFakta
@@ -70,6 +70,53 @@ data object IngenMålgruppeFlyttingTso : MålgruppeFlyttingTso {
     override val vurderinger: IngenVurderinger = IngenVurderinger
     override val fakta: IngenFakta = IngenFakta
 }
+
+/**
+ * Aktivitet vurderes ikke for flytting TSO. Lønn i tiltaket vurderes derfor på målgruppen.
+ */
+data class VurderingAAPFlyttingTso(
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
+    override val lønnet: VurderingLønnet,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering,
+    MottarSykepengerForFulltidsstillingVurdering,
+    LønnetVurdering {
+    override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling =
+        VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
+}
+
+data class VurderingUføretrygdFlyttingTso(
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
+    override val lønnet: VurderingLønnet,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering,
+    MottarSykepengerForFulltidsstillingVurdering,
+    LønnetVurdering {
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling =
+        VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
+}
+
+data class VurderingNedsattArbeidsevneFlyttingTso(
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling,
+    override val lønnet: VurderingLønnet,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering,
+    MottarSykepengerForFulltidsstillingVurdering,
+    LønnetVurdering
+
+data class VurderingAktivitetspengerFlyttingTso(
+    override val lønnet: VurderingLønnet,
+) : LønnetVurdering
 
 sealed interface TypeFaktaOgVurderingFlyttingTso : TypeFaktaOgVurdering
 

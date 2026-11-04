@@ -1,5 +1,10 @@
 {
   "fakta": { },
   "type": "AKTIVITETSPENGER_FLYTTING_TSO",
-  "vurderinger": { }
+  "vurderinger": {
+    "lønnet": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    }
+  }
 }

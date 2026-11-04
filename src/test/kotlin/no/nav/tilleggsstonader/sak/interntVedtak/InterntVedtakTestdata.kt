@@ -136,7 +136,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneFlyttingTso
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Month.FEBRUARY
@@ -1372,12 +1373,13 @@ object InterntVedtakTestdata {
                                 if (stønadstype == Stønadstype.FLYTTING_TSO) {
                                     NedsattArbeidsevneFlyttingTso(
                                         vurderinger =
-                                            VurderingNedsattArbeidsevne(
+                                            VurderingNedsattArbeidsevneFlyttingTso(
                                                 medlemskap = vurderingMedlemskap(SvarJaNei.JA),
                                                 dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
                                                 aldersvilkår = vurderingAldersVilkår(),
                                                 mottarSykepengerForFulltidsstilling =
                                                     vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI),
+                                                lønnet = VurderingLønnet(SvarJaNei.NEI),
                                             ),
                                     )
                                 } else {
