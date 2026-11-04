@@ -47,19 +47,6 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
     val fom: LocalDate = 1 januar 2026
     val tom: LocalDate = 31 januar 2026
 
-    val delperiode =
-        listOf(
-            FaktaDelperiodePrivatBilDto(
-                fom = fom,
-                tom = tom,
-                reisedagerPerUke = 5,
-                bompengerPerDag = null,
-                fergekostnadPerDag = null,
-                skalBehandlesManuelt = true,
-                begrunnelseManuellBehandling = "Begrunnelse",
-            ),
-        )
-
     @BeforeEach
     fun setUp() {
         every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
@@ -95,6 +82,18 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `mottatt kjøreliste som skal behandles manuelt oppretter manuell behandling`() {
+        val delperiode =
+            listOf(
+                FaktaDelperiodePrivatBilDto(
+                    fom = fom,
+                    tom = tom,
+                    reisedagerPerUke = 5,
+                    bompengerPerDag = null,
+                    fergekostnadPerDag = null,
+                    skalBehandlesManuelt = true,
+                    begrunnelseManuellBehandling = "Begrunnelse",
+                ),
+            )
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
