@@ -81,6 +81,7 @@ import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPa
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagPrivatBilForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
@@ -1319,7 +1320,7 @@ object InterntVedtakTestdata {
                                     FlyttebyråTilbud("Flyttebyrå A", 12000),
                                     FlyttebyråTilbud("Flyttebyrå B", 10000),
                                 ),
-                            erUtgifterDokumentert = true,
+                            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             nødvendigUtgift = NødvendigUtgift(SvarJaNeiReiseTilSamling.JA, null),
                             adresse = "Flytteveien 1, 1234 Oslo",
                         ),
@@ -1334,7 +1335,7 @@ object InterntVedtakTestdata {
                     utgift = null,
                     fakta =
                         FaktaFlytteSelv(
-                            erUtgifterDokumentert = true,
+                            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             avstandEnVei = 100,
                             henger = 200,
                             leiebil = null,

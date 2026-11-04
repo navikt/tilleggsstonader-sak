@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -145,7 +146,7 @@ class FlyttingBeregningService(
         val grunnlag =
             BeregningsgrunnlagFlyttebyrå(
                 tilbud = tilbud.mapIndexed { indeks, tilbud -> tilbud.copy(erValgt = indeks == valgtTilbudIndeks) },
-                erUtgifterDokumentert = fakta.erUtgifterDokumentert,
+                erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
             )
         val beløp = tilbud[valgtTilbudIndeks].pris.avrundetStønadsbeløp()
 
@@ -171,7 +172,7 @@ class FlyttingBeregningService(
 
         val grunnlag =
             BeregningsgrunnlagFlytteSelv(
-                erUtgifterDokumentert = fakta.erUtgifterDokumentert,
+                erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
                 avstandEnVei = avstandEnVei,
                 sats = sats.first,
                 satsBekreftet = sats.second,

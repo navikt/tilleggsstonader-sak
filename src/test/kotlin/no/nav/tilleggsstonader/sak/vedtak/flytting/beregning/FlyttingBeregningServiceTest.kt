@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyt
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
@@ -93,7 +94,7 @@ class FlyttingBeregningServiceTest {
                                     FlyttebyråTilbud(navn = "Byrå A", pris = 124),
                                     FlyttebyråTilbud(navn = "Byrå B", pris = 123),
                                 ),
-                            erUtgifterDokumentert = true,
+                            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -159,7 +160,11 @@ class FlyttingBeregningServiceTest {
                     flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
-                            erUtgifterDokumentert = dokumentert,
+                            dokumenterteUtgifter =
+                                DokumenterteUtgifter(
+                                    if (dokumentert) SvarJaNei.JA else SvarJaNei.NEI,
+                                    "Kvittering fra flyttebyrå",
+                                ),
                             avstandEnVei = 100,
                             henger = 100,
                             leiebil = 50,
@@ -201,7 +206,7 @@ class FlyttingBeregningServiceTest {
                     flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
-                            erUtgifterDokumentert = true,
+                            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             avstandEnVei = 1,
                             henger = null,
                             leiebil = null,
@@ -495,7 +500,7 @@ class FlyttingBeregningServiceTest {
             ),
     ) = FaktaFlyttebyrå(
         tilbud = tilbud,
-        erUtgifterDokumentert = true,
+        dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
         adresse = "Flytteveien 1",
         nødvendigUtgift = nødvendigUtgift,
     )
@@ -509,7 +514,7 @@ class FlyttingBeregningServiceTest {
         parkering: Int? = 40,
         annet: Int? = null,
     ) = FaktaFlytteSelv(
-        erUtgifterDokumentert = true,
+        dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
         avstandEnVei = avstandEnVei,
         henger = henger,
         leiebil = leiebil,
