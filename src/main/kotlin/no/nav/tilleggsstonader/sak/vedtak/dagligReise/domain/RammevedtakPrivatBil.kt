@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
@@ -81,6 +83,18 @@ data class RammevedtakForReiseMedPrivatBil(
                 predicate = { it.inneholder(reiseperiode) },
             ) { "Kan ikke finne målgruppe for reiseperioden. Forventer nøyaktig en vedtaksperiode for reiseperioden." }
             .målgruppe
+
+    fun finnesUkerSomSkalBehandlesManuelt(avklarteUker: List<AvklartKjørtUke>) =
+        avklarteUker.any { uke ->
+            uke.dager.any { dag ->
+                val harKjørt =
+                    dag.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA
+
+                harKjørt &&
+                    grunnlag.inneholder(dag.dato) &&
+                    skalBehandlesManuelt(dag.dato)
+            }
+        }
 
     fun skalBehandlesManuelt(dato: LocalDate): Boolean = finnDelperiodeForPeriode(Datoperiode(dato, dato)).skalBehandlesManuelt
 }
