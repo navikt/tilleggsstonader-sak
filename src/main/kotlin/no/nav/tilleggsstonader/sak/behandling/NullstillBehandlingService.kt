@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -36,6 +37,7 @@ class NullstillBehandlingService(
     private val barnService: BarnService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -82,6 +84,10 @@ class NullstillBehandlingService(
     private fun slettDataIBehandling(behandling: Behandling) {
         vilkårperiodeRepository.findByBehandlingId(behandling.id).let(vilkårperiodeRepository::deleteAll)
         vilkårRepository.findByBehandlingId(behandling.id).let(vilkårRepository::deleteAll)
+
+        if (behandling.type == BehandlingType.REVURDERING) {
+            avklartKjørtUkeRepository.findByBehandlingId(behandling.id).let(avklartKjørtUkeRepository::deleteAll)
+        }
 
         if (behandling.type == BehandlingType.KJØRELISTE && behandling.årsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
             avklartKjørelisteService.slettAvklarteUkerOgKjørelisterLagtTilManueltIBehandling(behandling.id)

@@ -144,6 +144,24 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal slette avklarte uker på revurderingen ved nullstilling uten å slette historikk eller kjørelister`() {
+        val ordinærRevurdering = testoppsettService.oppdater(revurdering.copy(type = BehandlingType.REVURDERING))
+        opprettAvklartKjørtUke(behandling.id)
+        opprettAvklartKjørtUke(ordinærRevurdering.id)
+        val tidligereUker = avklartKjørtUkeRepository.findByBehandlingId(behandling.id)
+        val kjørelister = kjørelisteRepository.findAll().toList()
+
+        assertThat(avklartKjørtUkeRepository.findByBehandlingId(ordinærRevurdering.id)).hasSize(1)
+
+        nullstillBehandlingService.nullstillBehandling(ordinærRevurdering)
+
+        assertThat(avklartKjørtUkeRepository.findByBehandlingId(ordinærRevurdering.id)).isEmpty()
+        assertThat(avklartKjørtUkeRepository.findByBehandlingId(behandling.id))
+            .containsExactlyInAnyOrderElementsOf(tidligereUker)
+        assertThat(kjørelisteRepository.findAll()).containsExactlyInAnyOrderElementsOf(kjørelister)
+    }
+
+    @Test
     fun `avklarte kjørte uker skal tilbakestilles hvis kjørelistebehandling`() {
         opprettAvklartKjørtUke(behandling.id)
         opprettDagligReiseVedtak(behandling.id)
