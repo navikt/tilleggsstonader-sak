@@ -161,13 +161,13 @@ class BehandleMottattKjørelisteService(
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
         val harAvvik = avklarteUker.finnesUkerMedAvvik()
         val skalBehandlesManuelt =
-            erMarkertSomSkalBehandlesManueltFraRrammevedtak(kjøreliste, avklarteUker)
+            erMarkertSomSkalBehandlesManueltFraRammevedtak(kjøreliste, avklarteUker)
         val skalOppretteAutomatiskTask =
             !harAvvik && !skalBehandlesManuelt && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
         return skalOppretteAutomatiskTask
     }
 
-    private fun erMarkertSomSkalBehandlesManueltFraRrammevedtak(
+    private fun erMarkertSomSkalBehandlesManueltFraRammevedtak(
         kjøreliste: Kjøreliste,
         avklarteUker: List<AvklartKjørtUke>,
     ): Boolean {
