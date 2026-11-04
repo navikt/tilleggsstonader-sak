@@ -85,7 +85,7 @@ class StønadsvilkårTestdataDsl {
                                 FlyttebyråTilbudDto(navn = "Syntetisk tilbud ${index + 1}", pris = pris)
                             },
                         adresse = "Syntetisk adresse",
-                        erUtgifterDokumentert =
+                        dokumenterteUtgifter =
                             DokumenterteUtgifterDto(
                                 if (erUtgifterDokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                                 "Kvittering fra flyttebyrå",
@@ -113,7 +113,7 @@ class StønadsvilkårTestdataDsl {
                 svar = oppfylteSvarFlytteSelvDto(),
                 fakta =
                     FaktaFlytteSelvDto(
-                        erUtgifterDokumentert =
+                        dokumenterteUtgifter =
                             DokumenterteUtgifterDto(
                                 if (erUtgifterDokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                                 "Kvittering fra flyttebyrå",

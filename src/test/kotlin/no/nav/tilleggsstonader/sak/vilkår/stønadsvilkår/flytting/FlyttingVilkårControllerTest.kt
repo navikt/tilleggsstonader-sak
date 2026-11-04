@@ -67,7 +67,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 ),
             fakta =
                 FaktaFlytteSelvDto(
-                    erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                    dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     avstandEnVei = 100,
                     henger = 1500,
                     leiebil = null,
@@ -92,7 +92,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 FaktaFlyttebyråDto(
                     tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B", 12000)),
                     adresse = "Flytteveien 1",
-                    erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                    dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     nødvendigUtgift = nødvendigUtgiftDto,
                 ),
         )
@@ -115,7 +115,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
             FaktaFlyttebyråDto(
                 tilbud = listOf(FlyttebyråTilbudDto("Byrå B", 12000), FlyttebyråTilbudDto("Byrå A", 10000)),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgift,
             )
         val flytteSelv =
@@ -128,7 +128,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 parkering = 100,
                 annet = null,
                 adresse = "Flytteveien 2",
-                erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgift,
             )
         val requests =
@@ -137,7 +137,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     nyttVilkårFlyttebyrå.copy(
                         fakta =
                             flyttebyrå.copy(
-                                erUtgifterDokumentert =
+                                dokumenterteUtgifter =
                                     DokumenterteUtgifterDto(
                                         if (dokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                                         "Kvittering fra flyttebyrå",
@@ -147,7 +147,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     nyttVilkårFlytteSelv.copy(
                         fakta =
                             flytteSelv.copy(
-                                erUtgifterDokumentert =
+                                dokumenterteUtgifter =
                                     DokumenterteUtgifterDto(
                                         if (dokumentert) SvarJaNei.JA else SvarJaNei.NEI,
                                         "Kvittering fra flyttebyrå",
@@ -185,7 +185,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 flyttedato = 20 januar 2026,
                 fakta =
                     FaktaFlytteSelvDto(
-                        erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
+                        dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                         avstandEnVei = 200,
                         henger = 2000,
                         leiebil = null,
@@ -237,7 +237,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlyttebyråDto(
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå C", 8000), FlyttebyråTilbudDto("Byrå D", 9000)),
                         adresse = "Flytteveien 2",
-                        erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                        dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
@@ -280,7 +280,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlyttebyråDto(
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B")),
                         adresse = "Flytteveien 1",
-                        erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
+                        dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
@@ -300,7 +300,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlyttebyråDto(
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000)),
                         adresse = "Flytteveien 1",
-                        erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
+                        dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )

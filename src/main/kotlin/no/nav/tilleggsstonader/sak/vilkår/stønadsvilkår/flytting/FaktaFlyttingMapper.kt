@@ -22,13 +22,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyrå(
                     tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    dokumenterteUtgifter = erUtgifterDokumentert.tilDomene(),
+                    dokumenterteUtgifter = dokumenterteUtgifter.tilDomene(),
                     nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
 
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
-                    dokumenterteUtgifter = erUtgifterDokumentert.tilDomene(),
+                    dokumenterteUtgifter = dokumenterteUtgifter.tilDomene(),
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     leiebil = leiebil,
@@ -49,13 +49,13 @@ object FaktaFlyttingMapper {
                 FaktaFlyttebyråDto(
                     tilbud = tilbud.map { FlyttebyråTilbudDto(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
-                    erUtgifterDokumentert = dokumenterteUtgifter.tilDto(),
+                    dokumenterteUtgifter = dokumenterteUtgifter.tilDto(),
                     nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )
 
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
-                    erUtgifterDokumentert = dokumenterteUtgifter.tilDto(),
+                    dokumenterteUtgifter = dokumenterteUtgifter.tilDto(),
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     leiebil = leiebil,

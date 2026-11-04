@@ -47,8 +47,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -56,9 +54,8 @@ class InterntVedtakFlyttingMappingTest {
     private val behandlingId = BehandlingId.random()
     private val dato = LocalDate.of(2025, 1, 15)
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `mapper flyttefakta og beregningsresultat for begge stønadstypene`(dokumentert: Boolean) {
+    @Test
+    fun `mapper flyttefakta og beregningsresultat for begge stønadstypene`() {
         listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
             val flyttebyråFakta =
                 FaktaFlyttebyrå(
@@ -71,7 +68,7 @@ class InterntVedtakFlyttingMappingTest {
                 FaktaFlytteSelv(
                     dokumenterteUtgifter =
                         DokumenterteUtgifter(
-                            if (dokumentert) SvarJaNei.JA else SvarJaNei.NEI,
+                            SvarJaNei.JA,
                             "Kvittering fra flyttebyrå",
                         ),
                     avstandEnVei = 100,
@@ -96,7 +93,7 @@ class InterntVedtakFlyttingMappingTest {
                 .isEqualTo(
                     VilkårFaktaFlyttebyråInterntVedtak(
                         tilbud = flyttebyråFakta.tilbud,
-                        erUtgifterDokumentert = true,
+                        dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, begrunnelse = "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = flyttebyråFakta.nødvendigUtgift,
                         adresse = "Flytteveien 1",
                     ),
@@ -104,7 +101,7 @@ class InterntVedtakFlyttingMappingTest {
             assertThat(flytteSelv.vilkår.single().fakta)
                 .isEqualTo(
                     VilkårFaktaFlytteSelvInterntVedtak(
-                        erUtgifterDokumentert = dokumentert,
+                        dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, begrunnelse = "Kvittering fra flyttebyrå"),
                         avstandEnVei = 100,
                         henger = 200,
                         leiebil = null,

@@ -28,7 +28,7 @@ enum class TypeFaktaFlytting {
 
 data class FaktaFlyttebyråDto(
     val tilbud: List<FlyttebyråTilbudDto>,
-    val erUtgifterDokumentert: DokumenterteUtgifterDto,
+    val dokumenterteUtgifter: DokumenterteUtgifterDto,
     val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
 ) : FaktaFlyttingDto {
@@ -50,7 +50,7 @@ data class FaktaFlytteSelvDto(
     val annet: Int? = null,
     val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
-    val erUtgifterDokumentert: DokumenterteUtgifterDto,
+    val dokumenterteUtgifter: DokumenterteUtgifterDto,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTE_SELV
 }

@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
@@ -217,7 +218,7 @@ data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
 
 data class VilkårFaktaFlyttebyråInterntVedtak(
     val tilbud: List<FlyttebyråTilbud>,
-    val erUtgifterDokumentert: Boolean,
+    val dokumenterteUtgifter: DokumenterteUtgifter,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
 ) : VilkårFaktaInterntVedtak {
@@ -234,7 +235,7 @@ data class VilkårFaktaFlytteSelvInterntVedtak(
     val annet: Int?,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
-    val erUtgifterDokumentert: Boolean,
+    val dokumenterteUtgifter: DokumenterteUtgifter,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.FLYTTING_FLYTTE_SELV
 }

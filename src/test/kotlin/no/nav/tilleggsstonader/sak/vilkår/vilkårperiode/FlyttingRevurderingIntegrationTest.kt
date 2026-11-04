@@ -327,7 +327,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 vilkår {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå")))
+                        copy(fakta = byrå.copy(dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå")))
                     }
                 }
             }
@@ -414,7 +414,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                     endreFlytting {
                         val byrå = fakta as FaktaFlyttebyråDto
                         copy(
-                            fakta = byrå.copy(erUtgifterDokumentert = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
+                            fakta = byrå.copy(dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
                         )
                     }
                 }
