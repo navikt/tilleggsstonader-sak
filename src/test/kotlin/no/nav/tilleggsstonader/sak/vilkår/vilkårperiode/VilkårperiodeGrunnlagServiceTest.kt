@@ -3,7 +3,11 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
@@ -51,6 +55,33 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
     lateinit var registerAktivitetClient: RegisterAktivitetClient
 
     val ingenVilkårperioder = Vilkårperioder(emptyList(), emptyList())
+
+    @Test
+    fun `skal lagre arbeidssøkerperioder med faktiske datoer i flytting TSR grunnlag`() {
+        every { ytelseClient.hentYtelser(any()) } answers {
+            val request = firstArg<YtelsePerioderRequest>()
+            assertThat(request.typer).contains(TypeYtelsePeriode.ARBEIDSSØKER)
+            YtelsePerioderDto(
+                perioder =
+                    listOf(
+                        YtelsePeriode.Arbeidssøker(request.fom.minusDays(10), request.fom),
+                        YtelsePeriode.Arbeidssøker(request.tom, null),
+                    ),
+                kildeResultat = listOf(YtelsePerioderDto.KildeResultatYtelse(TypeYtelsePeriode.ARBEIDSSØKER, ResultatKilde.OK)),
+                perioderHentetFom = request.fom,
+                perioderHentetTom = request.tom,
+            )
+        }
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.FLYTTING_TSR)
+
+        val grunnlag = requireNotNull(vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder))
+
+        assertThat(grunnlag.ytelse.perioder).containsExactly(
+            PeriodeGrunnlagYtelse.Arbeidssøker(grunnlag.hentetInformasjon.fom.minusDays(10), grunnlag.hentetInformasjon.fom),
+            PeriodeGrunnlagYtelse.Arbeidssøker(grunnlag.hentetInformasjon.tom, null),
+        )
+        assertThat(vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id).grunnlag).isEqualTo(grunnlag)
+    }
 
     @Test
     internal fun `skal lagre ned grunnlagsadata på aktiviteter når man henter vilkårsperioder`() {

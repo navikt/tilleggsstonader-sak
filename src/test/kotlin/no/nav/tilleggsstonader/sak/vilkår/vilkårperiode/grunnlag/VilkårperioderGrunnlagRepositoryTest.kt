@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -41,6 +42,31 @@ internal class VilkårperioderGrunnlagRepositoryTest : CleanDatabaseIntegrationT
         val lagretGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)
         assertThat(lagretGrunnlag.behandlingId).isEqualTo(behandling.id)
         assertThat(lagretGrunnlag.grunnlag).isEqualTo(grunnlagJson)
+    }
+
+    @Test
+    internal fun `skal kunne lagre og lese avsluttet og åpen arbeidssøkerperiode`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+        val perioder: List<PeriodeGrunnlagYtelse> =
+            listOf(
+                PeriodeGrunnlagYtelse.Arbeidssøker(fom = 1 januar 2025, tom = 31 januar 2025),
+                PeriodeGrunnlagYtelse.Arbeidssøker(fom = 1 februar 2025, tom = null),
+            )
+
+        vilkårperioderGrunnlagRepository.insert(
+            VilkårperioderGrunnlagDomain(
+                behandlingId = behandling.id,
+                grunnlag =
+                    VilkårperioderGrunnlag(
+                        aktivitet = grunnlagAktivitet(),
+                        ytelse = grunnlagYtelseOk(perioder = perioder),
+                        hentetInformasjon = hentetInformasjon(),
+                    ),
+            ),
+        )
+
+        val lagretGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)
+        assertThat(lagretGrunnlag.grunnlag.ytelse.perioder).containsExactlyElementsOf(perioder)
     }
 
     @Test

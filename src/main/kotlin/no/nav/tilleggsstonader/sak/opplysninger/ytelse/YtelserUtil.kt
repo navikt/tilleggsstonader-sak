@@ -4,8 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 
 object YtelserUtil {
-    fun finnRelevanteYtelsesTyper(type: Stønadstype) =
+    fun finnRelevanteYtelsesTyper(type: Stønadstype): List<TypeYtelsePeriode> =
         when (type) {
+            Stønadstype.FLYTTING_TSR ->
+                finnRelevanteYtelsesTyper(Stønadstype.FLYTTING_TSO) + TypeYtelsePeriode.ARBEIDSSØKER
+
             Stønadstype.BARNETILSYN,
             Stønadstype.LÆREMIDLER,
             Stønadstype.BOUTGIFTER,
@@ -21,7 +24,6 @@ object YtelserUtil {
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.FLYTTING_TSO,
-            Stønadstype.FLYTTING_TSR,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             ->

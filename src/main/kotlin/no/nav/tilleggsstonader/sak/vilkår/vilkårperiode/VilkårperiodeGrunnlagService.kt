@@ -240,6 +240,12 @@ class VilkårperiodeGrunnlagService(
                                     fom = it.fom,
                                     tom = it.tom,
                                 )
+
+                            is YtelsePeriode.Arbeidssøker ->
+                                PeriodeGrunnlagYtelse.Arbeidssøker(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
                         }
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =
