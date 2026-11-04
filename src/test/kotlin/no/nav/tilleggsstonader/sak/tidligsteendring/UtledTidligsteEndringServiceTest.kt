@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.faktaPrivatBil
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -14,6 +15,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
@@ -363,6 +366,73 @@ class UtledTidligsteEndringServiceTest {
             )
 
         assertThat(result).isEqualTo(originalFom)
+    }
+
+    @Test
+    fun `utled tidligste endring når skalBehandlesManuelt endres for privat bil`() {
+        val fom = originalFom
+        val tom = originalTom
+
+        val privatBilFakta =
+            faktaPrivatBil(
+                reiseperioder =
+                    listOf(
+                        FaktaDelperiodePrivatBil(
+                            fom = fom,
+                            tom = tom,
+                            reisedagerPerUke = 5,
+                            bompengerPerDag = 80.toBigDecimal(),
+                            fergekostnadPerDag = null,
+                            skalBehandlesManuelt = false,
+                            begrunnelseManuellBehandling = null,
+                        ),
+                    ),
+            )
+
+        val gammelFakta =
+            FaktaDagligReisePrivatBil(
+                reiseId = privatBilFakta.reiseId,
+                reiseavstandEnVei = privatBilFakta.reiseavstandEnVei,
+                faktaDelperioder = privatBilFakta.faktaDelperioder,
+                adresse = privatBilFakta.adresse,
+                aktivitetId = privatBilFakta.aktivitetId,
+            )
+
+        val nyFakta =
+            gammelFakta.copy(
+                faktaDelperioder =
+                    gammelFakta.faktaDelperioder.map {
+                        it.copy(skalBehandlesManuelt = true)
+                    },
+            )
+
+        val gammeltVilkår =
+            vilkår(
+                behandlingId = sisteIverksatteBehandling.id,
+                type = VilkårType.DAGLIG_REISE,
+                fom = fom,
+                tom = tom,
+                fakta = gammelFakta,
+            )
+
+        val nyttVilkår =
+            gammeltVilkår.copy(
+                behandlingId = behandling.id,
+                fakta = nyFakta,
+            )
+
+        vilkårSisteIverksatteBehandling = listOf(gammeltVilkår)
+        vilkår = listOf(nyttVilkår)
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
+
+        val tidligesteEndring =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandling.id,
+                vedtaksperioder,
+            )
+
+        assertThat(tidligesteEndring).isEqualTo(fom)
     }
 }
 
