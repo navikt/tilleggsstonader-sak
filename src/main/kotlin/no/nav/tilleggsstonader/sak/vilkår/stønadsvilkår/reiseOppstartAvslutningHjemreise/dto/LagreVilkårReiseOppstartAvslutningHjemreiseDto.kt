@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
@@ -18,6 +19,7 @@ data class LagreVilkårReiseOppstartAvslutningHjemreiseDto(
     val typeReiseformål: TypeReiseformål,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaReiseOppstartAvslutningHjemreiseDto,
+    val parentVilkår: VilkårGlobalId? = null,
 ) : LagreVilkårROAHDto {
     override fun tilDomene() =
         LagreVilkårReiseOppstartAvslutningHjemreise(
@@ -28,6 +30,7 @@ data class LagreVilkårReiseOppstartAvslutningHjemreiseDto(
             typeReiseformål = typeReiseformål,
             svar = svar.mapValues { it.value.tilDomene() },
             fakta = fakta.mapTilFakta(),
+            parentVilkår = parentVilkår,
         )
 
     private fun utledTom(): LocalDate =

@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -16,6 +18,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -71,23 +74,80 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal hente reiser og paraplyvilkår hver for seg`() {
+    fun `skal lagre reise med referanse til paraply og hente den tilbake`() {
         val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
         val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
-        val reise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId))
+
+        val reiseUtenReferanse = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId))
+        val reiseMedReferanse =
+            vilkårKall.oppdaterVilkår(
+                lagreVilkår = reise(aktivitet.globalId, paraply.globalId),
+                vilkårId = reiseUtenReferanse.id,
+                behandlingId = behandling.id,
+            )
+
+        assertThat(reiseUtenReferanse.parentVilkår).isNull()
+        assertThat(reiseMedReferanse.parentVilkår).isEqualTo(paraply.globalId)
+        assertThat(reiseMedReferanse.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
 
         val hentet = vilkårKall.hentVilkår(behandling.id).single()
-
-        assertThat(hentet.reiser.single().id).isEqualTo(reise.id)
+        assertThat(hentet.reiser.single().parentVilkår).isEqualTo(paraply.globalId)
         assertThat(hentet.paraplyvilkår.single().id).isEqualTo(paraply.id)
     }
 
     @Test
-    fun `skal ikke kunne overskrive et paraplyvilkår med en reise`() {
+    fun `reise er ikke oppfylt når paraplyen ikke er oppfylt, og oppfylt igjen når paraplyen endres`() {
         val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
         val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        val reise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId))
+        assertThat(reise.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
 
-        vilkårKall.apiRespons
+        val ikkeOppfyltParaply =
+            vilkårKall.oppdaterParaplyvilkår(
+                lagreVilkår = paraplyvilkår(aktivitet.globalId, svar = ROAHTestUtil.ikkeOppfylteSvarMidlertidigBostedDto()),
+                vilkårId = paraply.id,
+                behandlingId = behandling.id,
+            )
+        assertThat(ikkeOppfyltParaply.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertThat(resultatTilReise(behandling.id, reise.id)).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+
+        val reiseOppdatertUnderIkkeOppfyltParaply =
+            vilkårKall.oppdaterVilkår(reise(aktivitet.globalId, paraply.globalId), reise.id, behandling.id)
+        assertThat(reiseOppdatertUnderIkkeOppfyltParaply.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+
+        vilkårKall.oppdaterParaplyvilkår(paraplyvilkår(aktivitet.globalId), paraply.id, behandling.id)
+        assertThat(resultatTilReise(behandling.id, reise.id)).isEqualTo(Vilkårsresultat.OPPFYLT)
+    }
+
+    @Test
+    fun `skal avvise ugyldig paraplyreferanse uten å ekkoe verdier`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val (annenBehandling, annenAktivitet) = opprettBehandlingMedAktivitet("12345678911")
+        val api = vilkårKall.apiRespons
+
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        val vanligReise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId))
+        val paraplyIAnnenBehandling =
+            vilkårKall.opprettParaplyvilkår(annenBehandling.id, paraplyvilkår(annenAktivitet.globalId))
+
+        // Ukjent vilkår
+        api
+            .opprettVilkår(behandling.id, reise(aktivitet.globalId, VilkårGlobalId.random()))
+            .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Paraplyvilkåret finnes ikke i behandlingen")
+        // Paraply i annen behandling
+        api
+            .opprettVilkår(behandling.id, reise(aktivitet.globalId, paraplyIAnnenBehandling.globalId))
+            .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Paraplyvilkåret finnes ikke i behandlingen")
+        // Vilkår som ikke er en paraply
+        api
+            .opprettVilkår(behandling.id, reise(aktivitet.globalId, vanligReise.globalId))
+            .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Referansen peker ikke på et paraplyvilkår")
+        // Reise som refererer til seg selv
+        api
+            .oppdaterVilkår(reise(aktivitet.globalId, vanligReise.globalId), vanligReise.id, behandling.id)
+            .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Et vilkår kan ikke referere til seg selv")
+        // Reise kan ikke overskrive et paraplyvilkår
+        api
             .oppdaterVilkår(reise(aktivitet.globalId), paraply.id, behandling.id)
             .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Kan ikke endre mellom reise og paraplyvilkår")
     }
@@ -218,16 +278,29 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         return behandling to aktivitet
     }
 
-    private fun reise(aktivitetId: VilkårperiodeGlobalId) =
-        LagreVilkårReiseOppstartAvslutningHjemreiseDto(
-            fom = 1 januar 2026,
-            tom = null,
-            reiseId = ReiseId.random(),
-            aktivitetId = aktivitetId,
-            typeReiseformål = TypeReiseformål.OPPSTART,
-            svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
-            fakta = offentligTransport(BigDecimal.valueOf(100)),
-        )
+    private fun reise(
+        aktivitetId: VilkårperiodeGlobalId,
+        parentVilkår: VilkårGlobalId? = null,
+    ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+        fom = 1 januar 2026,
+        tom = null,
+        reiseId = ReiseId.random(),
+        aktivitetId = aktivitetId,
+        typeReiseformål = TypeReiseformål.OPPSTART,
+        svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
+        fakta = offentligTransport(BigDecimal.valueOf(100)),
+        parentVilkår = parentVilkår,
+    )
+
+    private fun resultatTilReise(
+        behandlingId: BehandlingId,
+        vilkårId: VilkårId,
+    ) = vilkårKall
+        .hentVilkår(behandlingId)
+        .single()
+        .reiser
+        .single { it.id == vilkårId }
+        .resultat
 
     private fun paraplyvilkår(
         aktivitetId: VilkårperiodeGlobalId,

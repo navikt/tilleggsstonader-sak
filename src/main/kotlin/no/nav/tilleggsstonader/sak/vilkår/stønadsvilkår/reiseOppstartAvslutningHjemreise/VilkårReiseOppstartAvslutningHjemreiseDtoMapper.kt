@@ -67,6 +67,7 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
             fakta = this.fakta.tilDto(),
             slettetKommentar = this.slettetKommentar,
+            parentVilkår = this.parentVilkår,
         )
 
     private fun FaktaReiseOppstartAvslutningHjemreise.tilDto(): FaktaReiseOppstartAvslutningHjemreiseDto =
