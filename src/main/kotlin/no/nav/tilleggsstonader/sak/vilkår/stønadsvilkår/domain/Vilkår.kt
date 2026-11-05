@@ -290,6 +290,13 @@ enum class VilkårType(
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         ),
     ),
+    ROAH_MIDLERTIDIG_BOSTED_PERIODE(
+        "Midlertidig bosted i perioden",
+        listOf(
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        ),
+    ),
 
     // Flytting
     FLYTTING(

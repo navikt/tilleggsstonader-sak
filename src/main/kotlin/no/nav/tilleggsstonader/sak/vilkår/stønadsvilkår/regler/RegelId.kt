@@ -52,6 +52,12 @@ enum class RegelId(
     ROAH_BENYTTET_TAXI("Benyttet bruker taxi?"),
     ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL("Er søker innenfor normalt antall hjemreiser per år?"),
     ROAH_HJEMREISE_BEHOV_FLERE_REISER("Har bruker behov for flere hjemreiser, og er behovet tilfredsstillende dokumentert?"),
+    ROAH_MÅ_BO_MIDLERTIDIG_BORTE("Må bruker midlertidig bo borte hjemmefra for å delta på aktiviteten?"),
+    ROAH_HAR_BARN_UNDER_18_ÅR_SOM_FLYTTER_MED("Har bruker barn under 18 år som flytter med?"),
+    ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME("Har bruker barn som ikke har fullført 4. skoleår, som bor hjemme?"),
+    ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER(
+        "Har bruker dokumentert andre særskilte behov som gir rett på flere hjemreiser?",
+    ),
 
     // FLYTTING
     HAR_UTGIFTER_TIL_FLYTTING("Har bruker utgifter til flyttingen?"),
