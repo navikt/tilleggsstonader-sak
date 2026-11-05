@@ -19,6 +19,7 @@ object VilkårReiseTilSamlingMapper {
     fun Vilkår.mapTilVilkårReiseTilSamling() =
         VilkårReiseTilSamling(
             id = id,
+            globalId = globalId,
             behandlingId = behandlingId,
             fom = this.fom ?: error("Forventer at fom er satt"),
             tom = this.tom ?: error("Forventer at tom er satt"),
@@ -31,6 +32,8 @@ object VilkårReiseTilSamlingMapper {
     fun VilkårReiseTilSamling.mapTilVilkår() =
         Vilkår(
             id = this.id,
+            globalId = this.globalId,
+            parentVilkår = null,
             behandlingId = this.behandlingId,
             resultat = this.resultat,
             status = this.status,

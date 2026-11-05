@@ -29,6 +29,7 @@ import java.time.LocalDateTime
 data class Vilkår(
     @Id
     val id: VilkårId = VilkårId.random(),
+    val globalId: VilkårGlobalId?,
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val status: VilkårStatus?,
@@ -47,6 +48,8 @@ data class Vilkår(
     val gitVersjon: String?,
     val slettetKommentar: String? = null,
     val fakta: VilkårFakta? = null,
+    @Column("parent_vilkar")
+    val parentVilkår: VilkårGlobalId?,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 
@@ -100,7 +103,10 @@ data class Vilkår(
                 // TODO skal det være noe her?
             }
 
-            VilkårType.ROAH_OPPSTART_AVSLUTNING, VilkårType.ROAH_HJEMREISE -> {
+            VilkårType.ROAH_OPPSTART_AVSLUTNING,
+            VilkårType.ROAH_HJEMREISE,
+            VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+            -> {
                 // Dette er kun for tester foreløpig
             }
 

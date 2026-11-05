@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -374,5 +375,29 @@ class FlyttingVilkårServiceTest {
                     innsendt = nyttVilkår,
                 )
             }.withMessage("Kan ikke endre flyttevilkår når behandlingen er på steg=INNGANGSVILKÅR")
+    }
+
+    @Test
+    fun `skal beholde globalId ved oppdatering`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
+        val globalId = VilkårGlobalId.random()
+        val vilkår = eksisterendeVilkår.copy(behandlingId = behandling.id)
+        val eksisterende = vilkår.mapTilVilkår().copy(globalId = globalId)
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        every { vilkårRepository.findById(vilkår.id) } returns Optional.of(eksisterende)
+        every { vilkårRepository.findByBehandlingId(behandling.id) } returns listOf(eksisterende)
+        every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
+
+        flyttingVilkårService.oppdaterVilkår(
+            behandlingId = behandling.id,
+            vilkårId = vilkår.id,
+            innsendt = nyttVilkår.copy(flyttedato = 20 januar 2026),
+        )
+
+        verify(exactly = 1) {
+            vilkårRepository.update(match<Vilkår> { it.globalId == globalId })
+        }
     }
 }

@@ -21,6 +21,7 @@ object VilkårFlyttingMapper {
         }
         return VilkårFlytting(
             id = id,
+            globalId = globalId,
             behandlingId = behandlingId,
             flyttedato = fom ?: feil("Forventer at fom er satt for flytting"),
             resultat = resultat,
@@ -35,6 +36,8 @@ object VilkårFlyttingMapper {
     fun VilkårFlytting.mapTilVilkår(): Vilkår =
         Vilkår(
             id = id,
+            globalId = globalId,
+            parentVilkår = null,
             behandlingId = behandlingId,
             resultat = resultat,
             status = status,
