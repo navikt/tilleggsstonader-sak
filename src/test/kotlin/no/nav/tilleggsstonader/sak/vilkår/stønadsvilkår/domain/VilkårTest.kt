@@ -68,6 +68,34 @@ internal class VilkårTest {
     }
 
     @Test
+    fun `medIdentitetFra beholder globalId og parentVilkår fra eksisterende vilkår`() {
+        val eksisterende =
+            vilkår(behandlingId = behandlingIdFørstegangsbehandling, delvilkår = emptyList(), type = VilkårType.EKSEMPEL)
+                .copy(globalId = VilkårGlobalId.random(), parentVilkår = VilkårGlobalId.random())
+        val ombygd =
+            vilkår(behandlingId = behandlingIdFørstegangsbehandling, delvilkår = emptyList(), type = VilkårType.EKSEMPEL)
+
+        val resultat = ombygd.medIdFra(eksisterende)
+
+        assertThat(resultat.globalId).isEqualTo(eksisterende.globalId)
+        assertThat(resultat.parentVilkår).isEqualTo(eksisterende.parentVilkår)
+    }
+
+    @Test
+    fun `medIdentitetFra gir vilkår uten globalId en ny globalId`() {
+        val eksisterende =
+            vilkår(behandlingId = behandlingIdFørstegangsbehandling, delvilkår = emptyList(), type = VilkårType.EKSEMPEL)
+                .copy(globalId = null)
+        val ombygd =
+            vilkår(behandlingId = behandlingIdFørstegangsbehandling, delvilkår = emptyList(), type = VilkårType.EKSEMPEL)
+
+        val resultat = ombygd.medIdFra(eksisterende)
+
+        assertThat(resultat.globalId).isNotNull.isEqualTo(ombygd.globalId)
+        assertThat(resultat.parentVilkår).isNull()
+    }
+
+    @Test
     fun `kopiering til ny behandling beholder globalId og parentVilkår, men får ny id`() {
         val parentVilkår = VilkårGlobalId.random()
         val vilkår =

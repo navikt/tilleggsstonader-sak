@@ -66,6 +66,16 @@ data class Vilkår(
         }
     }
 
+    /**
+     * Brukes når et vilkår bygges på nytt fra en domenemodell ved oppdatering, så globalId og parentVilkår ikke
+     * går tapt. Vilkår som ikke har globalId ennå, beholder den nye verdien og får dermed en ved første oppdatering.
+     */
+    fun medIdFra(eksisterende: Vilkår) =
+        copy(
+            globalId = eksisterende.globalId ?: globalId,
+            parentVilkår = eksisterende.parentVilkår,
+        )
+
     private fun validerSlettefelter() {
         if (status == VilkårStatus.SLETTET) {
             feilHvis(slettetKommentar.isNullOrBlank()) {

@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -304,4 +305,24 @@ class DagligReiseVilkårServiceTest {
         prisSyvdagersbillett = prisSyvdagersbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
     )
+
+    @Test
+    fun `skal beholde globalId og parentVilkår ved oppdatering`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR)
+        val globalId = VilkårGlobalId.random()
+        val parentVilkår = VilkårGlobalId.random()
+        val eksisterende =
+            vilkårDagligReise(behandlingId = behandling.id)
+                .mapTilVilkår()
+                .copy(globalId = globalId, parentVilkår = parentVilkår)
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { vilkårRepository.findById(eksisterende.id) } returns Optional.of(eksisterende)
+        every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
+
+        dagligReiseVilkårService.oppdaterVilkår(nyttVilkår, behandling.id, eksisterende.id)
+
+        verify(exactly = 1) {
+            vilkårRepository.update(match<Vilkår> { it.globalId == globalId && it.parentVilkår == parentVilkår })
+        }
+    }
 }

@@ -77,10 +77,11 @@ class ReiseTilSamlingVilkårService(
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandling)
 
-        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårReiseTilSamling()
+        val eksisterendeEntitet = vilkårRepository.findByIdOrThrow(vilkårId)
+        val eksisterendeVilkår = eksisterendeEntitet.mapTilVilkårReiseTilSamling()
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
-        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
+        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår().medIdFra(eksisterendeEntitet))
 
         return lagretVilkår.mapTilVilkårReiseTilSamling()
     }

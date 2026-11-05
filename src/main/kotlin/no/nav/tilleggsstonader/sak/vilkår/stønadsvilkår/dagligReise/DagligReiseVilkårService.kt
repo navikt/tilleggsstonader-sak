@@ -76,11 +76,12 @@ class DagligReiseVilkårService(
         validerKanBehandleVilkåret(nyttVilkår, behandling)
         validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår)
 
-        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
+        val eksisterendeEntitet = vilkårRepository.findByIdOrThrow(vilkårId)
+        val eksisterendeVilkår = eksisterendeEntitet.mapTilVilkårDagligReise()
         validerMotEksisterendeVilkår(nyttVilkår, eksisterendeVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
-        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
+        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår().medIdFra(eksisterendeEntitet))
 
         return lagretVilkår.mapTilVilkårDagligReise()
     }
