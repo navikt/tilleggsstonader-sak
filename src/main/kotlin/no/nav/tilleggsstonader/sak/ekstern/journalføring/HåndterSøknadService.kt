@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningH
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
@@ -107,7 +109,6 @@ class HåndterSøknadService(
                     valgbareStønadstyperForIkkeStøttetSkjematype()
                 }
 
-            // TODO utled TSO eller TSR
             Skjematype.SØKNAD_FLYTTING ->
                 if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) || !filtrerStønadstyperSomIkkeErAktivert) {
                     ValgbareStønadstyperForJournalpost(
@@ -172,10 +173,12 @@ class HåndterSøknadService(
             StønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
         )
 
-    private fun finnStønadstypeForFlytting(journalpost: Journalpost): Stønadstype {
-        // TODO utled TSO eller TSR
-        return Stønadstype.FLYTTING_TSO
-    }
+    private fun finnStønadstypeForFlytting(journalpost: Journalpost) =
+        bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.FLYTTING_TSO,
+            StønadstypeTsr = Stønadstype.FLYTTING_TSR,
+        )
 
     private fun finnStønadstypeForReiseOppstartAvslutningHjemreise(journalpost: Journalpost) =
         bestemStønadstype(
@@ -224,6 +227,10 @@ class HåndterSøknadService(
 
     private fun finnPeriodeDetSkalSjekkesMotYtelser(søknad: Søknad<*>) =
         when (søknad) {
+            is SøknadFlytting -> {
+                val flyttedato = søknad.data.flyttingDetaljer?.flyttedato ?: feil("Mangler flyttedetaljer i flyttingsøknad")
+                Datoperiode(fom = flyttedato, tom = flyttedato)
+            }
             is SøknadROAH ->
                 Datoperiode(
                     fom = søknad.data.reiser.finnTidligsteDatoROAH(),

@@ -89,5 +89,6 @@ class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
             TypeYtelsePeriode.TILTAKSPENGER_TPSAK -> PeriodeGrunnlagYtelse.TiltakspengerTPSak(fom = fom, tom = tom)
             TypeYtelsePeriode.TILTAKSPENGER_ARENA -> PeriodeGrunnlagYtelse.TiltakspengerArena(fom = fom, tom = tom)
             TypeYtelsePeriode.AKTIVITETSPENGER -> PeriodeGrunnlagYtelse.Aktivitetspenger(fom = fom, tom = tom)
+            TypeYtelsePeriode.ARBEIDSSØKER -> PeriodeGrunnlagYtelse.Arbeidssøker(fom = fom, tom = tom)
         }
 }

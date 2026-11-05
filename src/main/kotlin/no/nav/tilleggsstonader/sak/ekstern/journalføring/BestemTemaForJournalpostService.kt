@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.finnRelevanteYtelsesTyper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
 import org.slf4j.LoggerFactory
@@ -35,7 +36,9 @@ class BestemTemaForJournalpostService(
         tom: LocalDate,
         målgrupperFraSøknad: Set<MålgruppeType>,
     ): Stønadstype {
-        val målgrupperFraRegister = hentMålgrupperFraRegister(journalpost, fom, tom).toSet()
+        val relevanteYtelsestyper =
+            (finnRelevanteYtelsesTyper(stønadstypeTso) + finnRelevanteYtelsesTyper(stønadstypeTsr)).toSet()
+        val målgrupperFraRegister = hentMålgrupperFraRegister(journalpost, relevanteYtelsestyper, fom, tom).toSet()
         val målgrupper = målgrupperFraRegister.takeIf { it.isNotEmpty() } ?: målgrupperFraSøknad
 
         logger.info(
@@ -56,6 +59,7 @@ class BestemTemaForJournalpostService(
 
     private fun hentMålgrupperFraRegister(
         journalpost: Journalpost,
+        typer: Set<TypeYtelsePeriode>,
         fom: LocalDate,
         tom: LocalDate,
     ): List<MålgruppeType> {
@@ -63,14 +67,12 @@ class BestemTemaForJournalpostService(
             "Forventer at bruker skal være satt på journalpost"
         }
 
-        return ytelseService
-            .hentYtelser(
-                ident = journalpost.bruker!!.id,
-                fom = fom,
-                tom = tom,
-                typer = TypeYtelsePeriode.entries.toList(),
-            ).also { validerResultat(it.kildeResultat) }
-            .perioder
+        val ident = journalpost.bruker!!.id
+        val ytelser =
+            ytelseService
+                .hentYtelser(ident = ident, fom = fom, tom = tom, typer = typer.toList())
+                .also { validerResultat(it.kildeResultat) }
+        return ytelser.perioder
             .map { it.type.tilMålgruppe() }
     }
 

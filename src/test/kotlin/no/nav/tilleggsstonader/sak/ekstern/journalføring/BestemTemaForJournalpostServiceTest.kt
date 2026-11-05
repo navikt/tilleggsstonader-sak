@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
@@ -22,6 +23,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
+import java.time.LocalDate
 
 class BestemTemaForJournalpostServiceTest {
     private val ytelseService = mockk<YtelseService>()
@@ -52,7 +55,92 @@ class BestemTemaForJournalpostServiceTest {
             )
 
         assertThat(stønadstype).isEqualTo(stønadstypeTso)
+        verify(exactly = 1) {
+            ytelseService.hentYtelser(any(), fom, tom, match { TypeYtelsePeriode.ARBEIDSSØKER !in it })
+        }
     }
+
+    @Test
+    fun `skal rute til TSR når registeret returnerer arbeidssøkerperiode`() {
+        val flyttedato = 1 januar 2026
+        val periode =
+            YtelsePeriode.Arbeidssøker(
+                fom = flyttedato,
+                tom = null,
+            )
+        every {
+            ytelseService.hentYtelser(any(), any(), any(), any())
+        } returns
+            tomYtelsePerioderDto().copy(
+                perioder = listOf(periode),
+                kildeResultat =
+                    listOf(YtelsePerioderDto.KildeResultatYtelse(TypeYtelsePeriode.ARBEIDSSØKER, ResultatKilde.OK)),
+            )
+
+        assertThat(bestemFlytting(flyttedato)).isEqualTo(Stønadstype.FLYTTING_TSR)
+        verify(exactly = 1) {
+            ytelseService.hentYtelser(
+                any(),
+                flyttedato,
+                flyttedato,
+                match { TypeYtelsePeriode.ARBEIDSSØKER in it && TypeYtelsePeriode.AAP in it },
+            )
+        }
+        verify(exactly = 1) { ytelseService.hentYtelser(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `skal bruke generelle rutingregler ved både AAP og arbeidssøkerperiode`() {
+        every {
+            ytelseService.hentYtelser(any(), any(), any(), any())
+        } returns
+            tomYtelsePerioderDto().copy(
+                perioder = ytelsePerioderDtoAAP().perioder + YtelsePeriode.Arbeidssøker(fom, tom),
+                kildeResultat =
+                    listOf(YtelsePerioderDto.KildeResultatYtelse(TypeYtelsePeriode.ARBEIDSSØKER, ResultatKilde.OK)),
+            )
+
+        assertThat(bestemFlytting(fom)).isEqualTo(Stønadstype.FLYTTING_TSR)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `skal falle tilbake på søknad når registeret ikke gir perioder`(harKilderesultat: Boolean) {
+        every { ytelseService.hentYtelser(any(), any(), any(), any()) } returns
+            tomYtelsePerioderDto().copy(
+                kildeResultat =
+                    if (harKilderesultat) {
+                        listOf(YtelsePerioderDto.KildeResultatYtelse(TypeYtelsePeriode.ARBEIDSSØKER, ResultatKilde.OK))
+                    } else {
+                        emptyList()
+                    },
+            )
+
+        assertThat(bestemFlytting(fom)).isEqualTo(Stønadstype.FLYTTING_TSO)
+    }
+
+    @Test
+    fun `skal stoppe ved feilet arbeidssøkeroppslag`() {
+        every {
+            ytelseService.hentYtelser(any(), any(), any(), any())
+        } returns
+            tomYtelsePerioderDto().copy(
+                kildeResultat =
+                    listOf(YtelsePerioderDto.KildeResultatYtelse(TypeYtelsePeriode.ARBEIDSSØKER, ResultatKilde.FEILET)),
+            )
+
+        assertThatThrownBy { bestemFlytting(fom) }.hasMessageContaining("Feil ved henting av ytelser")
+    }
+
+    private fun bestemFlytting(flyttedato: LocalDate) =
+        service.bestemStønadstype(
+            journalpost = journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.FLYTTING),
+            stønadstypeTso = Stønadstype.FLYTTING_TSO,
+            stønadstypeTsr = Stønadstype.FLYTTING_TSR,
+            fom = flyttedato,
+            tom = flyttedato,
+            målgrupperFraSøknad = setOf(MålgruppeType.AAP),
+        )
 
     @Test
     fun `skal rute til TSO når målgruppe fra register kan brukes for TSO`() {
