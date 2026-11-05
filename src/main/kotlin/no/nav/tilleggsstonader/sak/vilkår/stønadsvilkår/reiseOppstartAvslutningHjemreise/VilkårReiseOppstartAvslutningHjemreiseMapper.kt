@@ -4,22 +4,32 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAH
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.tilVilkårType
 
 object VilkårReiseOppstartAvslutningHjemreiseMapper {
-    fun Vilkår.mapTilVilkårReiseOppstartAvslutningHjemreise(): VilkårReiseOppstartAvslutningHjemreise {
-        val fakta = faktaROAHEllerFeil(this.fakta)
-        return VilkårReiseOppstartAvslutningHjemreise(
+    fun Vilkår.mapTilVilkårROAH(): VilkårROAH =
+        when (val fakta = faktaROAHEllerFeil(this.fakta)) {
+            is FaktaROAHReise -> mapTilReise(fakta)
+            is FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted -> mapTilMidlertidigBosted(fakta)
+        }
+
+    private fun Vilkår.mapTilReise(fakta: FaktaROAHReise) =
+        VilkårReiseOppstartAvslutningHjemreise(
             id = id,
             globalId = globalId,
             behandlingId = behandlingId,
@@ -33,7 +43,21 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
             delvilkårsett = this.delvilkårsett,
             fakta = fakta.mapTilFaktaReiseOppstartAvslutningHjemreise(),
         )
-    }
+
+    private fun Vilkår.mapTilMidlertidigBosted(fakta: FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted) =
+        VilkårMidlertidigBosted(
+            id = id,
+            globalId = globalId,
+            behandlingId = behandlingId,
+            fom = this.fom ?: error("Forventer at fom er satt"),
+            tom = this.tom ?: error("Forventer at tom er satt"),
+            aktivitetId = fakta.aktivitetId,
+            resultat = this.resultat,
+            status = this.status,
+            delvilkårsett = this.delvilkårsett,
+            fraAdresse = fakta.fraAdresse,
+            tilAdresse = fakta.tilAdresse,
+        )
 
     private fun faktaROAHEllerFeil(fakta: VilkårFakta?): FaktaROAH =
         when (fakta) {
@@ -46,21 +70,15 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
                 )
         }
 
-    fun VilkårReiseOppstartAvslutningHjemreise.mapTilVilkår() =
-        Vilkår(
-            id = this.id,
-            globalId = this.globalId,
-            parentVilkår = null,
-            behandlingId = this.behandlingId,
-            resultat = this.resultat,
-            status = this.status,
+    fun VilkårROAH.mapTilVilkår(): Vilkår =
+        when (this) {
+            is VilkårReiseOppstartAvslutningHjemreise -> mapTilVilkår()
+            is VilkårMidlertidigBosted -> mapTilVilkår()
+        }
+
+    private fun VilkårReiseOppstartAvslutningHjemreise.mapTilVilkår() =
+        tilVilkår(
             type = this.typeReiseformål.tilVilkårType(),
-            fom = this.fom,
-            tom = this.tom,
-            erFremtidigUtgift = false,
-            delvilkårwrapper = DelvilkårWrapper(this.delvilkårsett),
-            opphavsvilkår = null,
-            gitVersjon = Applikasjonsversjon.versjon,
             fakta =
                 this.fakta.mapTilVilkårFakta(
                     reiseId = this.reiseId,
@@ -69,7 +87,38 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
                 ),
         )
 
-    private fun FaktaROAH.mapTilFaktaReiseOppstartAvslutningHjemreise(): FaktaReiseOppstartAvslutningHjemreise =
+    private fun VilkårMidlertidigBosted.mapTilVilkår() =
+        tilVilkår(
+            type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+            fakta =
+                FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                    aktivitetId = this.aktivitetId,
+                    fraAdresse = this.fraAdresse,
+                    tilAdresse = this.tilAdresse,
+                ),
+        )
+
+    private fun VilkårROAH.tilVilkår(
+        type: VilkårType,
+        fakta: VilkårFakta,
+    ) = Vilkår(
+        id = this.id,
+        globalId = this.globalId,
+        parentVilkår = null,
+        behandlingId = this.behandlingId,
+        resultat = this.resultat,
+        status = this.status,
+        type = type,
+        fom = this.fom,
+        tom = this.tom,
+        erFremtidigUtgift = false,
+        delvilkårwrapper = DelvilkårWrapper(this.delvilkårsett),
+        opphavsvilkår = null,
+        gitVersjon = Applikasjonsversjon.versjon,
+        fakta = fakta,
+    )
+
+    private fun FaktaROAHReise.mapTilFaktaReiseOppstartAvslutningHjemreise(): FaktaReiseOppstartAvslutningHjemreise =
         when (this) {
             is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport -> this.mapTilFakta()
             is FaktaReiseOppstartAvslutningHjemreisePrivatBil -> this.mapTilFakta()
