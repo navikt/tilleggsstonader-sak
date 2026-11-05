@@ -12,4 +12,5 @@ data class AktivitetMedReiserDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val reiser: List<VilkårReiseOppstartAvslutningHjemreiseDto>,
+    val paraplyvilkår: List<VilkårMidlertidigBostedDto>,
 )

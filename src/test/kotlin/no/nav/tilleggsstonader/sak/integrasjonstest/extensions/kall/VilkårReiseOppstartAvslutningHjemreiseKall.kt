@@ -4,10 +4,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårMidlertidigBostedDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.RegelstrukturROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
 
 class VilkårReiseOppstartAvslutningHjemreiseKall(
@@ -28,6 +31,17 @@ class VilkårReiseOppstartAvslutningHjemreiseKall(
         behandlingId: BehandlingId,
     ): VilkårReiseOppstartAvslutningHjemreiseDto = apiRespons.oppdaterVilkår(lagreVilkår, vilkårId, behandlingId).expectOkWithBody()
 
+    fun opprettParaplyvilkår(
+        behandlingId: BehandlingId,
+        dto: LagreVilkårMidlertidigBostedDto,
+    ): VilkårMidlertidigBostedDto = apiRespons.opprettVilkår(behandlingId, dto).expectOkWithBody()
+
+    fun oppdaterParaplyvilkår(
+        lagreVilkår: LagreVilkårMidlertidigBostedDto,
+        vilkårId: VilkårId,
+        behandlingId: BehandlingId,
+    ): VilkårMidlertidigBostedDto = apiRespons.oppdaterVilkår(lagreVilkår, vilkårId, behandlingId).expectOkWithBody()
+
     fun slettVilkår(
         behandlingId: BehandlingId,
         vilkårId: VilkårId,
@@ -44,11 +58,11 @@ class VilkårReiseOppstartAvslutningHjemreiseKall(
 
         fun opprettVilkår(
             behandlingId: BehandlingId,
-            dto: LagreVilkårReiseOppstartAvslutningHjemreiseDto,
+            dto: LagreVilkårROAHDto,
         ) = testklient.post("/api/vilkar/reise-oppstart-avslutning-hjemreise/$behandlingId", dto)
 
         fun oppdaterVilkår(
-            lagreVilkår: LagreVilkårReiseOppstartAvslutningHjemreiseDto,
+            lagreVilkår: LagreVilkårROAHDto,
             vilkårId: VilkårId,
             behandlingId: BehandlingId,
         ) = testklient.put("/api/vilkar/reise-oppstart-avslutning-hjemreise/$behandlingId/$vilkårId", lagreVilkår)

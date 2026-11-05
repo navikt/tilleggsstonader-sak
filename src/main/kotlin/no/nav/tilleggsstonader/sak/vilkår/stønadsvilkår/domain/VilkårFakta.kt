@@ -34,6 +34,10 @@ import java.time.LocalDate
         FaktaReiseOppstartAvslutningHjemreiseUbestemt::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT",
     ),
+    JsonSubTypes.Type(
+        FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted::class,
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_MIDLERTIDIG_BOSTED",
+    ),
     JsonSubTypes.Type(FaktaFlyttebyrå::class, name = "FLYTTING_FLYTTEBYRÅ"),
     JsonSubTypes.Type(FaktaFlytteSelv::class, name = "FLYTTING_FLYTTE_SELV"),
     JsonSubTypes.Type(FaktaFlyttingUbestemt::class, name = "FLYTTING_UBESTEMT"),
@@ -107,8 +111,11 @@ data class FaktaReiseTilSamlingUbestemt(
 ) : ReiseVilkårFakta
 
 sealed interface FaktaROAH : VilkårFakta {
-    val reiseId: ReiseId
     val aktivitetId: VilkårperiodeGlobalId
+}
+
+sealed interface FaktaROAHReise : FaktaROAH {
+    val reiseId: ReiseId
     val typeReiseformål: TypeReiseformål
 }
 
@@ -119,7 +126,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String?,
-) : FaktaROAH
+) : FaktaROAHReise
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
@@ -132,12 +139,18 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String?,
-) : FaktaROAH
+) : FaktaROAHReise
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
+) : FaktaROAHReise
+
+data class FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+    override val aktivitetId: VilkårperiodeGlobalId,
+    val fraAdresse: String,
+    val tilAdresse: String,
 ) : FaktaROAH
 
 data class FaktaDagligReiseUbestemt(
@@ -199,4 +212,5 @@ enum class TypeVilkårFakta {
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT,
+    REISE_OPPSTART_AVSLUTNING_HJEMREISE_MIDLERTIDIG_BOSTED,
 }
