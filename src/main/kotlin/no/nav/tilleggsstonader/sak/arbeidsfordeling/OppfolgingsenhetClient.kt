@@ -56,7 +56,7 @@ class OppfolgingsenhetClient(
             // trenger å logge helt til secure logs eller kaste som en server error
             brukerfeilHvis(
                 fullFeilmelding.contains("Ikke tilgang til oppfolgingsEnhet: Veileder har ikke tilgang til bruker"),
-                HttpStatus.UNAUTHORIZED,
+                HttpStatus.FORBIDDEN,
             ) {
                 "Veileder har ikke tilgang til oppfolgingsenhet"
             }
