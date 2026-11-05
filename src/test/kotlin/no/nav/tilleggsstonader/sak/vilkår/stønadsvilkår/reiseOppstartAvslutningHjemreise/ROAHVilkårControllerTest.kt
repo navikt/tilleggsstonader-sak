@@ -7,14 +7,18 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
@@ -32,12 +36,16 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
 class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     val ident = "12345678910"
+
+    @Autowired
+    private lateinit var vilkårRepository: VilkårRepository
 
     @Test
     fun `skal lagre og oppdatere paraplyvilkår med datoer, adresser og egen vurdering`() {
@@ -82,6 +90,20 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         vilkårKall.apiRespons
             .oppdaterVilkår(reise(aktivitet.globalId), paraply.id, behandling.id)
             .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Kan ikke endre mellom reise og paraplyvilkår")
+    }
+
+    @Test
+    fun `skal ikke kunne overskrive vilkår av en annen type`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val dagligReise = vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.DAGLIG_REISE))
+
+        vilkårKall.apiRespons
+            .oppdaterVilkår(reise(aktivitet.globalId), dagligReise.id, behandling.id)
+            .expectProblemDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Vilkåret er ikke et vilkår for reise oppstart, avslutning og hjemreise",
+            )
+        assertThat(vilkårRepository.findByIdOrThrow(dagligReise.id).type).isEqualTo(VilkårType.DAGLIG_REISE)
     }
 
     @Test

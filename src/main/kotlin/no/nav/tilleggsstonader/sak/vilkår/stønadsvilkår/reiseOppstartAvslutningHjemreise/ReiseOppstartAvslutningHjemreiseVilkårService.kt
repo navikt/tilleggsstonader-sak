@@ -100,7 +100,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerAktivitet(nyttVilkår, behandlingId)
 
         val eksisterendeVilkår = hentVilkårForBehandling(vilkårId, behandlingId)
-        validerSammeTypeVilkår(eksisterendeVilkår, nyttVilkår)
+        validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
         val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
@@ -174,11 +174,17 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         return vilkår
     }
 
-    /** En reise kan ikke bli et paraplyvilkår, eller omvendt, ved oppdatering. */
-    private fun validerSammeTypeVilkår(
+    /**
+     * Endepunktet kan bare oppdatere vilkår for reise oppstart, avslutning og hjemreise, ikke andre vilkårstyper.
+     * En reise kan heller ikke bli et paraplyvilkår, eller omvendt, ved oppdatering.
+     */
+    private fun validerKanOppdatereVilkår(
         eksisterendeVilkår: Vilkår,
         nyttVilkår: LagreVilkårROAH,
     ) {
+        feilHvis(eksisterendeVilkår.type !in ROAH_VILKÅRSTYPER) {
+            "Vilkåret er ikke et vilkår for reise oppstart, avslutning og hjemreise"
+        }
         val erEksisterendeVilkårParaplyvilkår = eksisterendeVilkår.type == VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE
         val erNyttVilkårParaplyvilkår = nyttVilkår is LagreVilkårMidlertidigBosted
         feilHvis(erEksisterendeVilkårParaplyvilkår != erNyttVilkårParaplyvilkår) {
@@ -235,5 +241,14 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
             "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
+    }
+
+    private companion object {
+        val ROAH_VILKÅRSTYPER =
+            setOf(
+                VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                VilkårType.ROAH_HJEMREISE,
+                VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+            )
     }
 }
