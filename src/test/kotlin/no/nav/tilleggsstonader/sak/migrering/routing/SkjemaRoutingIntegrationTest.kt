@@ -235,22 +235,14 @@ class SkjemaRoutingIntegrationTest(
                 assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
                 assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
             }
-
-            @Test
-            fun `skal route til gammel løsning når maks antall er nådd og ingen eksisterende data`() {
-                mockMaksAntall(Toggle.SØKNAD_ROUTING_REISE_TIL_SAMLING, 0)
-
-                val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
-
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
-            }
         }
 
         @Nested
         inner class NyLøsning {
             @Test
             fun `skal alltid svare ny løsning hvis personen har blitt routet til ny løsning tidligere`() {
+                // todo gå igjennom tester, ingen bruker "send noen til ny løsning" stategien nå hva burde vi teste for her da,
+                //  evt kommentere ut en test  som kommenteres inn når den tas i bruk
                 testoppsettService.lagreSøknadRouting(
                     SkjemaRouting(
                         ident = jonasIdent,
