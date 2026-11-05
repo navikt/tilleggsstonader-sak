@@ -63,6 +63,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingU
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
@@ -500,6 +501,16 @@ class InterntVedtakService(
                     adresse = fakta.adresse,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     utgifterOffentligTransport = fakta.utgifterOffentligTransport,
+                    begrunnelse = fakta.begrunnelse,
+                    aktivitetId = fakta.aktivitetId,
+                )
+
+            is FaktaReiseTilSamlingDrosje ->
+                VilkårFaktaReiseTilSamlingDrosjeInterntVedtak(
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
+                    nødvendigUtgift = fakta.nødvendigUtgift,
+                    utgifterDrosje = fakta.utgifterDrosje,
                     begrunnelse = fakta.begrunnelse,
                     aktivitetId = fakta.aktivitetId,
                 )

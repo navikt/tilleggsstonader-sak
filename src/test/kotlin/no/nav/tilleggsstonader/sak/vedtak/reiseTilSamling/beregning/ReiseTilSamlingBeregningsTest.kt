@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
@@ -199,6 +200,46 @@ class ReiseTilSamlingBeregningsTest {
         assertThat(privatBil.first().grunnlag.fergekostnad).isEqualTo(100.toBigDecimal())
         assertThat(privatBil.first().grunnlag.parkering).isEqualTo(75.toBigDecimal())
         assertThat(privatBil.first().grunnlag.piggdekkavgift).isEqualTo(60.toBigDecimal())
+    }
+
+    @Test
+    fun `beregner drosjeutgift direkte uten sats eller omregning`() {
+        val aktivitetId = VilkårperiodeGlobalId.random()
+        val utgift = 123.45.toBigDecimal()
+        every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
+            listOf(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    fakta =
+                        FaktaReiseTilSamlingDrosje(
+                            reiseId = dummyReiseId,
+                            adresse = "Samlingsgata 1",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
+                            utgifterDrosje = utgift,
+                            begrunnelse = "Drosje til samling",
+                            aktivitetId = aktivitetId,
+                        ),
+                ),
+            )
+
+        val result =
+            beregningService.beregn(
+                behandling,
+                vedtaksperioder,
+                TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+            )
+
+        assertThat(result.drosje).hasSize(1)
+        assertThat(result.drosje.single().beløp).isEqualTo(utgift)
+        assertThat(result.drosje.single().aktivitetId).isEqualTo(aktivitetId)
+        assertThat(result.offentligTransport).isEmpty()
+        assertThat(result.privatBil).isEmpty()
     }
 
     @Test

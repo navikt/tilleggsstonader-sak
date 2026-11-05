@@ -15,6 +15,7 @@ enum class TypeVedtakReiseTilSamling(
 enum class TypeReiseTilSamling {
     OFFENTLIG_TRANSPORT,
     PRIVAT_BIL,
+    DROSJE,
     UBESTEMT,
 }
 

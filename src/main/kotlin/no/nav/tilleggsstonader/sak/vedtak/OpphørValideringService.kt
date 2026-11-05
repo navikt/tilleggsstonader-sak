@@ -97,6 +97,13 @@ class OpphørValideringService(
                     it.grunnlag.fom >= opphørsdato,
                 ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
             }
+        beregningsresultatReiseTilSamling.drosje
+            .filter { it.beløp > 0.toBigDecimal() }
+            .forEach {
+                brukerfeilHvis(
+                    it.grunnlag.fom >= opphørsdato,
+                ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
+            }
     }
 
     fun validerIngenUtbetalingEtterOpphørsdatoFlytting(

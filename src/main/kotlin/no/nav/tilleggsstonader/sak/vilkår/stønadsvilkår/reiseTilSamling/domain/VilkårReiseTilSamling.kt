@@ -33,8 +33,12 @@ data class VilkårReiseTilSamling(
     private fun validerFaktaErForventetType() {
         if (this.fakta.type === TypeReiseTilSamling.UBESTEMT) return
 
-        return require(this.fakta.type === TypeReiseTilSamling.OFFENTLIG_TRANSPORT || this.fakta.type === TypeReiseTilSamling.PRIVAT_BIL) {
-            "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er ${TypeReiseTilSamling.OFFENTLIG_TRANSPORT} eller ${TypeReiseTilSamling.PRIVAT_BIL}"
+        return require(
+            this.fakta.type === TypeReiseTilSamling.OFFENTLIG_TRANSPORT ||
+                this.fakta.type === TypeReiseTilSamling.PRIVAT_BIL ||
+                this.fakta.type === TypeReiseTilSamling.DROSJE,
+        ) {
+            "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er offentlig transport, privat bil eller drosje"
         }
     }
 }

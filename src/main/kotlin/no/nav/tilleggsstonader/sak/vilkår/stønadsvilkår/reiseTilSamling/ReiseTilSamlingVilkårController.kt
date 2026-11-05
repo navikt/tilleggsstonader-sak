@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
@@ -122,6 +123,7 @@ class ReiseTilSamlingVilkårController(
         when (this) {
             is FaktaOffentligTransport -> this.aktivitetId?.hentAktivitetInfo(behandlingId)
             is FaktaPrivatBil -> this.aktivitetId?.hentAktivitetInfo(behandlingId)
+            is FaktaDrosje -> this.aktivitetId?.hentAktivitetInfo(behandlingId)
             is FaktaUbestemtType -> null
         }
 

@@ -23,9 +23,46 @@ class ReiseTilSamlingRegel :
                 KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                 DOKUMENTERTE_UTGIFTER,
                 KAN_REISE_MED_EGEN_BIL,
+                KAN_REISE_MED_DROSJE,
+                HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE,
             ),
     ) {
     companion object {
+        private val HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE =
+            RegelSteg(
+                regelId = RegelId.HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa =
+                            SluttSvarRegel(
+                                resultat = Resultat.OPPFYLT,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
+                                tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_DROSJE,
+                            ),
+                        hvisNei =
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.PÅKREVD,
+                            ),
+                    ),
+            )
+
+        private val KAN_REISE_MED_DROSJE =
+            RegelSteg(
+                regelId = RegelId.KAN_REISE_MED_DROSJE,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE.regelId, BegrunnelseType.VALGFRI),
+                        hvisNei =
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.PÅKREVD,
+                            ),
+                    ),
+            )
+
         private val KAN_REISE_MED_EGEN_BIL =
             RegelSteg(
                 regelId = RegelId.KAN_REISE_MED_EGEN_BIL,
@@ -38,11 +75,7 @@ class ReiseTilSamlingRegel :
                                 begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL,
                             ),
-                        hvisNei =
-                            SluttSvarRegel(
-                                resultat = Resultat.IKKE_OPPFYLT,
-                                begrunnelseType = BegrunnelseType.PÅKREVD,
-                            ),
+                        hvisNei = NesteRegel(KAN_REISE_MED_DROSJE.regelId, BegrunnelseType.PÅKREVD),
                     ),
             )
 
