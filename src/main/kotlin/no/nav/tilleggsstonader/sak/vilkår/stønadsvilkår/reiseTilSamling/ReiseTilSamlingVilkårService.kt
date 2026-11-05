@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
@@ -77,11 +78,10 @@ class ReiseTilSamlingVilkårService(
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandling)
 
-        val eksisterendeEntitet = vilkårRepository.findByIdOrThrow(vilkårId)
-        val eksisterendeVilkår = eksisterendeEntitet.mapTilVilkårReiseTilSamling()
+        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårReiseTilSamling()
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
-        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår().medIdFra(eksisterendeEntitet))
+        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
 
         return lagretVilkår.mapTilVilkårReiseTilSamling()
     }
@@ -114,6 +114,7 @@ class ReiseTilSamlingVilkårService(
         return VilkårReiseTilSamling(
             behandlingId = behandlingId,
             id = eksisterendeVilkår?.id ?: VilkårId.random(),
+            globalId = eksisterendeVilkår?.globalId ?: VilkårGlobalId.random(),
             fom = nyttVilkår.fom,
             tom = nyttVilkår.tom,
             status = utledStatus(eksisterendeVilkår),

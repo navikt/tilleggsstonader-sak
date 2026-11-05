@@ -75,12 +75,11 @@ class FlyttingVilkårService(
         validerBehandling(behandling)
         validerFaktaOgSvar(innsendt)
         validerMålgruppeOgFlyttesvar(behandlingId, innsendt)
-        val eksisterendeEntitet = vilkårRepository.findByIdOrThrow(vilkårId)
-        val eksisterende = eksisterendeEntitet.mapTilVilkårFlytting()
+        val eksisterende = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårFlytting()
         validerEierskapOgStatus(eksisterende, behandlingId)
         val oppdatert = byggVilkår(behandlingId, innsendt, eksisterende)
         validerIngenOverlapp(behandlingId, oppdatert, vilkårId)
-        return vilkårRepository.update(oppdatert.mapTilVilkår().medIdFra(eksisterendeEntitet)).mapTilVilkårFlytting()
+        return vilkårRepository.update(oppdatert.mapTilVilkår()).mapTilVilkårFlytting()
     }
 
     @Transactional

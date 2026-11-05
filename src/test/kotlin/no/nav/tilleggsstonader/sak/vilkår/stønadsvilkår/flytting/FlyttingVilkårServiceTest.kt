@@ -378,13 +378,12 @@ class FlyttingVilkårServiceTest {
     }
 
     @Test
-    fun `skal beholde globalId og parentVilkår ved oppdatering`() {
+    fun `skal beholde globalId ved oppdatering`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
         val globalId = VilkårGlobalId.random()
-        val parentVilkår = VilkårGlobalId.random()
         val vilkår = eksisterendeVilkår.copy(behandlingId = behandling.id)
-        val eksisterende = vilkår.mapTilVilkår().copy(globalId = globalId, parentVilkår = parentVilkår)
+        val eksisterende = vilkår.mapTilVilkår().copy(globalId = globalId)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
         every { vilkårRepository.findById(vilkår.id) } returns Optional.of(eksisterende)
@@ -398,7 +397,7 @@ class FlyttingVilkårServiceTest {
         )
 
         verify(exactly = 1) {
-            vilkårRepository.update(match<Vilkår> { it.globalId == globalId && it.parentVilkår == parentVilkår })
+            vilkårRepository.update(match<Vilkår> { it.globalId == globalId })
         }
     }
 }

@@ -520,14 +520,13 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
-    fun `skal beholde globalId og parentVilkår ved oppdatering`() {
+    fun `skal beholde globalId ved oppdatering`() {
         val behandling = saksbehandling(steg = StegType.VILKÅR)
         val globalId = VilkårGlobalId.random()
-        val parentVilkår = VilkårGlobalId.random()
         val eksisterende =
             vilkårReiseTilSamling(behandlingId = behandling.id)
                 .mapTilVilkår()
-                .copy(globalId = globalId, parentVilkår = parentVilkår)
+                .copy(globalId = globalId)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING) } returns true
         every { vilkårRepository.findById(eksisterende.id) } returns Optional.of(eksisterende)
@@ -536,7 +535,7 @@ class ReiseTilSamlingVilkårServiceTest {
         reiseTilSamlingVilkårService.oppdaterVilkår(nyttVilkår, behandling.id, eksisterende.id)
 
         verify(exactly = 1) {
-            vilkårRepository.update(match<Vilkår> { it.globalId == globalId && it.parentVilkår == parentVilkår })
+            vilkårRepository.update(match<Vilkår> { it.globalId == globalId })
         }
     }
 }

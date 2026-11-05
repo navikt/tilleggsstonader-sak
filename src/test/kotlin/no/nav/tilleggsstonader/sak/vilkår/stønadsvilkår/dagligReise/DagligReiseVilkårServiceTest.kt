@@ -307,14 +307,13 @@ class DagligReiseVilkårServiceTest {
     )
 
     @Test
-    fun `skal beholde globalId og parentVilkår ved oppdatering`() {
+    fun `skal beholde globalId ved oppdatering`() {
         val behandling = saksbehandling(steg = StegType.VILKÅR)
         val globalId = VilkårGlobalId.random()
-        val parentVilkår = VilkårGlobalId.random()
         val eksisterende =
             vilkårDagligReise(behandlingId = behandling.id)
                 .mapTilVilkår()
-                .copy(globalId = globalId, parentVilkår = parentVilkår)
+                .copy(globalId = globalId)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { vilkårRepository.findById(eksisterende.id) } returns Optional.of(eksisterende)
         every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
@@ -322,7 +321,7 @@ class DagligReiseVilkårServiceTest {
         dagligReiseVilkårService.oppdaterVilkår(nyttVilkår, behandling.id, eksisterende.id)
 
         verify(exactly = 1) {
-            vilkårRepository.update(match<Vilkår> { it.globalId == globalId && it.parentVilkår == parentVilkår })
+            vilkårRepository.update(match<Vilkår> { it.globalId == globalId })
         }
     }
 }

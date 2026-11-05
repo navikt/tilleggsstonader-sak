@@ -29,7 +29,7 @@ import java.time.LocalDateTime
 data class Vilkår(
     @Id
     val id: VilkårId = VilkårId.random(),
-    val globalId: VilkårGlobalId? = VilkårGlobalId.random(),
+    val globalId: VilkårGlobalId?,
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val status: VilkårStatus?,
@@ -49,7 +49,7 @@ data class Vilkår(
     val slettetKommentar: String? = null,
     val fakta: VilkårFakta? = null,
     @Column("parent_vilkar")
-    val parentVilkår: VilkårGlobalId? = null,
+    val parentVilkår: VilkårGlobalId?,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 
@@ -65,16 +65,6 @@ data class Vilkår(
             validerSlettefelter()
         }
     }
-
-    /**
-     * Brukes når et vilkår bygges på nytt fra en domenemodell ved oppdatering, så globalId og parentVilkår ikke
-     * går tapt. Vilkår som ikke har globalId ennå, beholder den nye verdien og får dermed en ved første oppdatering.
-     */
-    fun medIdFra(eksisterende: Vilkår) =
-        copy(
-            globalId = eksisterende.globalId ?: globalId,
-            parentVilkår = eksisterende.parentVilkår,
-        )
 
     private fun validerSlettefelter() {
         if (status == VilkårStatus.SLETTET) {

@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
@@ -127,6 +128,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         return VilkårReiseOppstartAvslutningHjemreise(
             behandlingId = behandlingId,
             id = eksisterendeVilkår?.id ?: VilkårId.random(),
+            globalId = eksisterendeVilkår?.globalId ?: VilkårGlobalId.random(),
             fom = nyttVilkår.fom,
             tom = nyttVilkår.tom,
             aktivitetId = nyttVilkår.aktivitetId,
