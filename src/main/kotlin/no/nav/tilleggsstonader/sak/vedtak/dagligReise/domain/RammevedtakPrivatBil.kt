@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
@@ -86,14 +86,13 @@ data class RammevedtakForReiseMedPrivatBil(
 
     fun finnesUkerSomSkalBehandlesManuelt(avklarteUker: List<AvklartKjørtUke>) =
         avklarteUker.any { uke ->
-            uke.dager.any { dag ->
-                val harKjørt =
-                    dag.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA
-
-                harKjørt &&
-                    grunnlag.inneholder(dag.dato) &&
-                    skalBehandlesManuelt(dag.dato)
-            }
+            uke.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.NY &&
+                finnDelperiodeForPeriode(
+                    Datoperiode(
+                        uke.dager.minOf { it.dato },
+                        uke.dager.maxOf { it.dato },
+                    ),
+                ).skalBehandlesManuelt
         }
 
     fun skalBehandlesManuelt(dato: LocalDate): Boolean = finnDelperiodeForPeriode(Datoperiode(dato, dato)).skalBehandlesManuelt
