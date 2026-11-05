@@ -13,7 +13,6 @@ sealed interface RoutingStrategi {
         val kreverAktivtAapVedtak: Boolean,
         val kreverUgradertAdresse: Boolean,
         val alleMedAAPVedtakTilNyLøsning: Boolean,
-        val featureToggleMaksAntallForPrivatBil: ToggleId?,
     ) : RoutingStrategi
 
     data object DagligReise : RoutingStrategi
@@ -43,7 +42,6 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,
                 alleMedAAPVedtakTilNyLøsning = false,
-                featureToggleMaksAntallForPrivatBil = null,
             )
         Skjematype.SØKNAD_FLYTTING ->
             RoutingStrategi.FlyttingOgROAH(
