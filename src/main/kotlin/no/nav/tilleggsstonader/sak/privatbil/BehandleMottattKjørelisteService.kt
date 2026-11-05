@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import no.nav.tilleggsstonader.sak.privatbil.task.AutomatiskKjørelisteBehandlingTask
 import org.slf4j.LoggerFactory
@@ -74,8 +75,8 @@ class BehandleMottattKjørelisteService(
         val nyBehandling = opprettKjørelisteBehandling(kjøreliste)
 
         val skalOppretteAutomatiskTask =
-            nyBehandling.status != BehandlingStatus.SATT_PÅ_VENT && kanAutomatiskBehandles(nyBehandling.id)
-
+            nyBehandling.status != BehandlingStatus.SATT_PÅ_VENT &&
+                kanAutomatiskBehandles(nyBehandling.id, kjøreliste)
         if (skalOppretteAutomatiskTask) {
             logger.info(
                 "Ingen avvik funnet for behandling=${nyBehandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
@@ -152,13 +153,33 @@ class BehandleMottattKjørelisteService(
         }
     }
 
-    private fun kanAutomatiskBehandles(behandlingId: BehandlingId): Boolean {
+    private fun kanAutomatiskBehandles(
+        behandlingId: BehandlingId,
+        kjøreliste: Kjøreliste,
+    ): Boolean {
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
         val harAvvik = avklarteUker.finnesUkerMedAvvik()
+        val skalBehandlesManuelt =
+            erMarkertSomSkalBehandlesManueltFraRammevedtak(kjøreliste, avklarteUker)
         val skalOppretteAutomatiskTask =
-            !harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
-
+            !harAvvik && !skalBehandlesManuelt && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
         return skalOppretteAutomatiskTask
+    }
+
+    private fun erMarkertSomSkalBehandlesManueltFraRammevedtak(
+        kjøreliste: Kjøreliste,
+        avklarteUker: List<AvklartKjørtUke>,
+    ): Boolean {
+        val behandling =
+            behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(kjøreliste.fagsakId)
+                ?: return false
+
+        val rammeForReise =
+            avklartKjørelisteService.henteReiseFraVedtak(
+                behandling.id,
+                kjøreliste.data.reiseId,
+            )
+        return rammeForReise.finnesUkerSomSkalBehandlesManuelt(avklarteUker)
     }
 
     enum class KjørelisteBehandlingUtfall(

@@ -1,12 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
@@ -80,6 +83,19 @@ data class RammevedtakForReiseMedPrivatBil(
                 predicate = { it.inneholder(reiseperiode) },
             ) { "Kan ikke finne målgruppe for reiseperioden. Forventer nøyaktig en vedtaksperiode for reiseperioden." }
             .målgruppe
+
+    fun finnesUkerSomSkalBehandlesManuelt(avklarteUker: List<AvklartKjørtUke>) =
+        avklarteUker.any { uke ->
+            uke.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.NY &&
+                finnDelperiodeForPeriode(
+                    Datoperiode(
+                        uke.dager.minOf { it.dato },
+                        uke.dager.maxOf { it.dato },
+                    ),
+                ).skalBehandlesManuelt
+        }
+
+    fun skalBehandlesManuelt(dato: LocalDate): Boolean = finnDelperiodeForPeriode(Datoperiode(dato, dato)).skalBehandlesManuelt
 }
 
 data class RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
@@ -121,6 +137,8 @@ data class RammeForReiseMedPrivatBilDelperiode(
     val ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
     val reisedagerPerUke: Int,
     val satser: List<RammeForReiseMedPrivatBilSatsForDelperiode>,
+    val skalBehandlesManuelt: Boolean,
+    val begrunnelseManuellBehandling: String?,
 ) : Periode<LocalDate>,
     KopierPeriode<RammeForReiseMedPrivatBilDelperiode> {
     override fun medPeriode(

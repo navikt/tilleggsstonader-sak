@@ -1,3 +1,4 @@
+
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.tilleggsstonader.libs.feil.feil
@@ -24,6 +25,7 @@ object ReisevurderingPrivatBilMapper {
                 gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
                 forrigeRammevedtakForReise = forrigeRammevedtakForReise,
             )
+
         val ukeVurderingerDto =
             lagUkeVurderingerDto(
                 gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
@@ -31,6 +33,7 @@ object ReisevurderingPrivatBilMapper {
                 avklarteUker = avklarteUker,
                 kjørelister = kjørelister,
             )
+
         return ReisevurderingPrivatBilDto(
             reiseId = reiseId,
             rammevedtak = gjeldendeRammevedtakForReise?.tilDto(beregningsplan = null),
@@ -40,14 +43,15 @@ object ReisevurderingPrivatBilMapper {
     }
 
     /**
-     * Bruker gammelt rammevedtak for å finne ReiseId hvis hele reisen er slettet
+     * Bruker gammelt rammevedtak for å finne ReiseId hvis hele reisen er slettet.
      */
     private fun finnReiseId(
         gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
         forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
     ): ReiseId =
-        gjeldendeRammevedtakForReise?.reiseId ?: forrigeRammevedtakForReise?.reiseId
-            ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
+        gjeldendeRammevedtakForReise?.reiseId
+            ?: forrigeRammevedtakForReise?.reiseId
+            ?: feil("Kan ikke lage reisevurdering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
@@ -77,6 +81,7 @@ object ReisevurderingPrivatBilMapper {
                 avklartUke = avklartUke,
                 kjøreliste = kjørelisteForUke,
                 erUkeSlettet = erUkeSlettet(uke, gjeldendeUker, forrigeUker),
+                rammevedtak = gjeldendeRammevedtakForReise,
             )
         }
     }
@@ -88,6 +93,7 @@ object ReisevurderingPrivatBilMapper {
         avklartUke: AvklartKjørtUke?,
         kjøreliste: Kjøreliste?,
         erUkeSlettet: Boolean,
+        rammevedtak: RammevedtakForReiseMedPrivatBil?,
     ): UkeVurderingDto =
         UkeVurderingDto(
             ukenummer = uke.ukenummer,
@@ -110,6 +116,7 @@ object ReisevurderingPrivatBilMapper {
                         avklartUke = avklartUke,
                     )
                 },
+            skalBehandlesManuelt = skalBehandlesManuelt(datoer = gjeldendeDatoerForUke, rammevedtak = rammevedtak),
         )
 
     private fun lagDagDto(
@@ -153,4 +160,14 @@ object ReisevurderingPrivatBilMapper {
         gjeldendeUker: Map<UkeIÅr, List<LocalDate>>,
         forrigeUker: Map<UkeIÅr, List<LocalDate>>,
     ): Boolean = !gjeldendeUker.containsKey(uke) && forrigeUker.containsKey(uke)
+
+    private fun skalBehandlesManuelt(
+        datoer: List<LocalDate>,
+        rammevedtak: RammevedtakForReiseMedPrivatBil?,
+    ): Boolean? {
+        if (rammevedtak == null) return null
+        return datoer.any { dato ->
+            rammevedtak.skalBehandlesManuelt(dato)
+        }
+    }
 }
