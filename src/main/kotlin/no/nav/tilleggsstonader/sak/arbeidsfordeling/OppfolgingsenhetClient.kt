@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.arbeidsfordeling
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -48,7 +50,18 @@ class OppfolgingsenhetClient(
         }
 
         if (!response.errors.isNullOrEmpty()) {
-            secureLogger.error("Feil ved henting av oppfolgingsenhet: ${response.errors.joinToString { it.message }}")
+            val fullFeilmelding = response.errors.joinToString { it.message }
+
+            // Vanlig feilmelding som dukker opp fra Oppfølgingsenheten. Dette bør ikke være noe vi
+            // trenger å logge helt til secure logs eller kaste som en server error
+            brukerfeilHvis(
+                fullFeilmelding.contains("Ikke tilgang til oppfolgingsEnhet: Veileder har ikke tilgang til bruker"),
+                HttpStatus.FORBIDDEN,
+            ) {
+                "Veileder har ikke tilgang til oppfolgingsenhet"
+            }
+
+            secureLogger.error("Feil ved henting av oppfolgingsenhet: $fullFeilmelding")
             error("Feil ved henting av oppfolgingsenhet")
         }
 
