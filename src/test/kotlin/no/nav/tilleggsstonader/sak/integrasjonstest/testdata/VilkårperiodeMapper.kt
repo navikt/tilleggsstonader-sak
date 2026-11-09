@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgru
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFlyttingTsoFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeLæremidlerFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 
@@ -94,6 +95,14 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                 svarMottarSykepengerForFulltidsstilling = this.mottarSykepengerForFulltidsstilling?.svar,
             )
         }
+
+        is MålgruppeFlyttingTsoFaktaOgVurderingerDto ->
+            FaktaOgSvarMålgruppeDto(
+                svarMedlemskap = this.medlemskap?.svar,
+                svarUtgifterDekketAvAnnetRegelverk = this.utgifterDekketAvAnnetRegelverk?.svar,
+                svarMottarSykepengerForFulltidsstilling = this.mottarSykepengerForFulltidsstilling?.svar,
+                svarLønnet = this.lønnet?.svar,
+            )
 
         is MålgruppeLæremidlerFaktaOgVurderingerDto ->
             FaktaOgSvarMålgruppeDto(

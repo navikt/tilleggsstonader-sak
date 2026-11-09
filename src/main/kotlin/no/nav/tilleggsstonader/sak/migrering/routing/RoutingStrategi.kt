@@ -22,6 +22,8 @@ sealed interface RoutingStrategi {
 
     data class FlyttingOgROAH(
         val featureToggle: ToggleId,
+        val kreverUgradertAdresse: Boolean,
+        val krevBarnEllerAnnenForelderHarUgradertAdresse: Boolean,
     ) : RoutingStrategi
 }
 
@@ -46,9 +48,13 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
         Skjematype.SØKNAD_FLYTTING ->
             RoutingStrategi.FlyttingOgROAH(
                 featureToggle = Toggle.SØKNAD_ROUTING_FLYTTING,
+                kreverUgradertAdresse = true,
+                krevBarnEllerAnnenForelderHarUgradertAdresse = false,
             )
         Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
             RoutingStrategi.FlyttingOgROAH(
                 featureToggle = Toggle.SØKNAD_ROUTING_ROAH,
+                kreverUgradertAdresse = true,
+                krevBarnEllerAnnenForelderHarUgradertAdresse = true,
             )
     }

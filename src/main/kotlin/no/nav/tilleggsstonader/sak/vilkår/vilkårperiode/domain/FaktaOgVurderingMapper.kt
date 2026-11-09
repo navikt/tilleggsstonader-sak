@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerReiseTilSamlingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerReiseOppstartAvslutningHjemreiseTsr
@@ -95,6 +96,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadReiseTilSamlingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadFlyttingTso
@@ -137,8 +140,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspenger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspengerFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
@@ -147,6 +152,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
@@ -157,6 +163,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
@@ -181,6 +188,7 @@ fun mapFaktaOgSvarDto(
     when (vilkårperiode.type) {
         is AktivitetType ->
             mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode, kreverAktivitetsdager = kreverAktivitetsdager)
+
         is MålgruppeType ->
             mapMålgruppe(
                 stønadstype = stønadstype,
@@ -301,6 +309,7 @@ private fun mapMålgruppe(
         Stønadstype.FLYTTING_TSO -> {
             mapMålgruppeFlyttingTso(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
+
         Stønadstype.FLYTTING_TSR -> {
             mapMålgruppeFlyttingTsr(type)
         }
@@ -416,9 +425,7 @@ private fun mapAktiviteterDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
                 fakta =
-                    FaktaAktivitetDagligReiseTso(
-                        hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager),
-                    ),
+                    FaktaAktivitetDagligReiseTso(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -448,8 +455,7 @@ private fun mapAktiviteterDagligReiseTsr(
                     VurderingTiltakDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta =
-                    FaktaAktivitetDagligReiseTsr(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
+                fakta = FaktaAktivitetDagligReiseTsr(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -571,6 +577,7 @@ private fun mapMålgruppePassAvBarn(
             AktivitetspengerPassAvBarn(
                 vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevnePassAvBarn(
                 vurderinger =
@@ -590,6 +597,9 @@ private fun mapMålgruppePassAvBarn(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for pass av barn")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -640,6 +650,7 @@ private fun mapMålgruppeLæremidler(
             AktivitetspengerLæremidler(
                 vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneLæremidler(
                 vurderinger =
@@ -655,6 +666,9 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for læremidler")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -665,6 +679,7 @@ private fun mapMålgruppeBoutgfiter(
 ): MålgruppeBoutgifter =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeBoutgifter
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for boutgifter")
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadBoutgifter(
                 vurderinger =
@@ -704,6 +719,7 @@ private fun mapMålgruppeBoutgfiter(
             AktivitetspengerBoutgifter(
                 vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneBoutgifter(
                 vurderinger =
@@ -724,6 +740,8 @@ private fun mapMålgruppeBoutgfiter(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
     }
 
 private fun mapMålgruppeDagligReiseTso(
@@ -773,6 +791,7 @@ private fun mapMålgruppeDagligReiseTso(
             AktivitetspengerDagligReiseTso(
                 vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneDagligReiseTso(
                 vurderinger =
@@ -793,6 +812,9 @@ private fun mapMålgruppeDagligReiseTso(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker")
     }
 
 private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligReiseTsr =
@@ -810,6 +832,9 @@ private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligR
         MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetDagligReiseTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
         MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for daglig reise TSR")
     }
 
 private fun mapMålgruppeReiseTilSamlingTso(
@@ -859,6 +884,7 @@ private fun mapMålgruppeReiseTilSamlingTso(
             AktivitetspengerReiseTilSamlingTso(
                 vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneReiseTilSamlingTso(
                 vurderinger =
@@ -879,6 +905,9 @@ private fun mapMålgruppeReiseTilSamlingTso(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet for reise til samling tso")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram for reise til samling tso")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise til samling tso")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad for reise til samling tso")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise til samling tso")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise til samling TSO")
     }
 
 private fun mapAktiviteterReiseTilSamlingTsr(aktivitetType: AktivitetType): AktivitetReiseTilSamlingTsr =
@@ -904,6 +933,9 @@ private fun mapMålgruppeReiseTilSamlingTsr(type: MålgruppeType): MålgruppeRei
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsatt arbeidsevne for reise til samling TSR")
         MålgruppeType.AKTIVITETSPENGER -> error("Håndterer ikke aktivitetspenger for reise til samling TSR")
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise til samling TSR")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad for reise til samling TSR")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise til samling TSR")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise til samling TSR")
     }
 
 private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTso(
@@ -975,6 +1007,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
             AktivitetspengerReiseOppstartAvslutningHjemreiseTso(
                 vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso(
                 vurderinger =
@@ -995,6 +1028,13 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet for reise oppstart/avslutning/hjemreise TSO")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram for reise oppstart/avslutning/hjemreise TSO")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise oppstart/avslutning/hjemreise TSO")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD ->
+            error(
+                "Håndterer ikke opphørt omstillingsstønad for reise oppstart/avslutning/hjemreise TSO",
+            )
+
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise oppstart/avslutning/hjemreise TSO")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise oppstart/avslutning/hjemreise TSO")
     }
 
 private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(aktivitetType: AktivitetType): AktivitetReiseOppstartAvslutningHjemreiseTsr =
@@ -1026,6 +1066,13 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTsr(type: MålgruppeTyp
         MålgruppeType.AKTIVITETSPENGER -> error("Håndterer ikke aktivitetspenger for reise oppstart/avslutning/hjemreise TSR")
         MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetReiseOppstartAvslutningHjemreiseTsr()
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise oppstart/avslutning/hjemreise TSR")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD ->
+            error(
+                "Håndterer ikke opphørt omstillingsstønad for reise oppstart/avslutning/hjemreise TSR",
+            )
+
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise oppstart/avslutning/hjemreise TSR")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for reise oppstart/avslutning/hjemreise TSR")
     }
 
 private fun mapMålgruppeFlyttingTso(
@@ -1046,16 +1093,21 @@ private fun mapMålgruppeFlyttingTso(
             )
         }
 
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> OpphørtOmstillingsstønadFlyttingTso
+
         MålgruppeType.OVERGANGSSTØNAD -> {
             OvergangssstønadFlyttingTso
         }
 
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> OpphørtOvergangsstønadFlyttingTso
+
         MålgruppeType.AAP -> {
             AAPFlyttingTso(
                 vurderinger =
-                    VurderingAAP(
+                    VurderingAAPFlyttingTso(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
                     ),
             )
         }
@@ -1063,19 +1115,24 @@ private fun mapMålgruppeFlyttingTso(
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdFlyttingTso(
                 vurderinger =
-                    VurderingUføretrygd(
+                    VurderingUføretrygdFlyttingTso(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
                     ),
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerFlyttingTso()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerFlyttingTso(
+                vurderinger = VurderingAktivitetspengerFlyttingTso(lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet)),
+            )
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneFlyttingTso(
                 vurderinger =
-                    VurderingNedsattArbeidsevne(
+                    VurderingNedsattArbeidsevneFlyttingTso(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
@@ -1083,6 +1140,7 @@ private fun mapMålgruppeFlyttingTso(
                             VurderingMottarSykepengerForFulltidsstilling(
                                 faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
                             ),
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
                     ),
             )
 
@@ -1092,11 +1150,13 @@ private fun mapMålgruppeFlyttingTso(
         MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet for flytting TSO")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram for flytting TSO")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for flytting TSO")
+        MålgruppeType.ARBEIDSSØKER -> error("Håndterer ikke arbeidssøker for flytting TSO")
     }
 
 private fun mapMålgruppeFlyttingTsr(type: MålgruppeType): MålgruppeFlyttingTsr =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeFlyttingTsr
+        MålgruppeType.ARBEIDSSØKER -> ArbeidssøkerFlyttingTsr()
         MålgruppeType.DAGPENGER -> DagpengerFlyttingTsr()
         MålgruppeType.TILTAKSPENGER -> TiltakspengerFlyttingTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadFlyttingTsr()
@@ -1109,4 +1169,6 @@ private fun mapMålgruppeFlyttingTsr(type: MålgruppeType): MålgruppeFlyttingTs
         MålgruppeType.AKTIVITETSPENGER -> error("Håndterer ikke aktivitetspenger for flytting TSR")
         MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetFlyttingTsr()
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for flytting TSR")
+        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> error("Håndterer ikke opphørt omstillingsstønad for flytting TSR")
+        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for flytting TSR")
     }

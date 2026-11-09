@@ -21,8 +21,8 @@ data class BeregningsresultatFlyttevilkår(
 
 fun BeregningsresultatFlyttevilkår.skalUtbetales(): Boolean =
     when (val beregningsgrunnlag = grunnlag) {
-        is BeregningsgrunnlagFlyttebyrå -> beregningsgrunnlag.erBetalingDokumentert
-        is BeregningsgrunnlagFlytteSelv -> true
+        is BeregningsgrunnlagFlyttebyrå -> beregningsgrunnlag.erUtgifterDokumentert
+        is BeregningsgrunnlagFlytteSelv -> beregningsgrunnlag.erUtgifterDokumentert
     }
 
 enum class Flyttemåte {
@@ -38,17 +38,29 @@ enum class Flyttemåte {
 sealed interface BeregningsgrunnlagFlytting
 
 data class BeregningsgrunnlagFlyttebyrå(
-    val tilbud1Pris: BigDecimal,
-    val tilbud2Pris: BigDecimal,
-    val erBetalingDokumentert: Boolean,
-) : BeregningsgrunnlagFlytting
+    val tilbud: List<BeregningsgrunnlagFlyttebyråTilbud>,
+    val erUtgifterDokumentert: Boolean,
+) : BeregningsgrunnlagFlytting {
+    init {
+        require(tilbud.filter { it.erValgt }.size == 1) { "Det må være nøyaktig ett valgt tilbud" }
+    }
+}
+
+data class BeregningsgrunnlagFlyttebyråTilbud(
+    val navn: String,
+    val pris: BigDecimal,
+    val erValgt: Boolean,
+)
 
 data class BeregningsgrunnlagFlytteSelv(
     val avstandEnVei: Int,
     val sats: BigDecimal,
     val satsBekreftet: Boolean,
     val henger: BigDecimal,
+    val leiebil: BigDecimal,
     val bompenger: BigDecimal,
     val ferge: BigDecimal,
     val parkering: BigDecimal,
+    val annet: BigDecimal,
+    val erUtgifterDokumentert: Boolean,
 ) : BeregningsgrunnlagFlytting

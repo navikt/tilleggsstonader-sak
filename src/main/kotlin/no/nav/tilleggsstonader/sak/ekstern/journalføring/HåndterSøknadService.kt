@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningH
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -24,9 +26,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -103,7 +109,6 @@ class HåndterSøknadService(
                     valgbareStønadstyperForIkkeStøttetSkjematype()
                 }
 
-            // TODO utled TSO eller TSR
             Skjematype.SØKNAD_FLYTTING ->
                 if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) || !filtrerStønadstyperSomIkkeErAktivert) {
                     ValgbareStønadstyperForJournalpost(
@@ -115,7 +120,6 @@ class HåndterSøknadService(
                     valgbareStønadstyperForIkkeStøttetSkjematype()
                 }
 
-            // TODO utled TSO eller TSR
             Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
                 if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE) ||
                     !filtrerStønadstyperSomIkkeErAktivert
@@ -162,88 +166,100 @@ class HåndterSøknadService(
         return Stønadstype.entries - utilgjengeligeStønadstyper
     }
 
-    private fun finnStønadstypeForReiseTilSamling(journalpost: Journalpost): Stønadstype {
-        if (!journalpost.harStrukturertSøknad()) {
-            return if (journalpost.tema == Tema.TSO.name) {
-                Stønadstype.REISE_TIL_SAMLING_TSO
-            } else {
-                Stønadstype.REISE_TIL_SAMLING_TSR
-            }
-        }
-
-        val søknadsskjema =
-            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.REISE_TIL_SAMLING_TSO)
-        val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
-
-        if (søknad !is SøknadReiseTilSamling) {
-            error("Søknaden fra journalposten er ikke en reise-til-samling søknad")
-        }
-
-        return bestemTemaForJournalpostService.bestemStønadstype(
+    private fun finnStønadstypeForReiseTilSamling(journalpost: Journalpost) =
+        bestemStønadstype(
             journalpost = journalpost,
             stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
-            stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
-            fom = søknad.data.samlinger.finnTidligsteDatoForSamling(),
-            tom = søknad.data.samlinger.finnSenesteDatoForSamling(),
-            målgrupperFraSøknad =
-                søknad.data.hovedytelse.hovedytelse
-                    .map { it.tilMålgruppeType() }
-                    .toSet(),
+            StønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
         )
-    }
 
-    private fun finnStønadstypeForFlytting(journalpost: Journalpost): Stønadstype {
-        if (journalpost.tema == Tema.TSR.name) {
-            return Stønadstype.FLYTTING_TSR
-        }
-        return Stønadstype.FLYTTING_TSO
+    private fun finnStønadstypeForFlytting(journalpost: Journalpost) =
+        bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.FLYTTING_TSO,
+            StønadstypeTsr = Stønadstype.FLYTTING_TSR,
+        )
 
-        // TODO utled TSO eller TSR
-    }
+    private fun finnStønadstypeForReiseOppstartAvslutningHjemreise(journalpost: Journalpost) =
+        bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            StønadstypeTsr = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        )
 
-    private fun finnStønadstypeForReiseOppstartAvslutningHjemreise(journalpost: Journalpost): Stønadstype {
-        if (journalpost.tema == Tema.TSR.name) {
-            return Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
-        }
-        return Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
+    private fun finnStønadstypeForDagligReise(journalpost: Journalpost) =
+        bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.DAGLIG_REISE_TSO,
+            StønadstypeTsr = Stønadstype.DAGLIG_REISE_TSR,
+        )
 
-        // TODO utled TSO eller TSR
-    }
-
-    private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
+    private fun bestemStønadstype(
+        journalpost: Journalpost,
+        stønadstypeTso: Stønadstype,
+        StønadstypeTsr: Stønadstype,
+    ): Stønadstype {
         if (!journalpost.harStrukturertSøknad()) {
             return if (journalpost.tema == Tema.TSO.name) {
-                Stønadstype.DAGLIG_REISE_TSO
+                stønadstypeTso
             } else {
-                Stønadstype.DAGLIG_REISE_TSR
+                StønadstypeTsr
             }
         }
 
-        // Alle daglige reiser stønader legges på TSO fra fyll ut send inn
         val søknadsskjema =
-            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
+            journalpostService.hentSøknadFraJournalpost(journalpost, stønadstypeTso)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
-
-        if (søknad !is SøknadDagligReise) {
-            error("Søknaden fra journalposten er ikke en daglige reiser søknad")
-        }
+        val periode = finnPeriodeDetSkalSjekkesMotYtelser(søknad)
 
         return bestemTemaForJournalpostService.bestemStønadstype(
             journalpost = journalpost,
-            stønadstypeTso = Stønadstype.DAGLIG_REISE_TSO,
-            stønadstypeTsr = Stønadstype.DAGLIG_REISE_TSR,
-            fom = søknad.data.reiser.finnTidligsteDato(),
-            tom = søknad.data.reiser.finnSenesteDato(),
+            stønadstypeTso = stønadstypeTso,
+            stønadstypeTsr = StønadstypeTsr,
+            fom = periode.fom,
+            tom = periode.tom,
             målgrupperFraSøknad =
                 søknad.data.hovedytelse.hovedytelse
                     .map { it.tilMålgruppeType() }
                     .toSet(),
         )
     }
+
+    private fun finnPeriodeDetSkalSjekkesMotYtelser(søknad: Søknad<*>) =
+        when (søknad) {
+            is SøknadFlytting -> {
+                val flyttedato = søknad.data.flyttingDetaljer?.flyttedato ?: feil("Mangler flyttedetaljer i flyttingsøknad")
+                Datoperiode(fom = flyttedato, tom = flyttedato)
+            }
+            is SøknadROAH ->
+                Datoperiode(
+                    fom = søknad.data.reiser.finnTidligsteDatoROAH(),
+                    tom = søknad.data.reiser.finnSenesteDatoROAH(),
+                )
+            is SøknadDagligReise ->
+                Datoperiode(
+                    fom = søknad.data.reiser.finnTidligsteDato(),
+                    tom = søknad.data.reiser.finnSenesteDato(),
+                )
+            is SøknadReiseTilSamling ->
+                Datoperiode(
+                    fom = søknad.data.samlinger.finnTidligsteDatoForSamling(),
+                    tom = søknad.data.samlinger.finnSenesteDatoForSamling(),
+                )
+            else -> error("Uforventet søknad-type ${søknad.javaClass.simpleName}")
+        }
 
     private fun List<Reise>.finnTidligsteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.min()
 
     private fun List<Reise>.finnSenesteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.max()
+
+    private fun List<ROAHReise>.finnTidligsteDatoROAH() =
+        flatMap { listOfNotNull(it.fom, it.tom) }.minOrNull()
+            ?: error("Finner ingen reisedatoer i søknaden")
+
+    private fun List<ROAHReise>.finnSenesteDatoROAH() =
+        flatMap { listOfNotNull(it.fom, it.tom) }.maxOrNull()
+            ?: error("Finner ingen reisedatoer i søknaden")
 
     private fun List<Samling>.finnTidligsteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.min()
 

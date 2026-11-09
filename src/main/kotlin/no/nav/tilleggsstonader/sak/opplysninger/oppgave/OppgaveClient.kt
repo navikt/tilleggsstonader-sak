@@ -17,6 +17,8 @@ import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import no.nav.tilleggsstonader.libs.http.client.patchForEntity
 import no.nav.tilleggsstonader.libs.http.client.postForEntity
+import no.nav.tilleggsstonader.libs.http.client.putForEntity
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppdaterBehandlingstypeRequest
 import no.nav.tilleggsstonader.sak.util.medContentTypeJsonUTF8
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -152,6 +154,35 @@ class OppgaveClient(
                     oppgaveIdUriVariables(oppgave.id),
                 )
             return response
+        } catch (e: ProblemDetailException) {
+            sjekkOgHåndtertConflict(e)
+            throw e
+        }
+    }
+
+    /**
+     * Setter eller fjerner behandlingstype på oppgaven. behandlingstype = null fjerner verdien.
+     */
+    fun oppdaterBehandlingstype(
+        oppgaveId: Long,
+        versjon: Int,
+        behandlingstype: String?,
+        endretAvEnhetsnr: String?,
+    ): Oppgave {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveUri)
+                .pathSegment("{id}", "behandlingstype")
+                .encode()
+                .toUriString()
+
+        try {
+            return restTemplate.putForEntity<Oppgave>(
+                uri,
+                OppdaterBehandlingstypeRequest(versjon, behandlingstype, endretAvEnhetsnr),
+                HttpHeaders().medContentTypeJsonUTF8(),
+                oppgaveIdUriVariables(oppgaveId),
+            )
         } catch (e: ProblemDetailException) {
             sjekkOgHåndtertConflict(e)
             throw e

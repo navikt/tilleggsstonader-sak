@@ -6,8 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaROAH
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -18,13 +20,17 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SøknadsskjemaFlyttingMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaPassAvBarnMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SøknadsskjemaReiseTilSamlingMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.SøknadsskjemaROAHMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -40,6 +46,8 @@ class SøknadService(
     private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
     private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
     private val søknadReiseTilSamlingRepository: SøknadReiseTilSamlingRepository,
+    private val søknadFlyttingRepository: SøknadFlyttingRepository,
+    private val søknadROAHRepository: SøknadROAHRepository,
     private val søknadMetrikker: SøknadMetrikker,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -71,6 +79,16 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadReiseTilSamlingRepository.findByIdOrThrow(it.søknadId) }
 
+    fun hentSøknadFlytting(behandlingId: BehandlingId): SøknadFlytting? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadFlyttingRepository.findByIdOrThrow(it.søknadId) }
+
+    fun hentSøknadROAH(behandlingId: BehandlingId): SøknadROAH? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadROAHRepository.findByIdOrThrow(it.søknadId) }
+
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
@@ -84,6 +102,8 @@ class SøknadService(
                 is SøknadBoutgifter -> søknadBoutgifterRepository.insert(søknad)
                 is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
                 is SøknadReiseTilSamling -> søknadReiseTilSamlingRepository.insert(søknad)
+                is SøknadFlytting -> søknadFlyttingRepository.insert(søknad)
+                is SøknadROAH -> søknadROAHRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
 
@@ -95,7 +115,7 @@ class SøknadService(
     fun mapSøknad(
         skjema: InnsendtSkjema<out Skjemadata>,
         journalpost: Journalpost,
-    ): Søknad<out Any> =
+    ): Søknad<*> =
         when (val søknadsskjema = skjema.skjema) {
             is SøknadsskjemaPassAvBarn ->
                 SøknadsskjemaPassAvBarnMapper.map(
@@ -115,6 +135,22 @@ class SøknadService(
 
             is SøknadsskjemaReiseTilSamling ->
                 SøknadsskjemaReiseTilSamlingMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+
+            is SøknadsskjemaFlytting ->
+                SøknadsskjemaFlyttingMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+
+            is SøknadsskjemaROAH ->
+                SøknadsskjemaROAHMapper.map(
                     skjema.mottattTidspunkt,
                     skjema.språk,
                     journalpost,

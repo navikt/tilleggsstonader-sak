@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
@@ -113,6 +114,7 @@ class ReiseTilSamlingVilkårService(
         return VilkårReiseTilSamling(
             behandlingId = behandlingId,
             id = eksisterendeVilkår?.id ?: VilkårId.random(),
+            globalId = eksisterendeVilkår?.globalId ?: VilkårGlobalId.random(),
             fom = nyttVilkår.fom,
             tom = nyttVilkår.tom,
             status = utledStatus(eksisterendeVilkår),

@@ -19,11 +19,23 @@ enum class MålgruppeType(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
+    ARBEIDSSØKER(
+        gyldigeAktiviter = emptySet(),
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+    ),
     OMSTILLINGSSTØNAD(
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.GJENLEVENDE,
     ),
+    OPPHØRT_OMSTILLINGSSTØNAD(
+        gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.GJENLEVENDE,
+    ),
     OVERGANGSSTØNAD(
+        gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+    ),
+    OPPHØRT_OVERGANGSSTØNAD(
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
     ),
@@ -87,13 +99,16 @@ enum class MålgruppeType(
             -> true
 
             OVERGANGSSTØNAD,
+            OPPHØRT_OVERGANGSSTØNAD,
             INGEN_MÅLGRUPPE,
             SYKEPENGER_100_PROSENT,
             DAGPENGER,
+            ARBEIDSSØKER,
             TILTAKSPENGER,
             KVALIFISERINGSSTØNAD,
             INNSATT_I_FENGSEL,
             UNGDOMSPROGRAMMET,
+            OPPHØRT_OMSTILLINGSSTØNAD,
             -> false
         }
 
@@ -108,14 +123,27 @@ enum class MålgruppeType(
                         OMSTILLINGSSTØNAD,
                         OVERGANGSSTØNAD,
                         UFØRETRYGD,
-                        SYKEPENGER_100_PROSENT,
                         INGEN_MÅLGRUPPE,
+                        SYKEPENGER_100_PROSENT,
+                    )
+
+            Stønadstype.FLYTTING_TSO ->
+                this in
+                    listOf(
+                        AAP,
+                        NEDSATT_ARBEIDSEVNE,
+                        AKTIVITETSPENGER,
+                        OMSTILLINGSSTØNAD,
+                        OVERGANGSSTØNAD,
+                        UFØRETRYGD,
+                        INGEN_MÅLGRUPPE,
+                        OPPHØRT_OMSTILLINGSSTØNAD,
+                        OPPHØRT_OVERGANGSSTØNAD,
                     )
 
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.FLYTTING_TSO,
             ->
                 this in
                     listOf(
@@ -131,7 +159,6 @@ enum class MålgruppeType(
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.REISE_TIL_SAMLING_TSR,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            Stønadstype.FLYTTING_TSR,
             ->
                 this in
                     listOf(
@@ -141,6 +168,18 @@ enum class MålgruppeType(
                         KVALIFISERINGSSTØNAD,
                         DAGPENGER,
                         INNSATT_I_FENGSEL,
+                    )
+
+            Stønadstype.FLYTTING_TSR ->
+                this in
+                    listOf(
+                        INGEN_MÅLGRUPPE,
+                        TILTAKSPENGER,
+                        UNGDOMSPROGRAMMET,
+                        KVALIFISERINGSSTØNAD,
+                        DAGPENGER,
+                        INNSATT_I_FENGSEL,
+                        ARBEIDSSØKER,
                     )
         }
 }

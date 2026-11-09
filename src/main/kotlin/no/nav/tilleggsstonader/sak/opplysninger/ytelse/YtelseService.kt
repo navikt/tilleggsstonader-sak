@@ -7,15 +7,13 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserRegisterDtoMapper.tilDto
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.filtrerAktivitetspengerHvisDeaktivert
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.finnRelevanteYtelsesTyper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -25,7 +23,6 @@ class YtelseService(
     private val fagsakPersonService: FagsakPersonService,
     private val ytelseClient: YtelseClient,
     private val behandlingService: BehandlingService,
-    private val unleashService: UnleashService,
 ) {
     fun hentYtelser(fagsakPersonId: FagsakPersonId): YtelserRegisterDto {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
@@ -38,7 +35,7 @@ class YtelseService(
                 TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
                 TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                 TypeYtelsePeriode.AKTIVITETSPENGER,
-            ).filtrerAktivitetspengerHvisDeaktivert()
+            )
 
         return ytelseClient
             .hentYtelser(
@@ -112,8 +109,21 @@ class YtelseService(
 
     /**
      * Returnerer false hvis kallet mot ung-sak feiler, slik at bruker kan svare selv på om de mottar aktivitetspenger.
+     * Bruk [harAktivitetspengerIDagEllerFremITidEllerFeil] når resultatet lagres uten bekreftelse fra bruker.
      */
-    fun harAktivitetspengerIDagEllerFremITid(ident: String): Boolean {
+    fun harAktivitetspengerIDagEllerFremITid(ident: String): Boolean = finnAktivitetspengerIDagEllerFremITid(ident) ?: false
+
+    /**
+     * Skiller feilet oppslag fra bekreftet nei, slik at oppretting kan feile og prøves på nytt.
+     */
+    fun harAktivitetspengerIDagEllerFremITidEllerFeil(ident: String): Boolean =
+        finnAktivitetspengerIDagEllerFremITid(ident)
+            ?: feil("Kunne ikke avgjøre om bruker har aktivitetspenger fordi kall mot ung-sak feilet")
+
+    /**
+     * Returnerer null hvis kallet mot ung-sak feiler.
+     */
+    private fun finnAktivitetspengerIDagEllerFremITid(ident: String): Boolean? {
         val ytelser =
             try {
                 ytelseClient.hentYtelser(
@@ -126,7 +136,7 @@ class YtelseService(
                 )
             } catch (e: Exception) {
                 logger.warn("Kall for å hente aktivitetspenger feilet", e)
-                return false
+                return null
             }
 
         val kallFeilet =
@@ -135,7 +145,7 @@ class YtelseService(
             }
         if (kallFeilet) {
             logger.warn("Henting av aktivitetspenger fra ung-sak feilet")
-            return false
+            return null
         }
 
         return ytelser.perioder.any { it.type == TypeYtelsePeriode.AKTIVITETSPENGER }
@@ -147,12 +157,9 @@ class YtelseService(
         tom: LocalDate,
     ): YtelsePerioderDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype).filtrerAktivitetspengerHvisDeaktivert()
+        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
         return hentYtelser(behandling.ident, fom, tom, typer)
     }
-
-    private fun List<TypeYtelsePeriode>.filtrerAktivitetspengerHvisDeaktivert(): List<TypeYtelsePeriode> =
-        filtrerAktivitetspengerHvisDeaktivert(unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER))
 
     fun hentYtelser(
         ident: String,

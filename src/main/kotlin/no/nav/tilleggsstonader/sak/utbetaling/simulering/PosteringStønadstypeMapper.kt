@@ -260,5 +260,9 @@ object PosteringStønadstypeMapper {
             "TSROSJK2009-OP" to TypeAndel.REISE_TIL_SAMLING_TILTAK_JOBBKLUBB,
             "TSROSOPPFAG-OP" to TypeAndel.REISE_TIL_SAMLING_TILTAK_OPPFØLGING,
             "TSROSUAOPPF-OP" to TypeAndel.REISE_TIL_SAMLING_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
+            "TSFLASISP1-OP," to TypeAndel.FLYTTING_AAP,
+            "TSFLASISP3-OP," to TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+            "TSFLASISP5-OP," to TypeAndel.FLYTTING_ETTERLATTE,
+            "TSFLASISP2-OP," to TypeAndel.FLYTTING_ARBEIDSSØKER,
         )
 }

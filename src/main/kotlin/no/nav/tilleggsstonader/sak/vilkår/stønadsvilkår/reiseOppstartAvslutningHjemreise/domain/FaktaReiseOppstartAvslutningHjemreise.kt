@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -11,34 +12,32 @@ import java.math.BigDecimal
 
 sealed interface FaktaReiseOppstartAvslutningHjemreise {
     val type: TypeReiseOppstartAvslutningHjemreise
-    val typeReiseformål: TypeReiseformål
-    val reiseId: ReiseId
-    val adresse: String?
 
-    fun mapTilVilkårFakta(): VilkårFakta
+    fun mapTilVilkårFakta(
+        reiseId: ReiseId,
+        aktivitetId: VilkårperiodeGlobalId,
+        typeReiseformål: TypeReiseformål,
+    ): VilkårFakta
 }
 
-data class FaktaUbestemtType(
-    override val typeReiseformål: TypeReiseformål,
-    override val reiseId: ReiseId,
-    override val adresse: String?,
-) : FaktaReiseOppstartAvslutningHjemreise {
+data object FaktaUbestemtType : FaktaReiseOppstartAvslutningHjemreise {
     override val type = TypeReiseOppstartAvslutningHjemreise.UBESTEMT
 
-    override fun mapTilVilkårFakta() =
-        FaktaReiseOppstartAvslutningHjemreiseUbestemt(
-            reiseId = reiseId,
-            adresse = adresse,
-            typeReiseformål = typeReiseformål,
-        )
+    override fun mapTilVilkårFakta(
+        reiseId: ReiseId,
+        aktivitetId: VilkårperiodeGlobalId,
+        typeReiseformål: TypeReiseformål,
+    ) = FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+        reiseId = reiseId,
+        typeReiseformål = typeReiseformål,
+        aktivitetId = aktivitetId,
+    )
 }
 
 data class FaktaOffentligTransport(
-    override val typeReiseformål: TypeReiseformål,
-    override val reiseId: ReiseId,
-    override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val begrunnelse: String? = null,
 ) : FaktaReiseOppstartAvslutningHjemreise {
     override val type = TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT
 
@@ -46,14 +45,18 @@ data class FaktaOffentligTransport(
         validerIngenNegativeUtgifter()
     }
 
-    override fun mapTilVilkårFakta() =
-        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
-            reiseId = reiseId,
-            adresse = adresse,
-            typeReiseformål = typeReiseformål,
-            utgifterOffentligTransport = utgifterOffentligTransport,
-            aktivitetId = aktivitetId,
-        )
+    override fun mapTilVilkårFakta(
+        reiseId: ReiseId,
+        aktivitetId: VilkårperiodeGlobalId,
+        typeReiseformål: TypeReiseformål,
+    ) = FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+        reiseId = reiseId,
+        typeReiseformål = typeReiseformål,
+        nødvendigUtgift = nødvendigUtgift,
+        utgifterOffentligTransport = utgifterOffentligTransport,
+        aktivitetId = aktivitetId,
+        begrunnelse = begrunnelse,
+    )
 
     private fun validerIngenNegativeUtgifter() {
         brukerfeilHvis(utgifterOffentligTransport <= 0.toBigDecimal()) {
@@ -63,13 +66,13 @@ data class FaktaOffentligTransport(
 }
 
 data class FaktaPrivatBil(
-    override val typeReiseformål: TypeReiseformål,
-    override val reiseId: ReiseId,
-    override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
+    val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
+    val begrunnelse: String? = null,
 ) : FaktaReiseOppstartAvslutningHjemreise {
     override val type = TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL
 
@@ -78,16 +81,22 @@ data class FaktaPrivatBil(
         validerIngenNegativeEkstrakostnader()
     }
 
-    override fun mapTilVilkårFakta() =
-        FaktaReiseOppstartAvslutningHjemreisePrivatBil(
-            reiseId = reiseId,
-            adresse = adresse,
-            typeReiseformål = typeReiseformål,
-            reiseavstand = reiseavstand,
-            aktivitetId = aktivitetId,
-            bompenger = bompenger,
-            fergekostnad = fergekostnad,
-        )
+    override fun mapTilVilkårFakta(
+        reiseId: ReiseId,
+        aktivitetId: VilkårperiodeGlobalId,
+        typeReiseformål: TypeReiseformål,
+    ) = FaktaReiseOppstartAvslutningHjemreisePrivatBil(
+        reiseId = reiseId,
+        typeReiseformål = typeReiseformål,
+        nødvendigUtgift = nødvendigUtgift,
+        reiseavstand = reiseavstand,
+        aktivitetId = aktivitetId,
+        bompenger = bompenger,
+        fergekostnad = fergekostnad,
+        parkering = parkering,
+        piggdekkavgift = piggdekkavgift,
+        begrunnelse = begrunnelse,
+    )
 
     private fun validerIngenNegativReiseavstand() {
         reiseavstand.let {
@@ -99,10 +108,16 @@ data class FaktaPrivatBil(
 
     private fun validerIngenNegativeEkstrakostnader() {
         brukerfeilHvis(bompenger != null && bompenger < BigDecimal.ZERO) {
-            "Bompenger kan ikke være negativ"
+            "Bompenger må være mer enn 0kr"
         }
         brukerfeilHvis(fergekostnad != null && fergekostnad < BigDecimal.ZERO) {
-            "Fergekostnad kan ikke være negativ"
+            "Fergekostnad må være mer enn 0kr"
+        }
+        brukerfeilHvis(parkering != null && parkering < BigDecimal.ZERO) {
+            "Parkering må være mer enn 0kr"
+        }
+        brukerfeilHvis(piggdekkavgift != null && piggdekkavgift < BigDecimal.ZERO) {
+            "Piggdekkavgift må være mer enn 0kr"
         }
     }
 }

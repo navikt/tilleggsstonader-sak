@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
@@ -113,6 +114,7 @@ class DagligReiseVilkårService(
         return VilkårDagligReise(
             behandlingId = behandlingId,
             id = eksisterendeVilkår?.id ?: VilkårId.random(),
+            globalId = eksisterendeVilkår?.globalId ?: VilkårGlobalId.random(),
             fom = nyttVilkår.fom,
             tom = nyttVilkår.tom,
             status = utledStatus(eksisterendeVilkår),

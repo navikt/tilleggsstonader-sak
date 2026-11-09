@@ -24,7 +24,12 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -33,12 +38,16 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockIsEnabled
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.eksternOppgave
@@ -49,6 +58,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import java.time.LocalDate
 import java.util.UUID
@@ -62,6 +72,8 @@ internal class OppgaveServiceTest {
     private val cacheManager = ConcurrentMapCacheManager()
     private val personService = mockk<PersonService>(relaxed = true)
     private val klageService = mockk<KlageService>(relaxed = true)
+    private val ytelseService = mockk<YtelseService>()
+    private val unleashService = mockUnleashService()
 
     private val oppgaveService =
         OppgaveService(
@@ -72,6 +84,8 @@ internal class OppgaveServiceTest {
             cacheManager = cacheManager,
             personService = personService,
             klageService = klageService,
+            ytelseService = ytelseService,
+            unleashService = unleashService,
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
@@ -105,6 +119,7 @@ internal class OppgaveServiceTest {
     fun `Opprett oppgave skal kunne opprettes uten behandlingId`() {
         val slot = slot<OpprettOppgaveRequest>()
         mockOpprettOppgave(slot)
+        every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } returns false
 
         oppgaveService.opprettOppgave(
             personIdent = FNR,
@@ -141,6 +156,161 @@ internal class OppgaveServiceTest {
         assertThat(slot.captured.aktivDato).isEqualTo(LocalDate.now())
         assertThat(slot.captured.tema).isEqualTo(Tema.TSO)
         assertThat(opprettOppgaveDomainSlot.captured.behandlingId).isEqualTo(BEHANDLING_ID)
+    }
+
+    @Nested
+    inner class BehandlingstypeAktivitetspenger {
+        @Test
+        fun `skal sette behandlingstype aktivitetspenger når personen har aktivitetspenger`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+        }
+
+        @Test
+        fun `skal ikke sette behandlingstype når personen ikke har aktivitetspenger`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = false)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            assertThat(slot.captured.behandlingstype).isNull()
+        }
+
+        @Test
+        fun `eksplisitt behandlingstype skal overstyre aktivitetspenger`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(
+                personIdent = FNR,
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = BEHANDLING_ID,
+                behandlingstype = Behandlingstype.Tilbakekreving,
+                oppgave = OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak),
+            )
+
+            assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Tilbakekreving.value)
+        }
+
+        @Test
+        fun `skal ikke slå opp ung-sak eller sette behandlingstype når toggle er av`() {
+            unleashService.mockIsEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER, false)
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            assertThat(slot.captured.behandlingstype).isNull()
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
+        }
+
+        @Test
+        fun `skal bruke tolerant oppslag mot ung-sak når oppgaven har behandling`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            verify(exactly = 1) { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) }
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(any()) }
+        }
+    }
+
+    @Nested
+    inner class ArvAvMarkeringFraForrigeOppgave {
+        private val forrigeOppgave = lagTestOppgave().copy(gsakOppgaveId = 999L, type = Oppgavetype.BehandleSak)
+        private val slot = slot<OpprettOppgaveRequest>()
+
+        @BeforeEach
+        fun setUp() {
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = false)
+            every { oppgaveRepository.findByBehandlingId(BEHANDLING_ID) } returns listOf(forrigeOppgave)
+        }
+
+        @Test
+        fun `skal arve markering fra forrige oppgave også når ung-sak sier nei`() {
+            every { oppgaveClient.finnOppgaveMedId(999L) } returns
+                lagEksternTestOppgave().copy(behandlingstype = Behandlingstype.Aktivitetspenger.value)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+
+            assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
+        }
+
+        @Test
+        fun `skal ikke markere når forrige oppgave ble rettet til å ikke gjelde aktivitetspenger`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns true
+            every { oppgaveClient.finnOppgaveMedId(999L) } returns lagEksternTestOppgave().copy(behandlingstype = null)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+
+            assertThat(slot.captured.behandlingstype).isNull()
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
+        }
+
+        @Test
+        fun `skal ikke opprette oppgave eller slå opp ung-sak når forrige oppgave ikke kan hentes`() {
+            every { oppgaveClient.finnOppgaveMedId(999L) } throws RuntimeException("Gosys feilet")
+
+            assertThrows<RuntimeException> {
+                oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.GodkjenneVedtak))
+            }
+
+            verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
+        }
+    }
+
+    @Nested
+    inner class BehandlingstypeAktivitetspengerUtenBehandling {
+        private val request = slot<OpprettOppgaveRequest>()
+
+        @BeforeEach
+        fun setUp() {
+            every { arbeidsfordelingService.hentNavEnhetId(any(), any(), any()) } returns ENHETSNUMMER
+            every { oppgaveClient.opprettOppgave(capture(request)) } returns GSAK_OPPGAVE_ID
+        }
+
+        private fun opprettJournalføringsoppgave() =
+            oppgaveService.opprettOppgave(
+                personIdent = FNR,
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = null,
+                oppgave = OpprettOppgave(oppgavetype = Oppgavetype.Journalføring),
+            )
+
+        @Test
+        fun `skal sette behandlingstype aktivitetspenger ut fra person når oppgaven ikke har behandling`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } returns true
+
+            opprettJournalføringsoppgave()
+
+            assertThat(request.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+        }
+
+        @Test
+        fun `skal ikke sette behandlingstype når ung-sak bekrefter at personen ikke har aktivitetspenger`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } returns false
+
+            opprettJournalføringsoppgave()
+
+            assertThat(request.captured.behandlingstype).isNull()
+        }
+
+        @Test
+        fun `skal ikke opprette oppgave når oppslag mot ung-sak feiler`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } throws
+                RuntimeException("ung-sak feilet")
+
+            assertThrows<RuntimeException> { opprettJournalføringsoppgave() }
+
+            verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
+        }
     }
 
     @Nested
@@ -332,6 +502,132 @@ internal class OppgaveServiceTest {
         }
     }
 
+    @Nested
+    inner class FordelAktivitetspengerOppgave {
+        private val aktivitetspengerOppgave =
+            eksternOppgave(
+                id = GSAK_OPPGAVE_ID,
+                versjon = 0,
+                behandlingstype = Behandlingstype.Aktivitetspenger.value,
+            )
+
+        @BeforeEach
+        fun setUpFordel() {
+            every { oppgaveRepository.findByGsakOppgaveId(GSAK_OPPGAVE_ID) } returns lagTestOppgave()
+            every { oppgaveClient.fordelOppgave(any(), any(), any(), any()) } returns aktivitetspengerOppgave
+        }
+
+        @Test
+        fun `skal ikke tildele aktivitetspenger-oppgave til saksbehandler uten tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+            }.hasMessageContaining("aktivitetspenger")
+
+            verify(exactly = 0) { oppgaveRepository.update(any()) }
+            verify(exactly = 0) { oppgaveClient.fordelOppgave(any(), any(), any(), any()) }
+        }
+
+        @Test
+        fun `skal ikke tildele aktivitetspenger-klage til saksbehandler uten tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns
+                aktivitetspengerOppgave.copy(behandlingstype = Behandlingstype.AktivitetspengerKlage.value)
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+            }.hasMessageContaining("aktivitetspenger")
+        }
+
+        @Test
+        fun `skal tildele aktivitetspenger-oppgave til saksbehandler med tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, true)
+
+            oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+
+            verify(exactly = 1) { oppgaveClient.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1, any()) }
+        }
+
+        @Test
+        fun `skal tildele vanlig oppgave til saksbehandler uten tilgang til aktivitetspenger`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns lagEksternTestOppgave()
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
+
+            verify(exactly = 1) { oppgaveClient.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1, any()) }
+        }
+
+        @Test
+        fun `skal alltid kunne tilbakestille fordeling av aktivitetspenger-oppgave`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, null, 1)
+
+            verify(exactly = 1) { oppgaveClient.fordelOppgave(GSAK_OPPGAVE_ID, null, 1, any()) }
+        }
+
+        @Test
+        fun `skal ikke ta aktivitetspenger-oppgave av vent og tildele til saksbehandler uten tilgang`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.taAvVent(taAvVentRequest(beholdOppgave = true))
+            }.hasMessageContaining("aktivitetspenger")
+
+            verify(exactly = 0) { oppgaveClient.taAvVent(any()) }
+        }
+
+        @Test
+        fun `skal ikke sette aktivitetspenger-oppgave på vent og beholde den uten tilgang`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            assertThatThrownBy {
+                oppgaveService.settPåVent(
+                    SettPåVentRequest(GSAK_OPPGAVE_ID, null, 1 januar 2026, beholdOppgave = true, endretAvEnhetsnr = null),
+                )
+            }.hasMessageContaining("aktivitetspenger")
+            assertThatThrownBy {
+                oppgaveService.oppdaterPåVent(
+                    OppdaterPåVentRequest(GSAK_OPPGAVE_ID, 1, null, 1 januar 2026, beholdOppgave = true, endretAvEnhetsnr = null),
+                )
+            }.hasMessageContaining("aktivitetspenger")
+
+            verify(exactly = 0) { oppgaveClient.settPåVent(any()) }
+            verify(exactly = 0) { oppgaveClient.oppdaterPåVent(any()) }
+        }
+
+        @Test
+        fun `skal kunne ta aktivitetspenger-oppgave av vent uten å beholde den`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            every { oppgaveClient.taAvVent(any()) } returns SettPåVentResponse(GSAK_OPPGAVE_ID, 2)
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, false)
+
+            oppgaveService.taAvVent(taAvVentRequest(beholdOppgave = false))
+
+            verify(exactly = 1) { oppgaveClient.taAvVent(any()) }
+        }
+
+        @Test
+        fun `skal kunne ta aktivitetspenger-oppgave av vent og beholde den med tilgang`() {
+            every { oppgaveClient.finnOppgaveMedId(GSAK_OPPGAVE_ID) } returns aktivitetspengerOppgave
+            every { oppgaveClient.taAvVent(any()) } returns SettPåVentResponse(GSAK_OPPGAVE_ID, 2)
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER, true)
+
+            oppgaveService.taAvVent(taAvVentRequest(beholdOppgave = true))
+
+            verify(exactly = 1) { oppgaveClient.taAvVent(any()) }
+        }
+
+        private fun taAvVentRequest(beholdOppgave: Boolean) = TaAvVentRequest(GSAK_OPPGAVE_ID, null, beholdOppgave, 1 januar 2026, null)
+    }
+
     @Test
     fun `skal legge til navn på oppgave hvis oppgaven har folkeregisterident`() {
         val oppgaveIdMedNavn = 1L
@@ -498,8 +794,13 @@ internal class OppgaveServiceTest {
             .isEqualTo(behandleSakOppgave)
     }
 
-    private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
+    private fun mockOpprettOppgave(
+        slot: CapturingSlot<OpprettOppgaveRequest>,
+        gjelderAktivitetspenger: Boolean = false,
+    ) {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
+        every { ytelseService.harAktivitetspengerIDagEllerFremITid(FNR) } returns gjelderAktivitetspenger
+        every { oppgaveRepository.findByBehandlingId(any()) } returns emptyList()
 
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())

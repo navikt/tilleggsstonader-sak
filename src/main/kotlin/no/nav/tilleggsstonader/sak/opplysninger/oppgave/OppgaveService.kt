@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
@@ -16,14 +17,17 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalHåndteresAvTSSak
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
@@ -35,6 +39,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.DatoFormat
 import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
@@ -52,6 +57,8 @@ class OppgaveService(
     private val cacheManager: CacheManager,
     private val personService: PersonService,
     private val klageService: KlageService,
+    private val ytelseService: YtelseService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -108,14 +115,14 @@ class OppgaveService(
         finnOppgaveMetadataSak(oppgaver) + finnOppgaveMetadataKlage(oppgaver)
 
     private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
-        val oppgaveIder = oppgaver.filter { it.behandlingstype != Behandlingstype.Klage.value }.map { it.id }
+        val oppgaveIder = oppgaver.filterNot { Behandlingstype.erKlage(it.behandlingstype) }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
             oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
         }
     }
 
     private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
-        val oppgaveIder = oppgaver.filter { it.behandlingstype == Behandlingstype.Klage.value }.map { it.id }
+        val oppgaveIder = oppgaver.filter { Behandlingstype.erKlage(it.behandlingstype) }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadataKlage", oppgaveIder) {
             klageService
                 .hentBehandlingIderForOppgaveIder(oppgaveIder)
@@ -123,10 +130,6 @@ class OppgaveService(
                 .toMap()
         }
     }
-
-    private val Oppgave.ident: String?
-        get() =
-            this.bruker?.ident.takeIf { this.bruker?.type == OppgaveBrukerType.PERSON }
 
     @Transactional
     fun fordelOppgave(
@@ -137,6 +140,10 @@ class OppgaveService(
         val finnOppgave =
             oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)
         val oppgave = hentOppgave(gsakOppgaveId)
+
+        if (saksbehandler != null) {
+            validerKanTildelesAktivitetspengerOppgave(oppgave)
+        }
 
         finnOppgave?.let { it ->
             oppgaveRepository.update(it.copy(tilordnetSaksbehandler = saksbehandler))
@@ -151,6 +158,18 @@ class OppgaveService(
             )
 
         return medMetadata(oppdatertOppgave)
+    }
+
+    /**
+     * Kun saksbehandlere med [Toggle.KAN_BEHANDLE_AKTIVITETSPENGER] kan plukke aktivitetspenger oppgaver.
+     */
+    private fun validerKanTildelesAktivitetspengerOppgave(oppgave: Oppgave) {
+        brukerfeilHvis(
+            OppgaveUtil.gjelderAktivitetspenger(oppgave.behandlingstype) &&
+                !unleashService.isEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER),
+        ) {
+            "Oppgaven gjelder aktivitetspenger og kan kun tildeles saksbehandlere som jobber med aktivitetspenger"
+        }
     }
 
     private fun medMetadata(oppdatertOppgave: Oppgave): OppgaveMedMetadata =
@@ -200,7 +219,7 @@ class OppgaveService(
                 oppgave,
                 enhetsnummer,
                 mappeId,
-                behandlingstype,
+                behandlingstype ?: utledBehandlingstype(personIdent, behandlingId, stønadstype),
             )
         val oppgave =
             OppgaveDomain(
@@ -217,7 +236,57 @@ class OppgaveService(
         return opprettetOppgaveId
     }
 
+    /**
+     * Oppgaven i Gosys er sannheten. En ny oppgave på en behandling arver markeringen fra forrige oppgave,
+     * slik at manuelle rettinger følger behandlingen. Uten tidligere oppgave slås personen opp mot ung-sak.
+     * Feiler oppslaget mot Gosys, opprettes ikke oppgaven.
+     */
+    private fun utledBehandlingstype(
+        personIdent: String,
+        behandlingId: BehandlingId?,
+        stønadstype: Stønadstype,
+    ): Behandlingstype? {
+        if (!unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER)) {
+            return null
+        }
+        if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
+            return null
+        }
+
+        val gjelderForrigeOppgaveAktivitetspenger = behandlingId?.let { gjelderForrigeOppgaveAktivitetspenger(it) }
+        val gjelderAktivitetspenger =
+            gjelderForrigeOppgaveAktivitetspenger
+                ?: if (behandlingId != null) {
+                    ytelseService.harAktivitetspengerIDagEllerFremITid(personIdent)
+                } else {
+                    ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
+                }
+
+        return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
+    }
+
+    private fun gjelderForrigeOppgaveAktivitetspenger(behandlingId: BehandlingId): Boolean? {
+        val forrigeOppgave = finnSisteBehandlingsoppgaveForBehandling(behandlingId) ?: return null
+        return oppgaveClient.finnOppgaveMedId(forrigeOppgave.gsakOppgaveId).gjelderAktivitetspenger()
+    }
+
+    private fun Oppgave.gjelderAktivitetspenger() = behandlingstype == Behandlingstype.Aktivitetspenger.value
+
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse = oppgaveClient.oppdaterOppgave(oppgave)
+
+    fun oppdaterBehandlingstype(
+        oppgave: Oppgave,
+        behandlingstype: Behandlingstype?,
+    ): OppgaveMedMetadata {
+        val oppdatertOppgave =
+            oppgaveClient.oppdaterBehandlingstype(
+                oppgaveId = oppgave.id,
+                versjon = oppgave.versjon,
+                behandlingstype = behandlingstype?.value,
+                endretAvEnhetsnr = oppgave.tildeltEnhetsnr,
+            )
+        return medMetadata(oppdatertOppgave)
+    }
 
     /**
      * I de tilfeller en service ønsker å ansvare selv for lagring til [OppgaveRepository]
@@ -415,13 +484,32 @@ class OppgaveService(
         }
 
     fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
+        validerKanTildelesVedBeholdOppgave(settPåVent.oppgaveId, settPåVent.beholdOppgave)
         logger.info("Setter oppgave ${settPåVent.oppgaveId} på vent")
         return oppgaveClient.settPåVent(settPåVent)
     }
 
-    fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse = oppgaveClient.oppdaterPåVent(oppdaterPåVent)
+    fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
+        validerKanTildelesVedBeholdOppgave(oppdaterPåVent.oppgaveId, oppdaterPåVent.beholdOppgave)
+        return oppgaveClient.oppdaterPåVent(oppdaterPåVent)
+    }
 
-    fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse = oppgaveClient.taAvVent(taAvVent)
+    fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
+        validerKanTildelesVedBeholdOppgave(taAvVent.oppgaveId, taAvVent.beholdOppgave)
+        return oppgaveClient.taAvVent(taAvVent)
+    }
+
+    /**
+     * Når oppgaven beholdes tildeles den innlogget saksbehandler, så samme sperre som ved fordeling må gjelde.
+     */
+    private fun validerKanTildelesVedBeholdOppgave(
+        oppgaveId: Long,
+        beholdOppgave: Boolean,
+    ) {
+        if (beholdOppgave) {
+            validerKanTildelesAktivitetspengerOppgave(hentOppgave(oppgaveId))
+        }
+    }
 
     private fun Map<String, PdlPersonKort>.visningsnavnFor(oppgave: Oppgave) =
         oppgave.ident
@@ -459,3 +547,6 @@ class OppgaveService(
         }
     }
 }
+
+internal val Oppgave.ident: String?
+    get() = bruker?.ident.takeIf { bruker?.type == OppgaveBrukerType.PERSON }

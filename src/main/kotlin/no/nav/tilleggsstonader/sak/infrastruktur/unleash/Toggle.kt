@@ -46,4 +46,7 @@ enum class Toggle(
 
     KAN_BRUKE_MÅLGRUPPE_UNGDOMSPROGRAMMET("sak.frontend.kan-bruke-malgruppe-ungdomsprogrammet"),
     KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER("sak.frontend.kan-bruke-malgruppe-aktivitetspenger"),
+
+    KAN_BEHANDLE_AKTIVITETSPENGER("sak.kan-behandle-aktivitetspenger"),
+    SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER("sak.skal-markere-aktivitetspenger-oppgaver"),
 }

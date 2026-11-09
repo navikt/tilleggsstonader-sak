@@ -14,12 +14,14 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -34,12 +36,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeA
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class UtledTidligsteEndringServiceTest {
+    private val nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null)
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårService = mockk<VilkårService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -108,9 +112,9 @@ class UtledTidligsteEndringServiceTest {
         val tom = 31 januar 2026
         val fakta =
             FaktaFlyttebyrå(
-                tilbud1 = FlyttebyråTilbud("A", 5000),
-                tilbud2 = FlyttebyråTilbud("B", 6000),
-                erBetalingDokumentert = true,
+                tilbud = listOf(FlyttebyråTilbud("A", 5000), FlyttebyråTilbud("B", 6000)),
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                nødvendigUtgift = nødvendigUtgift,
                 adresse = "Syntetisk adresse",
             )
         val original =
@@ -133,10 +137,26 @@ class UtledTidligsteEndringServiceTest {
             )
         assertThat(utleder.utledTidligsteEndring()).isNull()
         listOf(
-            fakta.copy(tilbud1 = fakta.tilbud1.copy(pris = 3000)),
-            fakta.copy(erBetalingDokumentert = false),
+            fakta.copy(
+                tilbud =
+                    fakta.tilbud.mapIndexed { index, tilbud ->
+                        if (index == 0) tilbud.copy(pris = 3000) else tilbud
+                    },
+            ),
+            fakta.copy(dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
             fakta.copy(adresse = "Ny syntetisk adresse"),
-            FaktaFlytteSelv(100, null, null, null, null, fakta.adresse),
+            FaktaFlytteSelv(
+                100,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                nødvendigUtgift,
+                fakta.adresse,
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+            ),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)
@@ -144,10 +164,22 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
-    fun `egen flytting oppdager avstand og alle tilleggskostnader`() {
+    fun `egen flytting oppdager avstand tilleggskostnader og dokumentasjon`() {
         val fom = 1 januar 2026
         val tom = 31 januar 2026
-        val fakta = FaktaFlytteSelv(100, 100, 100, 100, 100, "Syntetisk adresse")
+        val fakta =
+            FaktaFlytteSelv(
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                nødvendigUtgift,
+                "Syntetisk adresse",
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+            )
         val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING, fakta = fakta)
         val utleder =
             TidligsteEndringIBehandlingUtleder(
@@ -162,9 +194,12 @@ class UtledTidligsteEndringServiceTest {
         listOf(
             fakta.copy(avstandEnVei = 200),
             fakta.copy(henger = 200),
+            fakta.copy(leiebil = 200),
             fakta.copy(bompenger = 200),
             fakta.copy(ferge = 200),
             fakta.copy(parkering = 200),
+            fakta.copy(annet = 200),
+            fakta.copy(dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)

@@ -54,6 +54,25 @@ class MålgruppeTypeTest {
         assertThat(MålgruppeType.AKTIVITETSPENGER.skalVurdereAldersvilkår()).isTrue
     }
 
+    @Test
+    fun `opphørte stønader er bare tilgjengelige for flytting TSO`() {
+        val opphørteStønader =
+            listOf(
+                MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+                MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
+            )
+
+        assertThat(opphørteStønader).allMatch { it.kanBrukesForStønad(Stønadstype.FLYTTING_TSO) }
+        assertThat(opphørteStønader).noneMatch { it.kanBrukesForStønad(Stønadstype.FLYTTING_TSR) }
+        assertThat(opphørteStønader).noneMatch { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }
+    }
+
+    @Test
+    fun `arbeidssøker er bare tilgjengelig for flytting TSR`() {
+        assertThat(Stønadstype.entries.filter { MålgruppeType.ARBEIDSSØKER.kanBrukesForStønad(it) })
+            .containsExactly(Stønadstype.FLYTTING_TSR)
+    }
+
     @Nested
     inner class MappingTilFaktiskMålgruppe {
         @Test
@@ -65,7 +84,9 @@ class MålgruppeTypeTest {
                             MålgruppeType.AAP -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
                             MålgruppeType.DAGPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.OMSTILLINGSSTØNAD -> FaktiskMålgruppe.GJENLEVENDE
+                            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> FaktiskMålgruppe.GJENLEVENDE
                             MålgruppeType.OVERGANGSSTØNAD -> FaktiskMålgruppe.ENSLIG_FORSØRGER
+                            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> FaktiskMålgruppe.ENSLIG_FORSØRGER
                             MålgruppeType.NEDSATT_ARBEIDSEVNE -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
                             MålgruppeType.UFØRETRYGD -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
                             MålgruppeType.SYKEPENGER_100_PROSENT -> null
@@ -73,6 +94,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.KVALIFISERINGSSTØNAD -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.INNSATT_I_FENGSEL -> FaktiskMålgruppe.ARBEIDSSØKER
+                            MålgruppeType.ARBEIDSSØKER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.UNGDOMSPROGRAMMET -> FaktiskMålgruppe.UNGDOMSPROGRAMMET
                             MålgruppeType.AKTIVITETSPENGER -> FaktiskMålgruppe.AKTIVITETSPENGER
                         }

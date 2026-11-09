@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 
 class FlyttingTsrIntegrationTest : IntegrationTest() {
@@ -53,7 +55,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                 }
             }
             vilkår {
-                flyttingEgenKjøring(flytteDato = fom, avstandEnVei = 100, bompenger = 100)
+                flyttingEgenKjøring(flyttedato = fom, avstandEnVei = 100, bompenger = 100)
             }
             vedtak {
                 avslag()
@@ -74,8 +76,9 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         assertThat(tilkjentYtelseRepository.findByBehandlingId(behandling.id)).isNull()
     }
 
-    @Test
-    fun `skal kunne vedta og beregne flytting med flytting selv`() {
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `skal beregne egen flytting og bare utbetale dokumenterte utgifter`(dokumentert: Boolean) {
         val fom = 1 januar 2026
         val tom = 1 januar 2026
 
@@ -99,9 +102,10 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingEgenKjøring(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
+                    erUtgifterDokumentert = dokumentert,
                 )
             }
         }
@@ -117,12 +121,17 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
 
         assertThat(resultat.beløp).isEqualTo(394.toBigDecimal())
         assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlytteSelv::class.java)
+        assertThat((resultat.grunnlag as BeregningsgrunnlagFlytteSelv).erUtgifterDokumentert).isEqualTo(dokumentert)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 
-        assertThat(andeler).hasSize(1)
-        assertThat(andeler.single().beløp).isEqualTo(394)
-        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_ARBEIDSSØKER)
+        if (dokumentert) {
+            assertThat(andeler).hasSize(1)
+            assertThat(andeler.single().beløp).isEqualTo(394)
+            assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_ARBEIDSSØKER)
+        } else {
+            assertThat(andeler).isEmpty()
+        }
     }
 
     @Test
@@ -150,10 +159,9 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
-                    erBetalingDokumentert = true,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
+                    erUtgifterDokumentert = true,
                 )
             }
         }
@@ -169,6 +177,11 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
 
         assertThat(resultat.beløp).isEqualTo(5000.toBigDecimal())
         assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+        val grunnlag = resultat.grunnlag as BeregningsgrunnlagFlyttebyrå
+        assertThat(grunnlag.tilbud.map { it.navn }).containsExactly("Syntetisk tilbud 1", "Syntetisk tilbud 2")
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud).isEqualTo(grunnlag.tilbud[1])
+        assertThat(resultat.beløp).isEqualTo(valgtTilbud.pris)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 
@@ -202,10 +215,9 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
-                    tilbud1Pris = 10000,
-                    tilbud2Pris = 5000,
-                    erBetalingDokumentert = false,
+                    flyttedato = fom,
+                    tilbudPriser = listOf(10000, 5000),
+                    erUtgifterDokumentert = false,
                 )
             }
         }

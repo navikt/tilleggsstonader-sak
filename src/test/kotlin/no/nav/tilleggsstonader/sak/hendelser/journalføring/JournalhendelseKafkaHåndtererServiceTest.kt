@@ -30,15 +30,12 @@ class JournalhendelseKafkaHåndtererServiceTest {
     @EnumSource(
         value = DokumentBrevkode::class,
         names = [
-            "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE",
             "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE_GAMMEL",
             "REISE_FOR_Å_KOMME_I_ARBEID",
             "REISE_FOR_Å_KOMME_I_ARBEID_GAMMEL",
-            "FLYTTING",
-            "FLYTTING_GAMMEL",
         ],
     )
-    fun `skal ikke prosessere nye brevkoder for reise og flytting`(brevkode: DokumentBrevkode) {
+    fun `skal ikke prosessere nye brevkoder for reise`(brevkode: DokumentBrevkode) {
         val journalpost = journalpost(dokumenter = listOf(dokumentInfoMedOriginalVariant(brevkode)))
         every { journalpostService.hentJournalpost(journalpost.journalpostId) } returns journalpost
 
@@ -57,6 +54,8 @@ class JournalhendelseKafkaHåndtererServiceTest {
             "PASS_AV_BARN",
             "DAGLIG_REISE",
             "REISE_TIL_SAMLING",
+            "FLYTTING",
+            "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE",
         ],
     )
     fun `skal prosessere eksisterende søknadsbrevkoder`(brevkode: DokumentBrevkode) {

@@ -18,7 +18,7 @@ object ReiseTilSamlingRegelTestUtil {
         )
 
     fun oppfylteSvarReiseTilSamlingOffentligTransport() =
-        oppfylteSvarReiseTilSamlingOffentligTransportDto().mapValues { it.value.tilDomain() }
+        oppfylteSvarReiseTilSamlingOffentligTransportDto().mapValues { it.value.tilDomene() }
 
     fun oppfylteSvarReiseTilSamlingPrivatBilDto() =
         mapOf(
@@ -33,7 +33,7 @@ object ReiseTilSamlingRegelTestUtil {
             RegelId.KAN_REISE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
-    fun oppfylteSvarReiseTilSamlingPrivatBil() = oppfylteSvarReiseTilSamlingPrivatBilDto().mapValues { it.value.tilDomain() }
+    fun oppfylteSvarReiseTilSamlingPrivatBil() = oppfylteSvarReiseTilSamlingPrivatBilDto().mapValues { it.value.tilDomene() }
 
     fun oppfylteDelvilkårReiseTilSamlingOffentligTransport() =
         listOf(

@@ -68,5 +68,10 @@ object YtelserRegisterDtoMapper {
                     fom = fom,
                     tom = tom,
                 )
+            is YtelsePeriode.Arbeidssøker ->
+                YtelsePeriodeRegisterDto.Arbeidssøker(
+                    fom = fom,
+                    tom = tom,
+                )
         }
 }

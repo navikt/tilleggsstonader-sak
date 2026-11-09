@@ -58,9 +58,8 @@ class GjenbrukDataRevurderingService(
                 forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
                 nyBehandlingId = behandling.id,
             )
+            avklartKjørelisteService.nullstillOgGjenbrukAvklarteUker(behandling.id, behandlingIdForGjenbruk)
         }
-
-        avklartKjørelisteService.nullstillOgGjenbrukAvklarteUker(behandling.id, behandlingIdForGjenbruk)
     }
 
     fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? =

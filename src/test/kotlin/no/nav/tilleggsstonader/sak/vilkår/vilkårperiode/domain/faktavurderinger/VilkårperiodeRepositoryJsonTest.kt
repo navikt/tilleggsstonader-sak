@@ -402,7 +402,9 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeFlyttingTsoType.UFØRETRYGD_FLYTTING_TSO -> UføretrygdFlyttingTso::class
                     MålgruppeFlyttingTsoType.NEDSATT_ARBEIDSEVNE_FLYTTING_TSO -> NedsattArbeidsevneFlyttingTso::class
                     MålgruppeFlyttingTsoType.OMSTILLINGSSTØNAD_FLYTTING_TSO -> OmstillingsstønadFlyttingTso::class
+                    MålgruppeFlyttingTsoType.OPPHØRT_OMSTILLINGSSTØNAD_FLYTTING_TSO -> OpphørtOmstillingsstønadFlyttingTso::class
                     MålgruppeFlyttingTsoType.OVERGANGSSTØNAD_FLYTTING_TSO -> OvergangssstønadFlyttingTso::class
+                    MålgruppeFlyttingTsoType.OPPHØRT_OVERGANGSSTØNAD_FLYTTING_TSO -> OpphørtOvergangsstønadFlyttingTso::class
                     MålgruppeFlyttingTsoType.INGEN_MÅLGRUPPE_FLYTTING_TSO -> IngenMålgruppeFlyttingTso::class
                     MålgruppeFlyttingTsoType.AKTIVITETSPENGER_FLYTTING_TSO -> AktivitetspengerFlyttingTso::class
                 }
@@ -414,6 +416,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             is MålgruppeFlyttingTsrType -> {
                 when (type) {
                     MålgruppeFlyttingTsrType.DAGPENGER_FLYTTING_TSR -> DagpengerFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.ARBEIDSSØKER_FLYTTING_TSR -> ArbeidssøkerFlyttingTsr::class
                     MålgruppeFlyttingTsrType.TILTAKSPENGER_FLYTTING_TSR -> TiltakspengerFlyttingTsr::class
                     MålgruppeFlyttingTsrType.KVALIFISERINGSSTØNAD_FLYTTING_TSR -> KvalifiseringsstønadFlyttingTsr::class
                     MålgruppeFlyttingTsrType.INNSATT_I_FENGSEL_FLYTTING_TSR -> InnsattIFengselFlyttingTsr::class

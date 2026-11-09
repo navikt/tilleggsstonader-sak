@@ -7,9 +7,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
@@ -65,3 +67,13 @@ interface SøknadDagligReiseRepository :
 interface SøknadReiseTilSamlingRepository :
     RepositoryInterface<SøknadReiseTilSamling, UUID>,
     InsertUpdateRepository<SøknadReiseTilSamling>
+
+@Repository
+interface SøknadFlyttingRepository :
+    RepositoryInterface<SøknadFlytting, UUID>,
+    InsertUpdateRepository<SøknadFlytting>
+
+@Repository
+interface SøknadROAHRepository :
+    RepositoryInterface<SøknadROAH, UUID>,
+    InsertUpdateRepository<SøknadROAH>

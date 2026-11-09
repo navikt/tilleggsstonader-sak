@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.juli
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -10,8 +11,15 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFlyttingTsrType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
@@ -25,6 +33,93 @@ import java.time.LocalDate
 
 class FaktaOgVurderingMapperTest {
     private val behandlingId = BehandlingId.random()
+
+    @Test
+    fun `opphørt stønad mappes til målgruppe uten vurderinger for flytting TSO`() {
+        val types =
+            listOf(
+                MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD to OpphørtOmstillingsstønadFlyttingTso,
+                MålgruppeType.OPPHØRT_OVERGANGSSTØNAD to OpphørtOvergangsstønadFlyttingTso,
+            )
+
+        types.forEach { (type, forventetFaktaOgVurdering) ->
+            val vilkårperiode =
+                LagreVilkårperiode(
+                    behandlingId = behandlingId,
+                    type = type,
+                    fom = 1 januar 2025,
+                    tom = 1 juli 2025,
+                    faktaOgSvar = FaktaOgSvarMålgruppeDto(),
+                )
+
+            val faktisk =
+                mapFaktaOgSvarDto(
+                    vilkårperiode = vilkårperiode,
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    fødselFaktaGrunnlag = null,
+                )
+
+            assertThat(faktisk).isEqualTo(forventetFaktaOgVurdering)
+            assertThat(faktisk.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+        }
+    }
+
+    @Nested
+    inner class LønnetFlyttingTso {
+        private val målgrupperMedLønnet =
+            listOf(
+                MålgruppeType.AAP,
+                MålgruppeType.UFØRETRYGD,
+                MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                MålgruppeType.AKTIVITETSPENGER,
+            )
+
+        private fun map(
+            type: MålgruppeType,
+            svarLønnet: SvarJaNei?,
+        ) = mapFaktaOgSvarDto(
+            vilkårperiode =
+                LagreVilkårperiode(
+                    behandlingId = behandlingId,
+                    type = type,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    faktaOgSvar =
+                        FaktaOgSvarMålgruppeDto(
+                            svarMedlemskap = SvarJaNei.JA,
+                            svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
+                            svarMottarSykepengerForFulltidsstilling = SvarJaNei.NEI,
+                            svarLønnet = svarLønnet,
+                        ),
+                ),
+            stønadstype = Stønadstype.FLYTTING_TSO,
+            fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(),
+        )
+
+        @Test
+        fun `nei på lønnet gir oppfylt`() {
+            målgrupperMedLønnet.forEach { type ->
+                val faktaOgVurdering = map(type, SvarJaNei.NEI)
+
+                assertThat((faktaOgVurdering.vurderinger as LønnetVurdering).lønnet.svar).isEqualTo(SvarJaNei.NEI)
+                assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+            }
+        }
+
+        @Test
+        fun `ja på lønnet gir ikke oppfylt`() {
+            målgrupperMedLønnet.forEach { type ->
+                assertThat(map(type, SvarJaNei.JA).utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            }
+        }
+
+        @Test
+        fun `manglende svar på lønnet gir ikke vurdert`() {
+            målgrupperMedLønnet.forEach { type ->
+                assertThat(map(type, null).utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
+            }
+        }
+    }
 
     @Test
     fun `aktivitetspenger har aldersvilkårsvurdering`() {
@@ -46,6 +141,31 @@ class FaktaOgVurderingMapperTest {
 
         assertThat(faktaOgVurdering.vurderinger).isInstanceOf(AldersvilkårVurdering::class.java)
         assertThat((faktaOgVurdering.vurderinger as AldersvilkårVurdering).aldersvilkår.svar).isEqualTo(SvarJaNei.JA)
+        assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+    }
+
+    @Test
+    fun `arbeidssøker for flytting TSR mappes uten fakta og vurderinger`() {
+        val målgruppe =
+            LagreVilkårperiode(
+                behandlingId = behandlingId,
+                type = MålgruppeType.ARBEIDSSØKER,
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                faktaOgSvar = FaktaOgSvarMålgruppeDto(),
+            )
+
+        val faktaOgVurdering =
+            mapFaktaOgSvarDto(
+                vilkårperiode = målgruppe,
+                stønadstype = Stønadstype.FLYTTING_TSR,
+                fødselFaktaGrunnlag = null,
+            )
+
+        assertThat(faktaOgVurdering).isEqualTo(ArbeidssøkerFlyttingTsr())
+        assertThat(faktaOgVurdering.type).isEqualTo(MålgruppeFlyttingTsrType.ARBEIDSSØKER_FLYTTING_TSR)
+        assertThat(faktaOgVurdering.fakta).isEqualTo(IngenFakta)
+        assertThat(faktaOgVurdering.vurderinger).isEqualTo(IngenVurderinger)
         assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 

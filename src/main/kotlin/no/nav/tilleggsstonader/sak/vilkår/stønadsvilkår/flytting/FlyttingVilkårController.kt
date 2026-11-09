@@ -49,7 +49,7 @@ class FlyttingVilkårController(
     ): VilkårFlyttingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        return flyttingVilkårService.opprettVilkår(behandlingId, lagreVilkår.tilDomain()).tilVilkårFlyttingDto()
+        return flyttingVilkårService.opprettVilkår(behandlingId, lagreVilkår.tilDomene()).tilVilkårFlyttingDto()
     }
 
     @PutMapping("{behandlingId}/{vilkårId}")
@@ -61,7 +61,7 @@ class FlyttingVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         return flyttingVilkårService
-            .oppdaterVilkår(behandlingId, vilkårId, lagreVilkår.tilDomain())
+            .oppdaterVilkår(behandlingId, vilkårId, lagreVilkår.tilDomene())
             .tilVilkårFlyttingDto()
     }
 

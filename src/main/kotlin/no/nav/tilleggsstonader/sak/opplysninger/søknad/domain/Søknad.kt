@@ -14,7 +14,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.SkjemaROAH
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -24,7 +26,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-sealed interface Søknad<T> {
+sealed interface Søknad<T : Søknadsdata> {
     val id: UUID
     val journalpostId: String
     val mottattTidspunkt: LocalDateTime
@@ -32,6 +34,8 @@ sealed interface Søknad<T> {
     val sporbar: Sporbar
     val data: T
 }
+
+interface Søknadsdata : HarHovedytelseAvsnitt
 
 /**
  * Gjør det mulig å koble en søknad til flere behandlinger
@@ -73,10 +77,10 @@ data class SøknadPassAvBarn(
 ) : Søknad<SkjemaPassAvBarn>
 
 data class SkjemaPassAvBarn(
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
     val dokumentasjon: List<Dokumentasjon>,
-)
+) : Søknadsdata
 
 @Table("soknad")
 data class SøknadLæremidler(
@@ -92,10 +96,10 @@ data class SøknadLæremidler(
 ) : Søknad<SkjemaLæremidler>
 
 data class SkjemaLæremidler(
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val utdanning: UtdanningAvsnitt,
     val dokumentasjon: List<Dokumentasjon>,
-)
+) : Søknadsdata
 
 @Table("soknad")
 data class SøknadBoutgifter(
@@ -136,12 +140,42 @@ data class SøknadReiseTilSamling(
     override val data: SkjemaReiseTilSamling,
 ) : Søknad<SkjemaReiseTilSamling>
 
+@Table("soknad")
+data class SøknadFlytting(
+    @Id
+    override val id: UUID = UUID.randomUUID(),
+    override val journalpostId: String,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    override val sporbar: Sporbar = Sporbar(),
+    override val data: SkjemaFlytting,
+) : Søknad<SkjemaFlytting>
+
+@Table("soknad")
+data class SøknadROAH(
+    @Id
+    override val id: UUID = UUID.randomUUID(),
+    override val journalpostId: String,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    override val sporbar: Sporbar = Sporbar(),
+    override val data: SkjemaROAH,
+) : Søknad<SkjemaROAH>
+
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
     val harRettTilUtstyrsstipend: HarRettTilUtstyrsstipendDto?,
     val harFunksjonsnedsettelse: JaNei,
 )
+
+interface HarHovedytelseAvsnitt {
+    val hovedytelse: HovedytelseAvsnitt
+}
 
 data class HovedytelseAvsnitt(
     val hovedytelse: List<Hovedytelse>,

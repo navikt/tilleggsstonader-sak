@@ -4,15 +4,16 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknadsdata
 import java.time.LocalDate
 
 data class SkjemaDagligReise(
     val personopplysninger: Personopplysninger,
-    val hovedytelse: HovedytelseAvsnitt,
+    override val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetDagligReiseAvsnitt,
     val reiser: List<Reise>,
     val dokumentasjon: List<DokumentasjonDagligReise>,
-)
+) : Søknadsdata
 
 data class AktivitetDagligReiseAvsnitt(
     val aktiviteter: List<AktivitetDagligReise>?,

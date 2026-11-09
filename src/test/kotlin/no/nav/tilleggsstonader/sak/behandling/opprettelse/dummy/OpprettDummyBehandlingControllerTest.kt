@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -18,6 +19,8 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -109,5 +112,45 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
                     ?.drosje
                     ?.harTTKort,
             ).isEqualTo(JaNei.NEI)
+    }
+
+    @Test
+    fun `skal kunne opprette en behandling for flytting`() {
+        val ident = FnrGenerator.generer(1 januar 2000)
+        val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.FLYTTING_TSO))
+
+        Assertions.assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
+        val søknad = søknadService.hentSøknadFlytting(behandlingId)!!
+        Assertions.assertThat(søknad).isInstanceOf(SøknadFlytting::class.java)
+        Assertions.assertThat(søknad.data.flyttingDetaljer?.flyttetilbud).hasSize(2)
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = Stønadstype::class,
+        names = ["REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO", "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR"],
+    )
+    fun `skal kunne opprette behandling og søknad for reise ved oppstart avslutning og hjemreise`(stønadstype: Stønadstype) {
+        val ident = FnrGenerator.generer(1 januar 2000)
+        val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype))
+
+        Assertions.assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
+        val søknad = søknadService.hentSøknadROAH(behandlingId)!!
+        Assertions
+            .assertThat(søknad.data.reiser.map { it.typeReise })
+            .containsExactlyElementsOf(no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHTypeReise.entries)
+        Assertions.assertThat(søknad.data.hovedytelse.hovedytelse).isNotEmpty
+        Assertions.assertThat(søknad.data.aktivitet.aktiviteter).isNotEmpty
+        Assertions
+            .assertThat(
+                søknad.data.adresser.adresseOriginaltBosted
+                    ?.adresseOriginaltBosted
+                    ?.adresse,
+            ).isNotNull
+        Assertions
+            .assertThat(
+                søknad.data.adresser.adresseMidlertidigBosted
+                    ?.adresse,
+            ).isNotNull
     }
 }

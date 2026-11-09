@@ -29,6 +29,7 @@ import java.time.LocalDateTime
 data class Vilkår(
     @Id
     val id: VilkårId = VilkårId.random(),
+    val globalId: VilkårGlobalId?,
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val status: VilkårStatus?,
@@ -47,6 +48,8 @@ data class Vilkår(
     val gitVersjon: String?,
     val slettetKommentar: String? = null,
     val fakta: VilkårFakta? = null,
+    @Column("parent_vilkar")
+    val parentVilkår: VilkårGlobalId?,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 
@@ -100,7 +103,10 @@ data class Vilkår(
                 // TODO skal det være noe her?
             }
 
-            VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE -> {
+            VilkårType.ROAH_OPPSTART_AVSLUTNING,
+            VilkårType.ROAH_HJEMREISE,
+            VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+            -> {
                 // Dette er kun for tester foreløpig
             }
 
@@ -276,8 +282,22 @@ enum class VilkårType(
     ),
 
     // Reise oppstart, avslutning og hjemreise
-    REISE_OPPSTART_AVSLUTNING_HJEMREISE(
-        "Reise oppstart, avslutning og hjemreise",
+    ROAH_OPPSTART_AVSLUTNING(
+        "Reise ved oppstart eller avslutning",
+        listOf(
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        ),
+    ),
+    ROAH_HJEMREISE(
+        "Hjemreise",
+        listOf(
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        ),
+    ),
+    ROAH_MIDLERTIDIG_BOSTED_PERIODE(
+        "Midlertidig bosted i perioden",
         listOf(
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,

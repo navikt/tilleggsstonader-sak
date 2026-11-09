@@ -6,12 +6,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import java.time.LocalDate
 
 data class VilkårReiseTilSamling(
     val id: VilkårId = VilkårId.random(),
+    val globalId: VilkårGlobalId? = VilkårGlobalId.random(),
     val behandlingId: BehandlingId,
     override val fom: LocalDate,
     override val tom: LocalDate,

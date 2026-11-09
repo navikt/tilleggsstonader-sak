@@ -33,7 +33,7 @@ class YtelseClientMockConfig {
 
                 val perioder =
                     request.typer
-                        .map { type ->
+                        .mapNotNull { type ->
                             when (type) {
                                 TypeYtelsePeriode.DAGPENGER ->
                                     YtelsePeriode.Dagpenger(
@@ -78,6 +78,7 @@ class YtelseClientMockConfig {
                                         fom = LocalDate.now(),
                                         tom = LocalDate.now(),
                                     )
+                                TypeYtelsePeriode.ARBEIDSSØKER -> null
                             }
                         }.toMutableList()
                 if (request.typer.contains(TypeYtelsePeriode.AAP)) {

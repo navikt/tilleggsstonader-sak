@@ -20,6 +20,7 @@ object VilkårDagligReiseMapper {
     fun Vilkår.mapTilVilkårDagligReise() =
         VilkårDagligReise(
             id = id,
+            globalId = globalId,
             behandlingId = behandlingId,
             fom = this.fom ?: error("Forventer at fom er satt"),
             tom = this.tom ?: error("Forventer at tom er satt"),
@@ -33,6 +34,8 @@ object VilkårDagligReiseMapper {
     fun VilkårDagligReise.mapTilVilkår() =
         Vilkår(
             id = this.id,
+            globalId = this.globalId,
+            parentVilkår = null,
             behandlingId = this.behandlingId,
             fom = this.fom,
             tom = this.tom,

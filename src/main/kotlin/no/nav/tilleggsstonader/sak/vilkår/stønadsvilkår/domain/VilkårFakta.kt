@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -35,6 +34,10 @@ import java.time.LocalDate
         FaktaReiseOppstartAvslutningHjemreiseUbestemt::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT",
     ),
+    JsonSubTypes.Type(
+        FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted::class,
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_MIDLERTIDIG_BOSTED",
+    ),
     JsonSubTypes.Type(FaktaFlyttebyrå::class, name = "FLYTTING_FLYTTEBYRÅ"),
     JsonSubTypes.Type(FaktaFlytteSelv::class, name = "FLYTTING_FLYTTE_SELV"),
     JsonSubTypes.Type(FaktaFlyttingUbestemt::class, name = "FLYTTING_UBESTEMT"),
@@ -52,9 +55,9 @@ sealed interface FlyttingVilkårFakta : VilkårFakta {
 }
 
 data class FaktaFlyttebyrå(
-    val tilbud1: FlyttebyråTilbud,
-    val tilbud2: FlyttebyråTilbud,
-    val erBetalingDokumentert: Boolean,
+    val tilbud: List<FlyttebyråTilbud>,
+    val dokumenterteUtgifter: DokumenterteUtgifter,
+    val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
 ) : FlyttingVilkårFakta
 
@@ -66,10 +69,14 @@ data class FlyttebyråTilbud(
 data class FaktaFlytteSelv(
     val avstandEnVei: Int?,
     val henger: Int?,
+    val leiebil: Int?,
     val bompenger: Int?,
     val ferge: Int?,
     val parkering: Int?,
+    val annet: Int?,
+    val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
+    val dokumenterteUtgifter: DokumenterteUtgifter,
 ) : FlyttingVilkårFakta
 
 data class FaktaFlyttingUbestemt(
@@ -103,29 +110,48 @@ data class FaktaReiseTilSamlingUbestemt(
     override val adresse: String?,
 ) : ReiseVilkårFakta
 
+sealed interface FaktaROAH : VilkårFakta {
+    val aktivitetId: VilkårperiodeGlobalId
+}
+
+sealed interface FaktaROAHReise : FaktaROAH {
+    val reiseId: ReiseId
+    val typeReiseformål: TypeReiseformål
+}
+
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
-) : ReiseVilkårFakta
+    val begrunnelse: String?,
+) : FaktaROAHReise
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
-) : ReiseVilkårFakta
+    val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
+    val begrunnelse: String?,
+) : FaktaROAHReise
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
-) : ReiseVilkårFakta
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+) : FaktaROAHReise
+
+data class FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+    override val aktivitetId: VilkårperiodeGlobalId,
+    val fraAdresse: String,
+    val tilAdresse: String,
+) : FaktaROAH
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,
@@ -188,4 +214,5 @@ enum class TypeVilkårFakta {
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL,
     REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT,
+    REISE_OPPSTART_AVSLUTNING_HJEMREISE_MIDLERTIDIG_BOSTED,
 }

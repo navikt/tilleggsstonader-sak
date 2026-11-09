@@ -245,11 +245,14 @@ class OppfølgingOpprettKontrollerService(
                     TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                 )
             MålgruppeType.UNGDOMSPROGRAMMET,
+            MålgruppeType.ARBEIDSSØKER,
             MålgruppeType.AKTIVITETSPENGER,
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
             MålgruppeType.KVALIFISERINGSSTØNAD,
             MålgruppeType.INNSATT_I_FENGSEL,
             -> error("Skal ikke sjekke målgruppe=$this")

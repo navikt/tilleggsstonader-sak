@@ -8,8 +8,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaROAH
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import tools.jackson.core.JsonParser
@@ -48,9 +50,11 @@ object SøknadsskjemaUtil {
             -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaReiseTilSamling>>(data)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
+            -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaFlytting>>(data)
+
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            -> error("Søknadsskjema for $stønadstype er ikke implementert")
+            -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaROAH>>(data)
         }
 
     private fun håndterBoutgifter(
@@ -78,7 +82,9 @@ object SøknadsskjemaUtil {
                 data,
             )
         return InnsendtSkjema(
-            ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
+            ident =
+                skjema.data.data.dineOpplysninger.identitet
+                    ?.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
             språk = mapFyllUtSpråk(skjema.language),
             skjema = skjema,

@@ -22,27 +22,34 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.time.LocalDate
 
 class FlyttingBeregningServiceTest {
+    private val nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null)
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
     private val vedtakService = mockk<VedtakService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
@@ -74,18 +81,22 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `flyttebyrå beregnes med laveste tilbudspris og riktig grunnlag`() {
+    fun `flyttebyrå velger billigste tilbud og lagrer byrånavn i grunnlaget`() {
         val periode = vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlyttebyrå(
-                            tilbud1 = FlyttebyråTilbud(navn = "Tilbud 1", pris = 123),
-                            tilbud2 = FlyttebyråTilbud(navn = "Tilbud 2", pris = 124),
-                            erBetalingDokumentert = true,
+                            tilbud =
+                                listOf(
+                                    FlyttebyråTilbud(navn = "Byrå A", pris = 124),
+                                    FlyttebyråTilbud(navn = "Byrå B", pris = 123),
+                                ),
+                            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -96,9 +107,12 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlyttebyrå(
-                    tilbud1Pris = BigDecimal("123"),
-                    tilbud2Pris = BigDecimal("124"),
-                    erBetalingDokumentert = true,
+                    tilbud =
+                        listOf(
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("124"), erValgt = false),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123"), erValgt = true),
+                        ),
+                    erUtgifterDokumentert = true,
                 ),
             )
         assertThat(resultat.målgruppe).isEqualTo(periode.målgruppe)
@@ -106,37 +120,80 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `egen flytting beregnes med kilometersats og tilleggskostnader`() {
+    fun `flyttebyrå velger første tilbud ved lik pris`() {
+        every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
+            listOf(
+                vilkår(
+                    flyttedato = 1 januar 2025,
+                    fakta =
+                        faktaFlyttebyrå(
+                            listOf(
+                                FlyttebyråTilbud("Første byrå", 123),
+                                FlyttebyråTilbud("Andre byrå", 123),
+                            ),
+                        ),
+                ),
+            )
+
+        val resultat =
+            beregningService
+                .beregn(
+                    behandling,
+                    listOf(vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)),
+                ).resultater
+                .single()
+
+        val grunnlag = resultat.grunnlag as BeregningsgrunnlagFlyttebyrå
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud).isEqualTo(grunnlag.tilbud.first())
+        assertThat(valgtTilbud.navn).isEqualTo("Første byrå")
+        assertThat(resultat.beløp).isEqualByComparingTo(valgtTilbud.pris)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `egen flytting beregnes med kilometersats og tilleggskostnader`(dokumentert: Boolean) {
         val periode = vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
+                            dokumenterteUtgifter =
+                                DokumenterteUtgifter(
+                                    if (dokumentert) SvarJaNei.JA else SvarJaNei.NEI,
+                                    "Kvittering fra flyttebyrå",
+                                ),
                             avstandEnVei = 100,
                             henger = 100,
+                            leiebil = 50,
                             bompenger = 20,
                             ferge = 30,
                             parkering = 40,
+                            annet = 60,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
 
         val resultat = beregningService.beregn(behandling, listOf(periode)).resultater.single()
 
-        assertThat(resultat.beløp).isEqualByComparingTo("478")
+        assertThat(resultat.beløp).isEqualByComparingTo("588")
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = dokumentert,
                     avstandEnVei = 100,
                     sats = BigDecimal("2.88"),
                     satsBekreftet = true,
                     henger = BigDecimal("100"),
+                    leiebil = BigDecimal("50"),
                     bompenger = BigDecimal("20"),
                     ferge = BigDecimal("30"),
                     parkering = BigDecimal("40"),
+                    annet = BigDecimal("60"),
                 ),
             )
     }
@@ -146,15 +203,19 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
+                            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             avstandEnVei = 1,
                             henger = null,
+                            leiebil = null,
                             bompenger = null,
                             ferge = null,
                             parkering = null,
+                            annet = null,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -169,21 +230,24 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = true,
                     avstandEnVei = 1,
                     sats = BigDecimal("2.88"),
                     satsBekreftet = true,
                     henger = BigDecimal.ZERO,
+                    leiebil = BigDecimal.ZERO,
                     bompenger = BigDecimal.ZERO,
                     ferge = BigDecimal.ZERO,
                     parkering = BigDecimal.ZERO,
+                    annet = BigDecimal.ZERO,
                 ),
             )
     }
 
     @Test
     fun `resultater beregnes for alle vilkår og sorteres etter startdato`() {
-        val førsteVilkår = vilkår(flytteDato = 1 februar 2025)
-        val andreVilkår = vilkår(flytteDato = 1 januar 2025)
+        val førsteVilkår = vilkår(flyttedato = 1 februar 2025)
+        val andreVilkår = vilkår(flyttedato = 1 januar 2025)
         val vedtaksperioder =
             listOf(
                 vedtaksperiode(
@@ -219,7 +283,7 @@ class FlyttingBeregningServiceTest {
             )
         stubForrigeVedtak(forrigeBehandlingId, forrigeResultat)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns
-            listOf(vilkår(flytteDato = 1 februar 2025, behandlingId = revurdering.id))
+            listOf(vilkår(flyttedato = 1 februar 2025, behandlingId = revurdering.id))
 
         val resultater =
             beregningService
@@ -250,7 +314,7 @@ class FlyttingBeregningServiceTest {
             )
         stubForrigeVedtak(forrigeBehandlingId, forrigeResultat)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns
-            listOf(vilkår(flytteDato = 1 januar 2025, behandlingId = revurdering.id))
+            listOf(vilkår(flyttedato = 1 januar 2025, behandlingId = revurdering.id))
 
         val resultat =
             beregningService.beregn(
@@ -294,18 +358,29 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `flyttebyrå avviser manglende og negative tilbudspriser`() {
+    fun `flyttebyrå avviser ufullstendige tilbud og ugyldig antall`() {
         val ugyldigeFakta =
             listOf(
-                faktaFlyttebyrå(tilbud1Pris = null),
-                faktaFlyttebyrå(tilbud2Pris = null),
-                faktaFlyttebyrå(tilbud1Pris = -1),
-                faktaFlyttebyrå(tilbud2Pris = -1),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", null), FlyttebyråTilbud("Byrå B", 123))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 123), FlyttebyråTilbud("Byrå B", null))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud(" ", 123), FlyttebyråTilbud("Byrå B", 124))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 123), FlyttebyråTilbud(" byrå a ", 124))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 0), FlyttebyråTilbud("Byrå B", 123))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", -1), FlyttebyråTilbud("Byrå B", 123))),
+                faktaFlyttebyrå(emptyList()),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 123))),
+                faktaFlyttebyrå(
+                    listOf(
+                        FlyttebyråTilbud("Byrå A", 123),
+                        FlyttebyråTilbud("Byrå B", 124),
+                        FlyttebyråTilbud("Byrå C", 125),
+                    ),
+                ),
             )
 
         ugyldigeFakta.forEach { fakta ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
-                listOf(vilkår(flytteDato = 1 januar 2025, fakta = fakta))
+                listOf(vilkår(flyttedato = 1 januar 2025, fakta = fakta))
 
             assertThatThrownBy {
                 beregningService.beregn(
@@ -330,7 +405,7 @@ class FlyttingBeregningServiceTest {
 
         ugyldigeFakta.forEach { fakta ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
-                listOf(vilkår(flytteDato = 1 januar 2025, fakta = fakta))
+                listOf(vilkår(flyttedato = 1 januar 2025, fakta = fakta))
 
             assertThatThrownBy {
                 beregningService.beregn(
@@ -346,7 +421,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
                 ),
             )
@@ -404,14 +479,13 @@ class FlyttingBeregningServiceTest {
     }
 
     private fun vilkår(
-        flytteDato: LocalDate,
+        flyttedato: LocalDate,
         behandlingId: BehandlingId = behandling.id,
         fakta: FlyttingVilkårFakta = faktaFlyttebyrå(),
     ) = VilkårFlytting(
         id = VilkårId.random(),
         behandlingId = behandlingId,
-        fom = flytteDato,
-        tom = flytteDato,
+        flyttedato = flyttedato,
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
         delvilkårsett = emptyList(),
@@ -419,28 +493,37 @@ class FlyttingBeregningServiceTest {
     )
 
     private fun faktaFlyttebyrå(
-        tilbud1Pris: Int? = 123,
-        tilbud2Pris: Int? = 124,
+        tilbud: List<FlyttebyråTilbud> =
+            listOf(
+                FlyttebyråTilbud(navn = "Tilbud 1", pris = 123),
+                FlyttebyråTilbud(navn = "Tilbud 2", pris = 124),
+            ),
     ) = FaktaFlyttebyrå(
-        tilbud1 = FlyttebyråTilbud(navn = "Tilbud 1", pris = tilbud1Pris),
-        tilbud2 = FlyttebyråTilbud(navn = "Tilbud 2", pris = tilbud2Pris),
-        erBetalingDokumentert = true,
+        tilbud = tilbud,
+        dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
         adresse = "Flytteveien 1",
+        nødvendigUtgift = nødvendigUtgift,
     )
 
     private fun faktaFlytteSelv(
         avstandEnVei: Int? = 100,
         henger: Int? = 10,
+        leiebil: Int? = null,
         bompenger: Int? = 20,
         ferge: Int? = 30,
         parkering: Int? = 40,
+        annet: Int? = null,
     ) = FaktaFlytteSelv(
+        dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
         avstandEnVei = avstandEnVei,
         henger = henger,
+        leiebil = leiebil,
         bompenger = bompenger,
         ferge = ferge,
         parkering = parkering,
+        annet = annet,
         adresse = "Flytteveien 1",
+        nødvendigUtgift = nødvendigUtgift,
     )
 
     private fun resultat(
@@ -454,9 +537,12 @@ class FlyttingBeregningServiceTest {
         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         grunnlag =
             BeregningsgrunnlagFlyttebyrå(
-                tilbud1Pris = BigDecimal("500"),
-                tilbud2Pris = BigDecimal("600"),
-                erBetalingDokumentert = true,
+                tilbud =
+                    listOf(
+                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("500"), erValgt = true),
+                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("600"), erValgt = false),
+                    ),
+                erUtgifterDokumentert = true,
             ),
     )
 

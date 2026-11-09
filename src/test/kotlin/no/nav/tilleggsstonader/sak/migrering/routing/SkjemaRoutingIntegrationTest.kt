@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto.KildeResultat
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig.Companion.BARN2_FNR
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig.Companion.BARN_FNR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig.Companion.lagPersonKort
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockGetVariant
@@ -22,11 +24,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockIsEnabled
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -356,6 +361,43 @@ class SkjemaRoutingIntegrationTest(
 
     @Nested
     inner class FlyttingOgROAH {
+        @Test
+        fun `skal route ROAH til gammel løsning hvis bruker har flere barn og ett har fortrolig adresse`() {
+            val skjematype = Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = true)
+            every { pdlClient.hentBarn(listOf(BARN_FNR, BARN2_FNR)) } returns
+                mapOf(
+                    BARN_FNR to pdlBarn(),
+                    BARN2_FNR to
+                        pdlBarn(
+                            adressebeskyttelse = listOf(Adressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG, metadataGjeldende)),
+                        ),
+                )
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
+            assertThat(routingHarBlittLagret(skjematype)).isFalse()
+        }
+
+        @Test
+        fun `skal route ROAH til ny løsning hvis bruker har flere barn og ingen har fortrolig adresse`() {
+            val skjematype = Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = true)
+            every { pdlClient.hentBarn(listOf(BARN_FNR, BARN2_FNR)) } returns
+                mapOf(
+                    BARN_FNR to pdlBarn(),
+                    BARN2_FNR to pdlBarn(),
+                )
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+            assertThat(routingHarBlittLagret(skjematype)).isTrue()
+        }
+
         @ParameterizedTest
         @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal route til gammel løsning hvis toggle er av`(skjematype: Skjematype) {

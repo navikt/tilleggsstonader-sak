@@ -6,15 +6,16 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import java.time.LocalDate
 
 data class VilkårFlytting(
     val id: VilkårId = VilkårId.random(),
+    val globalId: VilkårGlobalId? = VilkårGlobalId.random(),
     val behandlingId: BehandlingId,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
+    val flyttedato: LocalDate,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<Delvilkår>,
@@ -22,7 +23,6 @@ data class VilkårFlytting(
     val slettetKommentar: String? = null,
     val opphavsvilkår: Opphavsvilkår? = null,
 ) : Periode<LocalDate> {
-    init {
-        require(fom == tom) { "For flytting så skal fom og tom være samme" }
-    }
+    override val fom = flyttedato
+    override val tom = flyttedato
 }

@@ -59,6 +59,7 @@
   "beregningsresultat": {
     "boutgifter": null,
     "dagligReise": null,
+    "flytting": null,
     "læremidler": [ {
       "aktivitet": "TILTAK",
       "antallMåneder": 2,

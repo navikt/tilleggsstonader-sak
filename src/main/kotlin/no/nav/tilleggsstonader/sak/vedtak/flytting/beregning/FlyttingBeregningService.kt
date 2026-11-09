@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -57,7 +59,7 @@ class FlyttingBeregningService(
                 Beregningsomfang.FRA_DATO -> {
                     val nyeBeregningsresultat =
                         oppfylteVilkår
-                            .filter { vilkår -> vedtaksperioder.any { it.overlapper(vilkår) } }
+                            .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
                             .map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
                     val forrigeBeregningsresultat = hentForrigeIverksatteVedtak(behandling).beregningsresultat.resultater
                     val beregnFraDato = beregningsplan.beregnFra() ?: feil("Forventer beregn-fra dato")
@@ -94,7 +96,7 @@ class FlyttingBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
     ): Vedtaksperiode =
         vedtaksperioder.single {
-            it.overlapper(vilkår)
+            it.inneholder(vilkår.flyttedato)
         }
 
     private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting =
@@ -117,25 +119,36 @@ class FlyttingBeregningService(
         return BeregningsresultatFlyttevilkår(
             grunnlag = grunnlag,
             fraTidligereVedtak = false,
-            fom = vilkår.fom,
-            tom = vilkår.tom,
+            fom = vilkår.flyttedato,
+            tom = vilkår.flyttedato,
             beløp = beløp,
             målgruppe = vedtaksperiode.målgruppe,
         )
     }
 
     private fun beregnFlyttebyrå(fakta: FaktaFlyttebyrå): Pair<BeregningsgrunnlagFlyttebyrå, BigDecimal> {
-        val tilbud1Pris = fakta.tilbud1.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 1")
-        val tilbud2Pris = fakta.tilbud2.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 2")
-        feilHvis(tilbud1Pris.signum() < 0 || tilbud2Pris.signum() < 0) { "Flyttebyråtilbud kan ikke ha negativ pris" }
+        feilHvis(fakta.tilbud.size != 2) { "Flyttevilkår må ha nøyaktig to flyttebyråtilbud" }
+        val tilbud =
+            fakta.tilbud.map { flyttebyråtilbud ->
+                val navn =
+                    flyttebyråtilbud.navn?.takeIf { it.isNotBlank() }
+                        ?: feil("Flyttevilkår mangler navn på flyttebyrå")
+                val pris =
+                    flyttebyråtilbud.pris?.takeIf { it > 0 }?.toBigDecimal()
+                        ?: feil("Flyttevilkår mangler gyldig pris på flyttebyråtilbud")
+                BeregningsgrunnlagFlyttebyråTilbud(navn = navn, pris = pris, erValgt = false)
+            }
+        feilHvis(tilbud.map { it.navn.trim().lowercase() }.distinct().size != tilbud.size) {
+            "Flyttebyråtilbud må være fra forskjellige flyttebyråer"
+        }
+        val valgtTilbudIndeks = tilbud.indices.minBy { tilbud[it].pris }
 
         val grunnlag =
             BeregningsgrunnlagFlyttebyrå(
-                tilbud1Pris = tilbud1Pris,
-                tilbud2Pris = tilbud2Pris,
-                erBetalingDokumentert = fakta.erBetalingDokumentert,
+                tilbud = tilbud.mapIndexed { indeks, tilbud -> tilbud.copy(erValgt = indeks == valgtTilbudIndeks) },
+                erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
             )
-        val beløp = minOf(tilbud1Pris, tilbud2Pris).avrundetStønadsbeløp()
+        val beløp = tilbud[valgtTilbudIndeks].pris.avrundetStønadsbeløp()
 
         return grunnlag to beløp
     }
@@ -151,23 +164,28 @@ class FlyttingBeregningService(
                 it.beløp to it.bekreftet
             }
         val henger = fakta.henger.tilBeløp()
+        val leiebil = fakta.leiebil.tilBeløp()
         val bompenger = fakta.bompenger.tilBeløp()
         val ferge = fakta.ferge.tilBeløp()
         val parkering = fakta.parkering.tilBeløp()
+        val annet = fakta.annet.tilBeløp()
 
         val grunnlag =
             BeregningsgrunnlagFlytteSelv(
+                erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
                 avstandEnVei = avstandEnVei,
                 sats = sats.first,
                 satsBekreftet = sats.second,
                 henger = henger,
+                leiebil = leiebil,
                 bompenger = bompenger,
                 ferge = ferge,
                 parkering = parkering,
+                annet = annet,
             )
         val beløp =
             avstandEnVei.toBigDecimal() * sats.first +
-                henger + bompenger + ferge + parkering
+                henger + leiebil + bompenger + ferge + parkering + annet
 
         return grunnlag to beløp.avrundetStønadsbeløp()
     }

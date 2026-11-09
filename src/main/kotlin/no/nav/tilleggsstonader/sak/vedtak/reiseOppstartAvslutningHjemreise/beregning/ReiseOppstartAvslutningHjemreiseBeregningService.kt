@@ -20,9 +20,10 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.domai
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -52,7 +53,8 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
             vilkårService
                 .hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(
                     behandling.id,
-                ).map { it.mapTilVilkårReiseOppstartAvslutningHjemreise() }
+                ).map { it.mapTilVilkårROAH() }
+                .filtrerKunReisevilkår()
                 .sortedBy { it.fom }
 
         val utgifterTilBeregning =
@@ -100,11 +102,11 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
             val fakta = reise.fakta as FaktaOffentligTransport
 
             BeregningsresultatOffentligTransport(
-                reiseId = fakta.reiseId,
-                aktivitetId = fakta.aktivitetId,
+                reiseId = reise.reiseId,
+                aktivitetId = reise.aktivitetId,
                 grunnlag =
                     BeregningsgrunnlagOffentligTransport(
-                        adresse = fakta.adresse,
+                        adresse = null,
                         fom = reise.fom,
                         tom = reise.tom,
                         vedtaksperioder =
@@ -133,7 +135,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
 
             val grunnlag =
                 BeregningsgrunnlagPrivatBil(
-                    adresse = fakta.adresse,
+                    adresse = null,
                     fom = reise.fom,
                     tom = reise.tom,
                     sats = sats.beløp,
@@ -147,8 +149,8 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
                 )
 
             BeregningsresultatPrivatBil(
-                reiseId = fakta.reiseId,
-                aktivitetId = fakta.aktivitetId,
+                reiseId = reise.reiseId,
+                aktivitetId = reise.aktivitetId,
                 grunnlag = grunnlag,
                 beløp = beregnBelopForPrivatBil(grunnlag),
             )
@@ -160,6 +162,8 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
         val ekstrakostnader = (grunnlag.bompenger ?: BigDecimal.ZERO) + (grunnlag.fergekostnad ?: BigDecimal.ZERO)
         return (kjøreutgift + ekstrakostnader).setScale(0, RoundingMode.HALF_UP)
     }
+
+    private fun List<VilkårROAH>.filtrerKunReisevilkår() = filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>()
 }
 
 private fun validerFinnesReise(vilkår: List<VilkårReiseOppstartAvslutningHjemreise>) {

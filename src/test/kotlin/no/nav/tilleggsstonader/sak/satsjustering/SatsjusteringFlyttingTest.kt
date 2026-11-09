@@ -43,7 +43,7 @@ class SatsjusteringFlyttingTest : IntegrationTest() {
     private lateinit var satsPrivatBilProvider: SatsPrivatBilProvider
 
     private val flytteÅr = LocalDate.now().year
-    private val flytteDato = 1 januar flytteÅr
+    private val flyttedato = 1 januar flytteÅr
 
     @AfterEach
     fun resetMock() {
@@ -66,12 +66,12 @@ class SatsjusteringFlyttingTest : IntegrationTest() {
         gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id) {
             målgruppe {
                 opprett {
-                    målgruppeAAP(flytteDato, flytteDato)
+                    målgruppeAAP(flyttedato, flyttedato)
                 }
             }
             vilkår {
                 flyttingEgenKjøring(
-                    flytteDato = flytteDato,
+                    flyttedato = flyttedato,
                     avstandEnVei = 100,
                 )
             }

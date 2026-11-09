@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Op
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.medResultatFraParent
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -228,9 +229,14 @@ class VilkårService(
         }
     }
 
+    /**
+     * Felles lesesti for vilkår. Resultatet til reiser under et paraplyvilkår er utledet fra paraplyen, og lagres ikke.
+     * Kode som skal lese det rå resultatet, for eksempel kopiering til revurdering, bruker [VilkårRepository] direkte.
+     */
     fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
+            .medResultatFraParent()
             .sortedWith(compareBy({ it.fom }, { it.tom }))
 
     /**
@@ -301,7 +307,5 @@ class VilkårService(
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
 
     fun hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandlingId: BehandlingId): List<Vilkår> =
-        vilkårRepository
-            .findByBehandlingId(behandlingId)
-            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+        hentVilkår(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT }
 }

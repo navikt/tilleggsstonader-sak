@@ -37,6 +37,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             -> true
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
+            MålgruppeType.ARBEIDSSØKER,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
@@ -44,6 +45,8 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.INNSATT_I_FENGSEL,
             MålgruppeType.AKTIVITETSPENGER,
             MålgruppeType.UNGDOMSPROGRAMMET,
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
             -> false
         }
 

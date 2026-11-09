@@ -120,6 +120,17 @@ class ArbeidsfordelingServiceTest {
         }
 
         @Test
+        fun `skal hente adressebeskyttelse for roah og andre foreldre for pass av barn då de er parter på saken`() {
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(søkerIdent) } returns
+                lagPersonMedRelasjoner()
+
+            service.hentNavEnhet(søkerIdent, Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
+
+            verify(exactly = 1) { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) }
+            verify(exactly = 0) { personService.hentAdressebeskyttelse(any()) }
+        }
+
+        @Test
         fun `skal kun hente adressebeskyttelse for søker hvis stønaden ikke gjelder barn`() {
             every { personService.hentAdressebeskyttelse(søkerIdent) } returns lagPersonUtenRelasjoner()
 

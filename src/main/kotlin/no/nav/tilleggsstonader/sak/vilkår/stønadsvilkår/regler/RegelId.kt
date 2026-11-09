@@ -44,11 +44,26 @@ enum class RegelId(
     KAN_REISE_MED_EGEN_BIL("Kan bruker benytte privat bil?"),
     DOKUMENTERTE_UTGIFTER("Har bruker dokumenterte utgifter til reise?"),
 
+    // REISE OPPSTART, AVSLUTNING OG HJEMREISE
+    ROAH_HAR_UTGIFTER_TIL_REISEN("Har bruker utgifter til reisen?"),
+    ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT("Har bruker mulighet til å reise med offentlig transport?"),
+    ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN("Har bruker dokumenterte utgifter til reisen?"),
+    ROAH_KAN_BENYTTE_PRIVAT_BIL("Kan bruker benytte seg av privat bil?"),
+    ROAH_BENYTTET_TAXI("Benyttet bruker taxi?"),
+    ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL("Er søker innenfor normalt antall hjemreiser per år?"),
+    ROAH_HJEMREISE_BEHOV_FLERE_REISER("Har bruker behov for flere hjemreiser, og er behovet tilfredsstillende dokumentert?"),
+    ROAH_MÅ_BO_MIDLERTIDIG_BORTE("Må bruker midlertidig bo borte hjemmefra for å delta på aktiviteten?"),
+    ROAH_HAR_BARN_UNDER_18_ÅR_SOM_FLYTTER_MED("Har bruker barn under 18 år som flytter med?"),
+    ROAH_HAR_BARN_IKKE_FULLFØRT_FJERDE_SKOLEÅR_HJEMME("Har bruker barn som ikke har fullført 4. skoleår, som bor hjemme?"),
+    ROAH_HAR_DOKUMENTERTE_SÆRSKILTE_BEHOV_FLERE_HJEMREISER(
+        "Har bruker dokumentert andre særskilte behov som gir rett på flere hjemreiser?",
+    ),
+
     // FLYTTING
+    HAR_UTGIFTER_TIL_FLYTTING("Har bruker utgifter til flyttingen?"),
     HVILKEN_FORBINDELSE_FLYTTER_BRUKER("I hvilken forbindelse flytter bruker?"),
-    MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET("Må bruker flytte fra hjemstedet for å gjennomføre aktiviteten?"),
-    FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET("Flytter bruker i forbindelse med arbeid etter at aktiviteten er gjennomført?"),
+    MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET("Må bruker flytte fra/til hjemsted?"),
+    FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET("Må bruker flytte i forbindelse med arbeid etter gjennomført tiltak eller utdanning?"),
     MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID("Må bruker flytte fra hjemstedet for å starte i arbeid på et annet sted?"),
-    ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE("Er kostnader for flytting nødvendig?"),
     HVORDAN_SKAL_BRUKER_FLYTTE("Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?"),
 }

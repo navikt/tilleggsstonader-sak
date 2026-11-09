@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.Flyttemåte
@@ -24,6 +25,7 @@ class DetaljertVedtaksperiodeFlyttingTest {
                         resultat(flyttedato, tom, BigDecimal("100"), dokumentert = true),
                         resultat(flyttedato, tom, BigDecimal("200"), dokumentert = false),
                         resultat(flyttedato, tom, BigDecimal("300"), flytteSelv = true),
+                        resultat(flyttedato, tom, BigDecimal("400"), dokumentert = false, flytteSelv = true),
                     ),
             )
 
@@ -55,6 +57,14 @@ class DetaljertVedtaksperiodeFlyttingTest {
                     flyttemåte = Flyttemåte.FLYTTE_SELV,
                     skalUtbetales = true,
                 ),
+                DetaljertVedtaksperiodeFlytting(
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    flyttedato = flyttedato,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                    beløp = BigDecimal("400"),
+                    flyttemåte = Flyttemåte.FLYTTE_SELV,
+                    skalUtbetales = false,
+                ),
             )
     }
 
@@ -72,19 +82,25 @@ class DetaljertVedtaksperiodeFlyttingTest {
         grunnlag =
             if (flytteSelv) {
                 BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = dokumentert,
                     avstandEnVei = 100,
                     sats = BigDecimal("2.94"),
                     satsBekreftet = true,
                     henger = BigDecimal.ZERO,
+                    leiebil = BigDecimal.ZERO,
                     bompenger = BigDecimal.ZERO,
                     ferge = BigDecimal.ZERO,
                     parkering = BigDecimal.ZERO,
+                    annet = BigDecimal.ZERO,
                 )
             } else {
                 BeregningsgrunnlagFlyttebyrå(
-                    tilbud1Pris = beløp,
-                    tilbud2Pris = beløp,
-                    erBetalingDokumentert = dokumentert,
+                    tilbud =
+                        listOf(
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("100"), erValgt = false),
+                        ),
+                    erUtgifterDokumentert = dokumentert,
                 )
             },
     )

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import org.assertj.core.api.Assertions.assertThat
@@ -55,13 +56,16 @@ class FlyttingAndelTilkjentYtelseMapperTest {
     fun `ubekreftet sats venter på satsendring før iverksetting`() {
         val grunnlag =
             BeregningsgrunnlagFlytteSelv(
+                erUtgifterDokumentert = true,
                 avstandEnVei = 100,
                 sats = BigDecimal("2.94"),
                 satsBekreftet = false,
                 henger = BigDecimal.ZERO,
+                leiebil = BigDecimal.ZERO,
                 bompenger = BigDecimal.ZERO,
                 ferge = BigDecimal.ZERO,
                 parkering = BigDecimal.ZERO,
+                annet = BigDecimal.ZERO,
             )
         val beregningsresultat =
             resultat(1 januar 2026).let { resultat ->
@@ -96,33 +100,39 @@ class FlyttingAndelTilkjentYtelseMapperTest {
     fun `udokumentert byrå gir ingen andeler for TSO eller TSR`() {
         listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
             assertThat(
-                resultat(1 januar 2026, erBetalingDokumentert = false).mapTilAndeler(stønadstype),
+                resultat(1 januar 2026, erUtgifterDokumentert = false).mapTilAndeler(stønadstype),
             ).isEmpty()
         }
     }
 
     @Test
-    fun `blandet beregning gir kun andeler for dokumentert byrå og egen kjøring`() {
+    fun `blandet beregning gir kun andeler for dokumentert byrå og dokumentert egen kjøring`() {
         val dato = 1 januar 2026
         val egenKjøring =
             resultat(dato).resultater.single().copy(
                 beløp = BigDecimal("294"),
                 grunnlag =
                     BeregningsgrunnlagFlytteSelv(
+                        erUtgifterDokumentert = true,
                         avstandEnVei = 100,
                         sats = BigDecimal("2.94"),
                         satsBekreftet = true,
-                        henger = BigDecimal.ZERO,
+                        henger = BigDecimal("100"),
+                        leiebil = BigDecimal.ZERO,
                         bompenger = BigDecimal.ZERO,
                         ferge = BigDecimal.ZERO,
                         parkering = BigDecimal.ZERO,
+                        annet = BigDecimal.ZERO,
                     ),
             )
         val blandet =
             BeregningsresultatFlytting(
-                resultat(dato, erBetalingDokumentert = false).resultater +
-                    resultat(dato, erBetalingDokumentert = true).resultater +
-                    egenKjøring,
+                resultat(dato, erUtgifterDokumentert = false).resultater +
+                    resultat(dato, erUtgifterDokumentert = true).resultater +
+                    egenKjøring +
+                    egenKjøring.copy(
+                        grunnlag = (egenKjøring.grunnlag as BeregningsgrunnlagFlytteSelv).copy(erUtgifterDokumentert = false),
+                    ),
             )
         listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
             val andeler = blandet.mapTilAndeler(stønadstype)
@@ -131,20 +141,29 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                 BigDecimal("100"),
                 BigDecimal("100"),
                 BigDecimal("294"),
+                BigDecimal("294"),
             )
         }
     }
 
     private fun resultat(
         fom: java.time.LocalDate,
-        erBetalingDokumentert: Boolean = true,
+        erUtgifterDokumentert: Boolean = true,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     ) = BeregningsresultatFlytting(
         listOf(
             BeregningsresultatFlyttevilkår(
                 fom = fom,
                 tom = fom.plusDays(10),
-                grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120"), erBetalingDokumentert),
+                grunnlag =
+                    BeregningsgrunnlagFlyttebyrå(
+                        tilbud =
+                            listOf(
+                                BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                            ),
+                        erUtgifterDokumentert = erUtgifterDokumentert,
+                    ),
                 beløp = BigDecimal("100"),
                 målgruppe = målgruppe,
             ),

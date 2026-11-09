@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -77,7 +78,7 @@ class StegService(
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
         val behandling = behandlingService.hentBehandling(behandlingId)
 
-        feilHvis(behandling.steg != steg) {
+        brukerfeilHvis(behandling.steg != steg) {
             "Behandling er i steg ${behandling.steg}. Steget $steg kan derfor ikke ferdigstilles."
         }
 

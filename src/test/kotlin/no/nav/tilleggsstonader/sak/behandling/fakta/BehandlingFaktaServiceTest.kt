@@ -3,12 +3,19 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
+import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHTypeReise
 import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -21,16 +28,29 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskF
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.Flyttetilbud
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.FlyttingDetaljer
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeInfo
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.OffentligTransportInfo
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.TilleggsopplysningerAnnenAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.AdresseOriginaltBostedAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.PeriodeMidlertidigBostedAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHAdresseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHBarnOgSærligeBehovAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.SkjemaROAH
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
@@ -50,7 +70,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import java.math.BigDecimal
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument as SøknadDokument
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon as SøknadDokumentasjon
 
 internal class BehandlingFaktaServiceTest {
     val søknadService = mockk<SøknadService>()
@@ -529,6 +552,7 @@ internal class BehandlingFaktaServiceTest {
 
     @Test
     fun `skal mappe minimal fakta for reise ved oppstart, avslutning og hjemreise`() {
+        every { søknadService.hentSøknadROAH(behandlingId) } returns null
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
             fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
@@ -538,10 +562,134 @@ internal class BehandlingFaktaServiceTest {
         assertThat(fakta.søknadMottattTidspunkt).isNull()
         assertThat(fakta.hovedytelse).isNull()
         assertThat(fakta.dokumentasjon).isNull()
+        assertThat(fakta.aktivitet).isNull()
+        assertThat(fakta.adresser).isNull()
+        assertThat(fakta.barnOgSærligeBehov).isNull()
+        assertThat(fakta.reiser).isEmpty()
+        assertThat(fakta.arena?.vedtakTom).isEqualTo(1 januar 2024)
+    }
+
+    @Test
+    fun `skal mappe lagrede ROAH-opplysninger uten å miste nullverdier eller berike barnereferanser`() {
+        val søknad =
+            SøknadROAH(
+                journalpostId = "roah-journalpost",
+                mottattTidspunkt = (2 mars 2026).atTime(12, 0),
+                språk = Språkkode.NB,
+                data =
+                    SkjemaROAH(
+                        hovedytelse = HovedytelseAvsnitt(listOf(Hovedytelse.AAP), null, null),
+                        aktivitet =
+                            AktivitetAvsnitt(
+                                aktiviteter = listOf(ValgtAktivitet("aktivitet-1", "Tiltak")),
+                                annenAktivitet = AnnenAktivitetType.TILTAK,
+                                lønnetAktivitet = JaNei.NEI,
+                            ),
+                        adresser =
+                            ROAHAdresseAvsnitt(
+                                måBoBorteHjemmefra = JaNei.JA,
+                                periodeMidlertidigBosted = PeriodeMidlertidigBostedAvsnitt(3 mars 2026, null),
+                                adresseOriginaltBosted =
+                                    AdresseOriginaltBostedAvsnitt(
+                                        skalReiseFraFolkeregistrertAdresse = JaNei.NEI,
+                                        adresseOriginaltBosted = Adresse(null, "Testgata 1", "0001", "Teststed", "NOR"),
+                                    ),
+                                adresseMidlertidigBosted = Adresse(null, "Testveien 2", null, null, "SWE"),
+                            ),
+                        barnOgSærligeBehov =
+                            ROAHBarnOgSærligeBehovAvsnitt(
+                                harBarnUnder18SomHarFlyttetMed = JaNei.JA,
+                                hvilkeBarnFlytterMed = listOf("barn-1"),
+                                harBarnHjemmeUnder4Klasse = JaNei.NEI,
+                                harSærligeBehovForFlereHjemreiser = JaNei.JA,
+                            ),
+                        reiser =
+                            listOf(
+                                ROAHReise(
+                                    typeReise = ROAHTypeReise.OPPSTART,
+                                    fom = 3 mars 2026,
+                                    tom = null,
+                                    reisemåte =
+                                        Reisemåte(
+                                            hvilkeTransportmidlerBleBenyttet = listOf(Transportmiddel.OFFENTLIG_TRANSPORT),
+                                            unntakFraOffentligTransport = null,
+                                            unntakFraPrivatBil = null,
+                                            offentligTransport = OffentligTransportInfo("1200"),
+                                            privatBil = null,
+                                            drosje = null,
+                                        ),
+                                ),
+                                ROAHReise(null, null, null, null),
+                            ),
+                        dokumentasjon =
+                            listOf(
+                                SøknadDokumentasjon(
+                                    type = Vedleggstype.UTGIFTER_ROAH,
+                                    dokumenter = listOf(SøknadDokument("roah-dokument")),
+                                    identBarn = "barn-1",
+                                ),
+                            ),
+                    ),
+            )
+        every { søknadService.hentSøknadROAH(behandlingId) } returns søknad
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseOppstartAvslutningHjemreiseDto
+
+        assertThat(fakta.søknadMottattTidspunkt).isEqualTo(søknad.mottattTidspunkt)
+        assertThat(fakta.hovedytelse?.søknadsgrunnlag?.hovedytelse).containsExactly(Hovedytelse.AAP)
+        assertThat(fakta.aktivitet?.søknadsgrunnlag?.aktiviteter).containsExactly("Tiltak")
+        assertThat(fakta.aktivitet?.søknadsgrunnlag?.annenAktivitet).isEqualTo(AnnenAktivitetType.TILTAK)
+        assertThat(fakta.aktivitet?.søknadsgrunnlag?.lønnetAktivitet).isEqualTo(JaNei.NEI)
+        assertThat(fakta.adresser?.måBoBorteHjemmefra).isEqualTo(JaNei.JA)
+        assertThat(fakta.adresser?.periodeMidlertidigBosted?.fomFlyttedato).isEqualTo(3 mars 2026)
+        assertThat(fakta.adresser?.periodeMidlertidigBosted?.tomFlyttedato).isNull()
+        assertThat(fakta.adresser?.adresseOriginaltBosted?.skalReiseFraFolkeregistrertAdresse).isEqualTo(JaNei.NEI)
+        assertThat(fakta.adresser?.adresseOriginaltBosted?.adresseOriginaltBosted)
+            .isEqualTo(FaktaAdresse("Testgata 1", "0001", "Teststed", "NOR"))
+        assertThat(fakta.adresser?.adresseMidlertidigBosted)
+            .isEqualTo(FaktaAdresse("Testveien 2", null, null, "SWE"))
+        assertThat(fakta.barnOgSærligeBehov)
+            .isEqualTo(FaktaROAHBarnOgSærligeBehov(JaNei.JA, listOf("barn-1"), JaNei.NEI, JaNei.JA))
+        assertThat(fakta.reiser).hasSize(2)
+        assertThat(fakta.reiser.first().typeReise).isEqualTo(ROAHTypeReise.OPPSTART)
+        assertThat(fakta.reiser.first().fom).isEqualTo(3 mars 2026)
+        assertThat(fakta.reiser.first().tom).isNull()
+        assertThat(
+            fakta.reiser
+                .first()
+                .reisemåte
+                ?.hvilkeTransportmidlerBleBenyttet,
+        ).containsExactly(Transportmiddel.OFFENTLIG_TRANSPORT)
+        assertThat(
+            fakta.reiser
+                .first()
+                .reisemåte
+                ?.offentligTransport
+                ?.totalUtgifterOffentligTransport,
+        ).isEqualTo("1200")
+        assertThat(fakta.reiser.last()).isEqualTo(FaktaROAHReise(null, null, null, null))
+        assertThat(fakta.dokumentasjon?.journalpostId).isEqualTo("roah-journalpost")
+        assertThat(
+            fakta.dokumentasjon
+                ?.dokumentasjon
+                ?.single()
+                ?.type,
+        ).isEqualTo(Vedleggstype.UTGIFTER_ROAH.tittel)
+        assertThat(
+            fakta.dokumentasjon
+                ?.dokumentasjon
+                ?.single()
+                ?.dokumenter,
+        ).containsExactly(Dokument("roah-dokument"))
+        assertThat(fakta.arena?.vedtakTom).isEqualTo(1 januar 2024)
     }
 
     @Test
     fun `skal mappe minimal fakta for flytting`() {
+        every { søknadService.hentSøknadFlytting(behandlingId) } returns null
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
             fagsak(stønadstype = Stønadstype.FLYTTING_TSO)
@@ -549,7 +697,110 @@ internal class BehandlingFaktaServiceTest {
         val fakta = service.hentFakta(behandlingId) as BehandlingFaktaFlyttingDto
 
         assertThat(fakta.søknadMottattTidspunkt).isNull()
-        assertThat(fakta.hovedytelse).isNull()
+        assertThat(fakta.hovedytelse?.søknadsgrunnlag).isNull()
         assertThat(fakta.dokumentasjon).isNull()
+    }
+
+    @Test
+    fun `skal mappe innsendte flytteopplysninger`() {
+        val flyttingDetaljer =
+            FlyttingDetaljer(
+                årsak = Flytteårsak.AKTIVITET,
+                flyttedato = 1 februar 2026,
+                adresse =
+                    Adresse(
+                        gyldigFraOgMed = null,
+                        adresse = "Gate 1",
+                        postnummer = "0001",
+                        poststed = "Oslo",
+                        landkode = "NOR",
+                    ),
+                flyttemåte = Flyttemåte.FLYTTEBYRÅ,
+                utgifterDekketPåAnnenMåte = UtgifterDekketPåAnnenMåte.NEI,
+                utgifterEgenFlytting = null,
+                flyttetilbud =
+                    listOf(
+                        Flyttetilbud(navn = "Byrå 1", beløp = BigDecimal("1000.50")),
+                        Flyttetilbud(navn = "Byrå 2", beløp = BigDecimal("900")),
+                    ),
+                skalFlytteFraFolkeregistrertAdresse = JaNei.NEI,
+                adresseDetSkalFlyttesFra =
+                    Adresse(
+                        gyldigFraOgMed = null,
+                        adresse = "Hjemveien 2",
+                        postnummer = "0002",
+                        poststed = "Oslo",
+                        landkode = "NOR",
+                    ),
+            )
+        val søknad =
+            SøknadFlytting(
+                journalpostId = "journalpostId",
+                mottattTidspunkt = (1 januar 2026).atStartOfDay(),
+                språk = Språkkode.NB,
+                data =
+                    SkjemaFlytting(
+                        hovedytelse =
+                            HovedytelseAvsnitt(
+                                hovedytelse = listOf(Hovedytelse.AKTIVITETSPENGER),
+                                harNedsattArbeidsevne = null,
+                                arbeidOgOpphold = null,
+                            ),
+                        flyttingDetaljer = flyttingDetaljer,
+                        dokumentasjon =
+                            listOf(
+                                SøknadDokumentasjon(
+                                    type = Vedleggstype.TILBUD_FLYTTEBYRÅ_1,
+                                    dokumenter = listOf(SøknadDokument("dokumentInfoId")),
+                                ),
+                            ),
+                    ),
+            )
+        every { søknadService.hentSøknadFlytting(behandlingId) } returns søknad
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.FLYTTING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaFlyttingDto
+
+        assertThat(fakta.hovedytelse?.søknadsgrunnlag?.hovedytelse)
+            .containsExactly(Hovedytelse.AKTIVITETSPENGER)
+        assertThat(fakta.flyttingDetaljer).isEqualTo(
+            FaktaFlyttingDetaljer(
+                årsak = Flytteårsak.AKTIVITET,
+                flyttedato = 1 februar 2026,
+                adresse =
+                    FaktaAdresse(
+                        gateadresse = "Gate 1",
+                        postnummer = "0001",
+                        poststed = "Oslo",
+                        landkode = "NOR",
+                    ),
+                flyttemåte = Flyttemåte.FLYTTEBYRÅ,
+                utgifterDekketPåAnnenMåte = UtgifterDekketPåAnnenMåte.NEI,
+                utgifterEgenFlytting = null,
+                flyttetilbud =
+                    listOf(
+                        FaktaFlyttetilbud(navn = "Byrå 1", beløp = BigDecimal("1000.50")),
+                        FaktaFlyttetilbud(navn = "Byrå 2", beløp = BigDecimal("900")),
+                    ),
+                skalFlytteFraFolkeregistrertAdresse = JaNei.NEI,
+                adresseDetSkalFlyttesFra =
+                    FaktaAdresse(
+                        gateadresse = "Hjemveien 2",
+                        postnummer = "0002",
+                        poststed = "Oslo",
+                        landkode = "NOR",
+                    ),
+            ),
+        )
+        assertThat(fakta.dokumentasjon?.journalpostId).isEqualTo("journalpostId")
+        assertThat(fakta.dokumentasjon?.dokumentasjon)
+            .containsExactly(
+                Dokumentasjon(
+                    type = Vedleggstype.TILBUD_FLYTTEBYRÅ_1.tittel,
+                    dokumenter = listOf(Dokument("dokumentInfoId")),
+                ),
+            )
     }
 }

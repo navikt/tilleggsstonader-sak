@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ReisemåteAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Adresse
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AvreiseadresseAvsnitt
@@ -31,7 +32,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.InfoBilKunDele
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.OffentligTransportInfo
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.PrivatBilInfo
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReiseTilSamlingAktivitetAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReisemåteAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Samling
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.TilleggsopplysningerAnnenAktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel

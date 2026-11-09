@@ -7,7 +7,7 @@ data class SvarOgBegrunnelseDto(
     val svar: SvarId,
     val begrunnelse: String? = null,
 ) {
-    fun tilDomain() =
+    fun tilDomene() =
         SvarOgBegrunnelse(
             svar = svar,
             begrunnelse = begrunnelse,

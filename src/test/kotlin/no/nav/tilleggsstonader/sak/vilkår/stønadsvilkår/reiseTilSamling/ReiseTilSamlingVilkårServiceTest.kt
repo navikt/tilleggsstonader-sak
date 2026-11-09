@@ -15,29 +15,34 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.dummyAktivitetId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransportReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.faktaPrivatBilReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
+import java.util.Optional
 
 class ReiseTilSamlingVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -512,5 +517,25 @@ class ReiseTilSamlingVilkårServiceTest {
                     aktivitetId = null,
                 )
             }.withMessage("Spesifikasjon av utgift må fylles ut")
+    }
+
+    @Test
+    fun `skal beholde globalId ved oppdatering`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR)
+        val globalId = VilkårGlobalId.random()
+        val eksisterende =
+            vilkårReiseTilSamling(behandlingId = behandling.id)
+                .mapTilVilkår()
+                .copy(globalId = globalId)
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING) } returns true
+        every { vilkårRepository.findById(eksisterende.id) } returns Optional.of(eksisterende)
+        every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
+
+        reiseTilSamlingVilkårService.oppdaterVilkår(nyttVilkår, behandling.id, eksisterende.id)
+
+        verify(exactly = 1) {
+            vilkårRepository.update(match<Vilkår> { it.globalId == globalId })
+        }
     }
 }

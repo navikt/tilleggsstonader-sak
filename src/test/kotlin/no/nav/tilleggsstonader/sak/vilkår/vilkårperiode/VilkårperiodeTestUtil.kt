@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
@@ -34,6 +35,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevnePassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOmstillingsstønadFlyttingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerPassAvBarn
@@ -128,6 +131,7 @@ object VilkårperiodeTestUtil {
         mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
+            MålgruppeType.ARBEIDSSØKER -> ArbeidssøkerFlyttingTsr()
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppePassAvBarn
             MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerPassAvBarn
             MålgruppeType.OMSTILLINGSSTØNAD ->
@@ -140,6 +144,8 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadPassAvBarn
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD -> OpphørtOmstillingsstønadFlyttingTso
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> OpphørtOvergangsstønadFlyttingTso
             MålgruppeType.AAP ->
                 AAPPassAvBarn(
                     vurderinger =
@@ -189,6 +195,7 @@ object VilkårperiodeTestUtil {
         aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
+            MålgruppeType.ARBEIDSSØKER -> error("Arbeidssøker støttes kun for flytting TSR")
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
             MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerLæremidler
             MålgruppeType.OMSTILLINGSSTØNAD ->
@@ -201,6 +208,9 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadLæremidler
+            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
+            -> error("Opphørt stønad støttes kun for flytting TSO")
             MålgruppeType.AAP ->
                 AAPLæremidler(
                     vurderinger =
@@ -246,6 +256,7 @@ object VilkårperiodeTestUtil {
         FaktaOgSvarMålgruppeDto(
             svarMedlemskap = null,
             svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
+            svarLønnet = SvarJaNei.NEI,
         )
 
     fun aktivitet(

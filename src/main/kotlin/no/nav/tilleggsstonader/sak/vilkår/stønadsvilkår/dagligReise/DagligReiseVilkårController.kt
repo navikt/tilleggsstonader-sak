@@ -59,7 +59,7 @@ class DagligReiseVilkårController(
 
         return dagligReiseVilkårService
             .opprettNyttVilkår(
-                nyttVilkår = lagreVilkårDto.tilDomain(),
+                nyttVilkår = lagreVilkårDto.tilDomene(),
                 behandlingId = behandlingId,
             ).tilDtoMedAktivitetType()
     }
@@ -75,7 +75,7 @@ class DagligReiseVilkårController(
 
         return dagligReiseVilkårService
             .oppdaterVilkår(
-                nyttVilkår = lagreVilkårDto.tilDomain(),
+                nyttVilkår = lagreVilkårDto.tilDomene(),
                 vilkårId = vilkårId,
                 behandlingId = behandlingId,
             ).tilDtoMedAktivitetType()
