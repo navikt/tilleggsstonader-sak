@@ -57,7 +57,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     fun hentVilkårGruppertPåAktivitet(behandlingId: BehandlingId): List<AktivitetMedReiser> {
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         val vilkår = hentVilkårForBehandling(behandlingId)
-        val reiserPerAktivitet = vilkår.filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>().groupBy { it.aktivitetId }
+        val reiserPerAktivitet =
+            vilkår.filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>().groupBy { it.aktivitetId }
         val paraplyvilkårPerAktivitet = vilkår.filterIsInstance<VilkårMidlertidigBosted>().groupBy { it.aktivitetId }
 
         return aktiviteter
@@ -88,7 +89,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
-        return hentVilkårMedResultatFraParent(lagretVilkår.id, behandlingId)
+        val parentVilkår = finnParent(lagretVilkår)
+        return lagretVilkår.medResultatFraParent(parentVilkår).mapTilVilkårROAH()
     }
 
     @Transactional
@@ -108,7 +110,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
         val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
-        return hentVilkårMedResultatFraParent(lagretVilkår.id, behandlingId)
+        val parentVilkår = finnParent(lagretVilkår)
+        return lagretVilkår.medResultatFraParent(parentVilkår).mapTilVilkårROAH()
     }
 
     @Transactional
@@ -170,16 +173,10 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         }
     }
 
-    /** Responsen skal vise samme resultat som [hentVilkårForBehandling], også når reisen ikke er oppfylt pga. paraplyen. */
-    private fun hentVilkårMedResultatFraParent(
-        vilkårId: VilkårId,
-        behandlingId: BehandlingId,
-    ): VilkårROAH =
-        vilkårRepository
-            .findByBehandlingId(behandlingId)
-            .medResultatFraParent()
-            .single { it.id == vilkårId }
-            .mapTilVilkårROAH()
+    private fun finnParent(vilkår: Vilkår): Vilkår? =
+        vilkår.parentVilkår?.let { parentId ->
+            vilkårRepository.findByBehandlingId(vilkår.behandlingId).singleOrNull { it.globalId == parentId }
+        }
 
     private fun hentVilkårForBehandling(
         vilkårId: VilkårId,
