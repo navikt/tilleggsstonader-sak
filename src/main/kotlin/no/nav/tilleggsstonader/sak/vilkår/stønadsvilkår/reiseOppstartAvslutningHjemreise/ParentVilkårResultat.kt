@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 
-/** Et vilkår med paraply er bare oppfylt når paraplyen er oppfylt. Mangler paraplyen, er vilkåret ikke oppfylt. */
+/** Et vilkår med paraply er bare oppfylt når paraplyen er oppfylt. */
 fun Vilkår.medResultatFraParent(parent: Vilkår?): Vilkår {
     if (parentVilkår == null) return this
 
