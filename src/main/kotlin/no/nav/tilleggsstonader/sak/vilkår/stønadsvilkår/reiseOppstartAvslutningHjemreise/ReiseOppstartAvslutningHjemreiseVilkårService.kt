@@ -85,7 +85,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerBehandling(behandling)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandlingId)
-        validerParaplyvilkår(nyttVilkår, behandlingId, vilkårId = null)
+        validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId = null)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -103,7 +103,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerBehandling(behandling)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandlingId)
-        validerParaplyvilkår(nyttVilkår, behandlingId, vilkårId)
+        validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId)
 
         val eksisterendeVilkår = hentVilkårForBehandling(vilkårId, behandlingId)
         validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
@@ -210,7 +210,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
      * globalId er ikke unik på tvers av behandlinger, så paraplyvilkåret slås alltid opp i samme behandling.
      * [vilkårId] er null når vilkåret opprettes. Feilmeldingene inneholder ingen verdier fra vilkåret.
      */
-    private fun validerParaplyvilkår(
+    private fun validerTilhørendeParaplyvilkår(
         nyttVilkår: LagreVilkårROAH,
         behandlingId: BehandlingId,
         vilkårId: VilkårId?,
