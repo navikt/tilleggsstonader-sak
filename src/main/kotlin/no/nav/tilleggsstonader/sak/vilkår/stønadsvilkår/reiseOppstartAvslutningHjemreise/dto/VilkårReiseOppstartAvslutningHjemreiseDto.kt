@@ -23,4 +23,5 @@ data class VilkårReiseOppstartAvslutningHjemreiseDto(
     val delvilkårsett: List<DelvilkårDto>,
     val fakta: FaktaReiseOppstartAvslutningHjemreiseDto,
     val slettetKommentar: String? = null,
+    val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAHDto

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOpps
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
@@ -42,6 +43,7 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
             status = this.status,
             delvilkårsett = this.delvilkårsett,
             fakta = fakta.mapTilFaktaReiseOppstartAvslutningHjemreise(),
+            parentVilkår = this.parentVilkår,
         )
 
     private fun Vilkår.mapTilMidlertidigBosted(fakta: FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted) =
@@ -85,6 +87,7 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
                     aktivitetId = this.aktivitetId,
                     typeReiseformål = this.typeReiseformål,
                 ),
+            parentVilkår = this.parentVilkår,
         )
 
     private fun VilkårMidlertidigBosted.mapTilVilkår() =
@@ -96,15 +99,16 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
                     fraAdresse = this.fraAdresse,
                     tilAdresse = this.tilAdresse,
                 ),
+            parentVilkår = null,
         )
 
     private fun VilkårROAH.tilVilkår(
         type: VilkårType,
         fakta: VilkårFakta,
+        parentVilkår: VilkårGlobalId?,
     ) = Vilkår(
         id = this.id,
         globalId = this.globalId,
-        parentVilkår = null,
         behandlingId = this.behandlingId,
         resultat = this.resultat,
         status = this.status,
@@ -116,6 +120,7 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
         opphavsvilkår = null,
         gitVersjon = Applikasjonsversjon.versjon,
         fakta = fakta,
+        parentVilkår = parentVilkår,
     )
 
     private fun FaktaROAHReise.mapTilFaktaReiseOppstartAvslutningHjemreise(): FaktaReiseOppstartAvslutningHjemreise =

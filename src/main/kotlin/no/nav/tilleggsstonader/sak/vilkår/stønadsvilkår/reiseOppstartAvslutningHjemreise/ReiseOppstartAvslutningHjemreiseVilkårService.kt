@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -47,15 +48,16 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     private val unleashService: UnleashService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårROAH> =
-        vilkårRepository
-            .findByBehandlingId(behandlingId)
+        vilkårService
+            .hentVilkår(behandlingId)
             .map { it.mapTilVilkårROAH() }
             .sortedBy { it.fom }
 
     fun hentVilkårGruppertPåAktivitet(behandlingId: BehandlingId): List<AktivitetMedReiser> {
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         val vilkår = hentVilkårForBehandling(behandlingId)
-        val reiserPerAktivitet = vilkår.filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>().groupBy { it.aktivitetId }
+        val reiserPerAktivitet =
+            vilkår.filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>().groupBy { it.aktivitetId }
         val paraplyvilkårPerAktivitet = vilkår.filterIsInstance<VilkårMidlertidigBosted>().groupBy { it.aktivitetId }
 
         return aktiviteter
@@ -82,10 +84,12 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerBehandling(behandling)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandlingId)
+        validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId = null)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
-        return lagretVilkår.mapTilVilkårROAH()
+        val parentVilkår = finnParent(lagretVilkår)
+        return lagretVilkår.medResultatFraParent(parentVilkår).mapTilVilkårROAH()
     }
 
     @Transactional
@@ -98,13 +102,15 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerBehandling(behandling)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandlingId)
+        validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId)
 
         val eksisterendeVilkår = hentVilkårForBehandling(vilkårId, behandlingId)
         validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
         val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
-        return lagretVilkår.mapTilVilkårROAH()
+        val parentVilkår = finnParent(lagretVilkår)
+        return lagretVilkår.medResultatFraParent(parentVilkår).mapTilVilkårROAH()
     }
 
     @Transactional
@@ -146,6 +152,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
                     delvilkårsett = delvilkårsett,
                     resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
                     fakta = nyttVilkår.fakta,
+                    parentVilkår = nyttVilkår.parentVilkår,
                 )
 
             is LagreVilkårMidlertidigBosted ->
@@ -164,6 +171,11 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
                 )
         }
     }
+
+    private fun finnParent(vilkår: Vilkår): Vilkår? =
+        vilkår.parentVilkår?.let { parentId ->
+            vilkårRepository.findByBehandlingId(vilkår.behandlingId).singleOrNull { it.globalId == parentId }
+        }
 
     private fun hentVilkårForBehandling(
         vilkårId: VilkårId,
@@ -189,6 +201,35 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val erNyttVilkårParaplyvilkår = nyttVilkår is LagreVilkårMidlertidigBosted
         feilHvis(erEksisterendeVilkårParaplyvilkår != erNyttVilkårParaplyvilkår) {
             "Kan ikke endre mellom reise og paraplyvilkår"
+        }
+    }
+
+    /**
+     * En reise kan høre til et paraplyvilkår (midlertidig bosted), referert med paraplyvilkårets globalId.
+     * globalId er ikke unik på tvers av behandlinger, så paraplyvilkåret slås alltid opp i samme behandling.
+     * [vilkårId] er null når vilkåret opprettes. Feilmeldingene inneholder ingen verdier fra vilkåret.
+     */
+    private fun validerTilhørendeParaplyvilkår(
+        nyttVilkår: LagreVilkårROAH,
+        behandlingId: BehandlingId,
+        vilkårId: VilkårId?,
+    ) {
+        val parentVilkårGlobalId = (nyttVilkår as? LagreVilkårReiseOppstartAvslutningHjemreise)?.parentVilkår ?: return
+
+        val parentVilkår =
+            vilkårRepository
+                .findByBehandlingId(behandlingId)
+                .singleOrNull { it.globalId == parentVilkårGlobalId }
+        feilHvis(parentVilkår == null) { "Paraplyvilkåret finnes ikke i behandlingen" }
+        feilHvis(parentVilkår.id == vilkårId) { "Et vilkår kan ikke referere til seg selv" }
+        feilHvis(parentVilkår.status == VilkårStatus.SLETTET) { "Paraplyvilkåret er slettet" }
+        feilHvis(parentVilkår.type != VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE) {
+            "Referansen peker ikke på et paraplyvilkår"
+        }
+
+        val parentAktivitetId = (parentVilkår.fakta as? FaktaROAH)?.aktivitetId
+        feilHvis(parentAktivitetId != nyttVilkår.aktivitetId) {
+            "Reisen må høre til samme aktivitet som paraplyvilkåret"
         }
     }
 
