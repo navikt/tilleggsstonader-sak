@@ -218,20 +218,6 @@ class SkjemaRoutingService(
         return antall >= maksAntall
     }
 
-    private fun erMaksAntallNåddForTsr(
-        skjematype: Skjematype,
-        toggleId: ToggleId,
-    ): Boolean {
-        val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
-        val antall =
-            routingRepository.countByTypeAndDetaljerContains(
-                skjematype,
-                detaljer = jsonMapper.writeValueAsString(mapOf("harAktivTsrMålgruppe" to true)),
-            )
-        logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall (kun harAktivTsrMålgruppe)")
-        return antall >= maksAntall
-    }
-
     private fun harAktivtVedtakIArena(
         skjematype: Skjematype,
         ident: String,
