@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -15,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
@@ -40,7 +38,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -125,37 +122,6 @@ class UtledTidligsteEndringServiceTest {
             )
 
         assertThat(utleder.utledTidligsteEndring()).isNull()
-    }
-
-    @Test
-    fun `uhåndterte faktakombinasjoner kaster feil med begge faktatypene`() {
-        val fakta = FaktaDagligReiseUbestemt(reiseId = ReiseId.random(), adresse = null)
-        val original = vilkår(fom = 1 januar 2026, tom = 31 januar 2026, fakta = fakta)
-
-        listOf(
-            fakta to fakta,
-            fakta to null,
-            null to fakta,
-        ).forEach { (faktaNå, faktaTidligere) ->
-            val utleder =
-                TidligsteEndringIBehandlingUtleder(
-                    vilkår = listOf(original.copy(fakta = faktaNå)),
-                    vilkårTidligereBehandling = listOf(original.copy(fakta = faktaTidligere)),
-                    vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
-                    vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
-                    vedtaksperioder = emptyList(),
-                    vedtaksperioderTidligereBehandling = emptyList(),
-                    barnIdTilIdentMap = emptyMap(),
-                )
-
-            assertThatThrownBy { utleder.utledTidligsteEndring() }
-                .isInstanceOf(Feil::class.java)
-                .hasMessage(
-                    "Mangler sammenligning av vilkårsfakta: " +
-                        "nå=${if (faktaNå == null) "null" else "FaktaDagligReiseUbestemt"}, " +
-                        "tidligere=${if (faktaTidligere == null) "null" else "FaktaDagligReiseUbestemt"}",
-                )
-        }
     }
 
     @Test

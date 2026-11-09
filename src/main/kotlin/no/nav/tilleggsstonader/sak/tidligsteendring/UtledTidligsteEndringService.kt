@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.førstePeriodeEtter
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -16,10 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -276,21 +271,6 @@ data class TidligsteEndringIBehandlingUtleder(
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
         when {
-            vilkårNå.fakta == null && vilkårTidligereBehandling.fakta == null -> false
-
-            vilkårNå.fakta is FlyttingVilkårFakta || vilkårTidligereBehandling.fakta is FlyttingVilkårFakta ->
-                vilkårNå.fakta != vilkårTidligereBehandling.fakta
-
-            vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
-                vilkårTidligereBehandling.fakta is FaktaDagligReisePrivatBil -> {
-                true
-            }
-
-            vilkårNå.fakta is FaktaDagligReisePrivatBil &&
-                vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
-                true
-            }
-
             vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
                 vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
                 val faktaNå = vilkårNå.fakta
@@ -316,50 +296,8 @@ data class TidligsteEndringIBehandlingUtleder(
                     normaliserPrivatBilDelperioder(faktaTidligere, sammenligningsFom, sammenligningsTom)
             }
 
-            vilkårNå.fakta is FaktaReiseTilSamlingOffentligTransport &&
-                (
-                    vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil ||
-                        vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingDrosje
-                ) -> {
-                true
-            }
-
-            vilkårNå.fakta is FaktaReiseTilSamlingPrivatBil &&
-                (
-                    vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport ||
-                        vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingDrosje
-                ) -> {
-                true
-            }
-
-            vilkårNå.fakta is FaktaReiseTilSamlingDrosje &&
-                (
-                    vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport ||
-                        vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil
-                ) -> {
-                true
-            }
-
-            vilkårNå.fakta is FaktaReiseTilSamlingOffentligTransport &&
-                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport -> {
-                vilkårNå.fakta != vilkårTidligereBehandling.fakta
-            }
-
-            vilkårNå.fakta is FaktaReiseTilSamlingPrivatBil &&
-                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil -> {
-                vilkårNå.fakta != vilkårTidligereBehandling.fakta
-            }
-            vilkårNå.fakta is FaktaReiseTilSamlingDrosje &&
-                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingDrosje -> {
-                vilkårNå.fakta != vilkårTidligereBehandling.fakta
-            }
-
             else -> {
-                feil(
-                    "Mangler sammenligning av vilkårsfakta: " +
-                        "nå=${vilkårNå.fakta?.javaClass?.simpleName}, " +
-                        "tidligere=${vilkårTidligereBehandling.fakta?.javaClass?.simpleName}",
-                )
+                vilkårNå.fakta != vilkårTidligereBehandling.fakta
             }
         }
 
