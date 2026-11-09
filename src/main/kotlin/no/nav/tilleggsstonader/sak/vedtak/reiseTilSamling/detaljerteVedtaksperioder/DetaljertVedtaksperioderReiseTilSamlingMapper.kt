@@ -24,6 +24,14 @@ object DetaljertVedtaksperioderReiseTilSamlingMapper {
                         tom = resultat.grunnlag.tom,
                         beløp = resultat.beløp,
                     )
+                } +
+                beregningsresultat.drosje.map { resultat ->
+                    DetaljertVedtaksperiodeReiseTilSamling(
+                        stønadstype = stønadstype,
+                        fom = resultat.grunnlag.fom,
+                        tom = resultat.grunnlag.tom,
+                        beløp = resultat.beløp,
+                    )
                 }
         ).sortedBy { it.fom }
             .mergeSammenhengende(

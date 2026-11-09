@@ -17,6 +17,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DokumenterteUt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -30,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
@@ -37,6 +41,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.LocalDate
 
 class UtledTidligsteEndringServiceTest {
@@ -101,6 +106,160 @@ class UtledTidligsteEndringServiceTest {
             listOf(
                 vedtaksperiode(originalFom, originalTom),
             )
+    }
+
+    @Test
+    fun `vilkår uten fakta i begge behandlinger er uendret`() {
+        val original = vilkår(fom = 1 januar 2026, tom = 31 januar 2026, fakta = null)
+        val utleder =
+            TidligsteEndringIBehandlingUtleder(
+                vilkår = listOf(original),
+                vilkårTidligereBehandling = listOf(original),
+                vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
+                vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
+                vedtaksperioder = emptyList(),
+                vedtaksperioderTidligereBehandling = emptyList(),
+                barnIdTilIdentMap = emptyMap(),
+            )
+
+        assertThat(utleder.utledTidligsteEndring()).isNull()
+    }
+
+    @Test
+    fun `drosje til samling oppdager endringer i fakta og gir ingen endring for like fakta`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+        val fakta =
+            FaktaReiseTilSamlingDrosje(
+                reiseId = ReiseId.random(),
+                adresse = "Syntetisk adresse",
+                nødvendigUtgift = nødvendigUtgift,
+                utgifterDrosje = BigDecimal(1000),
+                begrunnelse = "Behov for drosje",
+                aktivitetId = VilkårperiodeGlobalId.random(),
+            )
+        val original =
+            vilkår(
+                fom = fom,
+                tom = tom,
+                type = VilkårType.REISE_TIL_SAMLING,
+                fakta = fakta,
+            )
+        val utleder =
+            TidligsteEndringIBehandlingUtleder(
+                vilkår = listOf(original.copy(fakta = fakta.copy())),
+                vilkårTidligereBehandling = listOf(original),
+                vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
+                vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
+                vedtaksperioder = emptyList(),
+                vedtaksperioderTidligereBehandling = emptyList(),
+                barnIdTilIdentMap = emptyMap(),
+            )
+
+        assertThat(utleder.utledTidligsteEndring()).isNull()
+
+        listOf(
+            fakta.copy(reiseId = ReiseId.random()),
+            fakta.copy(adresse = "Ny syntetisk adresse"),
+            fakta.copy(nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Utgiften er ikke nødvendig")),
+            fakta.copy(utgifterDrosje = BigDecimal(2000)),
+            fakta.copy(begrunnelse = "Endret behov for drosje"),
+            fakta.copy(aktivitetId = VilkårperiodeGlobalId.random()),
+        ).forEach { endret ->
+            assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
+                .describedAs("Endret drosjefakta: %s", endret)
+                .isEqualTo(fom)
+        }
+    }
+
+    @Test
+    fun `offentlig transport til samling oppdager endringer i fakta og gir ingen endring for like fakta`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+        val fakta =
+            FaktaReiseTilSamlingOffentligTransport(
+                reiseId = ReiseId.random(),
+                adresse = "Syntetisk adresse",
+                nødvendigUtgift = nødvendigUtgift,
+                utgifterOffentligTransport = BigDecimal(1000),
+                begrunnelse = "Utgifter til offentlig transport",
+                aktivitetId = VilkårperiodeGlobalId.random(),
+            )
+        val original = vilkår(fom = fom, tom = tom, type = VilkårType.REISE_TIL_SAMLING, fakta = fakta)
+        val utleder =
+            TidligsteEndringIBehandlingUtleder(
+                vilkår = listOf(original.copy(fakta = fakta.copy())),
+                vilkårTidligereBehandling = listOf(original),
+                vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
+                vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
+                vedtaksperioder = emptyList(),
+                vedtaksperioderTidligereBehandling = emptyList(),
+                barnIdTilIdentMap = emptyMap(),
+            )
+
+        assertThat(utleder.utledTidligsteEndring()).isNull()
+
+        listOf(
+            fakta.copy(reiseId = ReiseId.random()),
+            fakta.copy(adresse = "Ny syntetisk adresse"),
+            fakta.copy(nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Utgiften er ikke nødvendig")),
+            fakta.copy(utgifterOffentligTransport = BigDecimal(2000)),
+            fakta.copy(begrunnelse = "Endrede utgifter til offentlig transport"),
+            fakta.copy(aktivitetId = VilkårperiodeGlobalId.random()),
+        ).forEach { endret ->
+            assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
+                .describedAs("Endret fakta for offentlig transport: %s", endret)
+                .isEqualTo(fom)
+        }
+    }
+
+    @Test
+    fun `privat bil til samling oppdager endringer i fakta og gir ingen endring for like fakta`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+        val fakta =
+            FaktaReiseTilSamlingPrivatBil(
+                reiseId = ReiseId.random(),
+                adresse = "Syntetisk adresse",
+                nødvendigUtgift = nødvendigUtgift,
+                reiseavstand = BigDecimal(100),
+                begrunnelse = "Utgifter til privat bil",
+                aktivitetId = VilkårperiodeGlobalId.random(),
+                bompenger = BigDecimal(50),
+                fergekostnad = BigDecimal(100),
+                parkering = BigDecimal(200),
+                piggdekkavgift = BigDecimal(30),
+            )
+        val original = vilkår(fom = fom, tom = tom, type = VilkårType.REISE_TIL_SAMLING, fakta = fakta)
+        val utleder =
+            TidligsteEndringIBehandlingUtleder(
+                vilkår = listOf(original.copy(fakta = fakta.copy())),
+                vilkårTidligereBehandling = listOf(original),
+                vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
+                vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
+                vedtaksperioder = emptyList(),
+                vedtaksperioderTidligereBehandling = emptyList(),
+                barnIdTilIdentMap = emptyMap(),
+            )
+
+        assertThat(utleder.utledTidligsteEndring()).isNull()
+
+        listOf(
+            fakta.copy(reiseId = ReiseId.random()),
+            fakta.copy(adresse = "Ny syntetisk adresse"),
+            fakta.copy(nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Utgiften er ikke nødvendig")),
+            fakta.copy(reiseavstand = BigDecimal(200)),
+            fakta.copy(begrunnelse = "Endrede utgifter til privat bil"),
+            fakta.copy(aktivitetId = VilkårperiodeGlobalId.random()),
+            fakta.copy(bompenger = BigDecimal(150)),
+            fakta.copy(fergekostnad = BigDecimal(200)),
+            fakta.copy(parkering = BigDecimal(300)),
+            fakta.copy(piggdekkavgift = BigDecimal(60)),
+        ).forEach { endret ->
+            assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
+                .describedAs("Endret fakta for privat bil: %s", endret)
+                .isEqualTo(fom)
+        }
     }
 
     @Test

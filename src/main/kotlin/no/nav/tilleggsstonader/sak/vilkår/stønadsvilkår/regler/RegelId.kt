@@ -43,6 +43,8 @@ enum class RegelId(
     ER_SAMLING_OBLIGATORISK("Er samlingen obligatorisk?"),
     KAN_REISE_MED_EGEN_BIL("Kan bruker benytte privat bil?"),
     DOKUMENTERTE_UTGIFTER("Har bruker dokumenterte utgifter til reise?"),
+    KAN_REISE_MED_DROSJE("Kan bruker benytte seg av drosje?"),
+    HAR_DOKUMENTERTE_UTGIFTER_TIL_DROSJE("Har bruker dokumenterte utgifter til drosje?"),
 
     // REISE OPPSTART, AVSLUTNING OG HJEMREISE
     ROAH_HAR_UTGIFTER_TIL_REISEN("Har bruker utgifter til reisen?"),

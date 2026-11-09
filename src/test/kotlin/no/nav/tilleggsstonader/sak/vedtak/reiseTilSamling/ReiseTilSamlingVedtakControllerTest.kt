@@ -85,6 +85,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
                             ),
                         ),
                     privatBil = null,
+                    drosje = null,
                     beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 ),
             gjelderFraOgMed = fom,
