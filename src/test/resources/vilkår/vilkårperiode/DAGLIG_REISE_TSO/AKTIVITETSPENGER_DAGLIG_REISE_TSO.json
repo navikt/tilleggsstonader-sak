@@ -2,12 +2,9 @@
   "fakta": { },
   "type": "AKTIVITETSPENGER_DAGLIG_REISE_TSO",
   "vurderinger": {
-    "aldersvilkår": {
+    "dekketAvAnnetRegelverk": {
       "resultat": "OPPFYLT",
-      "svar": "JA",
-      "vurderingFaktaEtterlevelse": {
-        "fødselsdato": "2000-01-01"
-      }
+      "svar": "NEI"
     }
   }
 }

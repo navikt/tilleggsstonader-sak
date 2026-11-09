@@ -60,6 +60,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
@@ -450,14 +451,14 @@ class InterntVedtakService(
             is FaktaFlyttebyrå ->
                 VilkårFaktaFlyttebyråInterntVedtak(
                     tilbud = fakta.tilbud,
-                    erUtgifterDokumentert = fakta.erUtgifterDokumentert,
+                    dokumenterteUtgifter = fakta.dokumenterteUtgifter,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     adresse = fakta.adresse,
                 )
 
             is FaktaFlytteSelv ->
                 VilkårFaktaFlytteSelvInterntVedtak(
-                    erUtgifterDokumentert = fakta.erUtgifterDokumentert,
+                    dokumenterteUtgifter = fakta.dokumenterteUtgifter,
                     avstandEnVei = fakta.avstandEnVei,
                     henger = fakta.henger,
                     leiebil = fakta.leiebil,
@@ -527,6 +528,7 @@ class InterntVedtakService(
             is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport -> TODO()
             is FaktaReiseOppstartAvslutningHjemreisePrivatBil -> TODO()
             is FaktaReiseOppstartAvslutningHjemreiseUbestemt -> TODO()
+            is FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted -> TODO()
 
             null -> null
         }

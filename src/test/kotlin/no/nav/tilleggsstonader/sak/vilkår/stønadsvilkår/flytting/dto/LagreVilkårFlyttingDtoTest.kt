@@ -49,7 +49,7 @@ class LagreVilkårFlyttingDtoTest {
                   "type": "FLYTTING_FLYTTEBYRÅ",
                   "tilbud": [{"navn": "Flyttebyrå A"}, {}],
                   "adresse": "Flytteveien 1",
-                  "erUtgifterDokumentert": false,
+                  "dokumenterteUtgifter": {"erUtgifterDokumentert": "NEI"},
                   "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}
                 }
                 """.trimIndent(),
@@ -63,7 +63,7 @@ class LagreVilkårFlyttingDtoTest {
                         FlyttebyråTilbudDto(),
                     ),
                 adresse = "Flytteveien 1",
-                erUtgifterDokumentert = false,
+                dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI),
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
@@ -73,11 +73,15 @@ class LagreVilkårFlyttingDtoTest {
     fun `skal deserialisere egen kjøring uten avstand og kostnader`() {
         val fakta =
             jsonMapper.readValue<FaktaFlyttingDto>(
-                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "erUtgifterDokumentert": true, "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
+                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "dokumenterteUtgifter": {"erUtgifterDokumentert": "JA", "begrunnelse": "Kvittering fra flyttebyrå"}, "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
             )
 
         assertThat(fakta).isEqualTo(
-            FaktaFlytteSelvDto(erUtgifterDokumentert = true, adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
+            FaktaFlytteSelvDto(
+                dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                adresse = "Flytteveien 1",
+                nødvendigUtgift = nødvendigUtgiftDto,
+            ),
         )
     }
 

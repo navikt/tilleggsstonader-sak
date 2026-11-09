@@ -82,7 +82,9 @@ object SøknadsskjemaUtil {
                 data,
             )
         return InnsendtSkjema(
-            ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
+            ident =
+                skjema.data.data.dineOpplysninger.identitet
+                    ?.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
             språk = mapFyllUtSpråk(skjema.language),
             skjema = skjema,

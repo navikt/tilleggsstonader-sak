@@ -13,7 +13,6 @@ sealed interface RoutingStrategi {
         val kreverAktivtAapVedtak: Boolean,
         val kreverUgradertAdresse: Boolean,
         val alleMedAAPVedtakTilNyLøsning: Boolean,
-        val featureToggleMaksAntallForPrivatBil: ToggleId?,
     ) : RoutingStrategi
 
     data object DagligReise : RoutingStrategi

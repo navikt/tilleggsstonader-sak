@@ -26,7 +26,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHTypeReise
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -63,6 +65,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
 import java.util.UUID
@@ -354,8 +357,39 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(journalhendelseTasks.single().status).isNotEqualTo(Status.FERDIG)
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `flyttingsøknad skal rutes etter arbeidssøkertreff i registeret`(harArbeidssøkerperiode: Boolean) {
+        val flyttedato = 1 mars 2026
+        mockYtelserForFlytting(
+            if (harArbeidssøkerperiode) {
+                listOf(YtelsePeriode.Arbeidssøker(fom = flyttedato.minusDays(60), tom = flyttedato))
+            } else {
+                emptyList()
+            },
+        )
+        val hendelse = journalfoeringHendelseRecord()
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        mockJournalpost(brevkode = DokumentBrevkode.FLYTTING, søknad = søknadFlytting(ident = ident))
+
+        kjørTasksKlareForProsessering()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            if (harArbeidssøkerperiode) Stønadstype.FLYTTING_TSR else Stønadstype.FLYTTING_TSO,
+            journalpostId.toString(),
+        )
+        val tasks = taskService.finnAlleTaskerMedType(JournalhendelseKafkaHåndtererTask.TYPE)
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks.single().status).isEqualTo(Status.FERDIG)
+    }
+
     @Test
     fun `mottar flytting-søknad fra kafka, journalføres og oppretter sak`() {
+        mockYtelserForFlytting(ytelsePerioderDtoAAP().perioder)
         val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
@@ -539,6 +573,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     @ParameterizedTest
     @EnumSource(Flyttemåte::class)
     fun `flyttesøknad fra journalhendelse bevarer alle opplysninger til fakta-api`(flyttemåte: Flyttemåte) {
+        mockYtelserForFlytting(ytelsePerioderDtoAAP().perioder)
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
         val søknad = søknadFlytting(ident = ident, flyttemåte = flyttemåte, medDokumentasjon = true)
         val vedlegg =
@@ -687,6 +722,18 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         this.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
         this.temaNytt = tema.name
         this.hendelsesId = UUID.randomUUID().toString()
+    }
+
+    private fun mockYtelserForFlytting(perioder: List<YtelsePeriode>) {
+        every { ytelseClient.hentYtelser(any()) } answers {
+            val request = firstArg<YtelsePerioderRequest>()
+            YtelsePerioderDto(
+                perioder = perioder.filter { it.type in request.typer },
+                kildeResultat = request.typer.map { YtelsePerioderDto.KildeResultatYtelse(it, ResultatKilde.OK) },
+                perioderHentetFom = request.fom,
+                perioderHentetTom = request.tom,
+            )
+        }
     }
 
     private fun mockJournalpost(

@@ -178,7 +178,7 @@ object VilkårperiodeTestUtil {
 
             MålgruppeType.AKTIVITETSPENGER ->
                 AktivitetspengerPassAvBarn(
-                    vurderinger = VurderingAktivitetspenger(aldersvilkår = aldersvilkår),
+                    vurderinger = VurderingAktivitetspenger(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
                 )
 
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
@@ -242,7 +242,7 @@ object VilkårperiodeTestUtil {
 
             MålgruppeType.AKTIVITETSPENGER ->
                 AktivitetspengerLæremidler(
-                    vurderinger = VurderingAktivitetspenger(aldersvilkår = aldersvilkår),
+                    vurderinger = VurderingAktivitetspenger(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
                 )
 
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
@@ -256,6 +256,7 @@ object VilkårperiodeTestUtil {
         FaktaOgSvarMålgruppeDto(
             svarMedlemskap = null,
             svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
+            svarLønnet = SvarJaNei.NEI,
         )
 
     fun aktivitet(

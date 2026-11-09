@@ -68,6 +68,25 @@ internal class VilkårTest {
     }
 
     @Test
+    fun `kopiering til ny behandling beholder globalId og parentVilkår, men får ny id`() {
+        val parentVilkår = VilkårGlobalId.random()
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingIdFørstegangsbehandling,
+                delvilkår = emptyList(),
+                type = VilkårType.EKSEMPEL,
+                status = VilkårStatus.NY,
+            ).copy(parentVilkår = parentVilkår)
+
+        val kopi = vilkår.kopierTilBehandling(behandlingIdRevurdering, BarnId.random())
+
+        assertThat(kopi.globalId).isEqualTo(vilkår.globalId)
+        assertThat(kopi.parentVilkår).isEqualTo(parentVilkår)
+        assertThat(kopi.id).isNotEqualTo(vilkår.id)
+        assertThat(kopi.behandlingId).isEqualTo(behandlingIdRevurdering)
+    }
+
+    @Test
     fun `skal feile dersom FOM fra vilkår ikke er første dagen i måneden`() {
         assertThatThrownBy {
             vilkår(

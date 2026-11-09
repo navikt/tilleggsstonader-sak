@@ -63,10 +63,14 @@
   "målgrupper": [ {
     "begrunnelse": "Målgruppen er dokumentert.",
     "faktaOgVurderinger": {
-      "@type": "MÅLGRUPPE",
+      "@type": "MÅLGRUPPE_FLYTTING_TSO",
       "aldersvilkår": {
         "resultat": "OPPFYLT",
         "svar": "JA"
+      },
+      "lønnet": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
       },
       "medlemskap": {
         "resultat": "OPPFYLT",
@@ -126,7 +130,10 @@
     } ],
     "fakta": {
       "adresse": "Flytteveien 1, 1234 Oslo",
-      "erUtgifterDokumentert": true,
+      "dokumenterteUtgifter": {
+        "begrunnelse": "Kvittering fra flyttebyrå",
+        "erUtgifterDokumentert": "JA"
+      },
       "nødvendigUtgift": {
         "begrunnelse": null,
         "erUtgiftenNødvendig": "JA"
@@ -173,7 +180,10 @@
       "annet": null,
       "avstandEnVei": 100,
       "bompenger": 300,
-      "erUtgifterDokumentert": true,
+      "dokumenterteUtgifter": {
+        "begrunnelse": "Kvittering fra flyttebyrå",
+        "erUtgifterDokumentert": "JA"
+      },
       "ferge": 400,
       "henger": 200,
       "leiebil": null,

@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeG
 import java.time.LocalDate
 
 /**
- * Grupperer stønadsvilkår ("reiser") for reise oppstart/avslutning/hjemreise per aktivitet fra inngangsvilkår.
+ * Grupperer stønadsvilkår for reise oppstart/avslutning/hjemreise per aktivitet fra inngangsvilkår, delt i reiser og paraplyvilkår.
  * Inneholder alle aktiviteter for behandlingen, uavhengig av om det finnes reiser knyttet til dem ennå.
  */
 data class AktivitetMedReiser(
@@ -16,4 +16,5 @@ data class AktivitetMedReiser(
     val fom: LocalDate,
     val tom: LocalDate,
     val reiser: List<VilkårReiseOppstartAvslutningHjemreise>,
+    val paraplyvilkår: List<VilkårMidlertidigBosted>,
 )

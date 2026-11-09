@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.UtgifterOvernattingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.HjemreiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.MidlertidigBostedPeriodeRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.OppstartAvslutningRegel
 
 /**
@@ -51,7 +52,7 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         -> listOf(FlyttingRegel())
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-        -> listOf(OppstartAvslutningRegel(), HjemreiseRegel())
+        -> listOf(OppstartAvslutningRegel(), HjemreiseRegel(), MidlertidigBostedPeriodeRegel())
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =

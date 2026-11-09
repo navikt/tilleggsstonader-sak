@@ -35,6 +35,7 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
                         ?.mottarSykepengerForFulltidsstilling
                         ?.svar,
+                svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
             )
 
         is AktivitetFaktaOgVurdering -> {

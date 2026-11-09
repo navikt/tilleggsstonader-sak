@@ -9,14 +9,11 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserRegisterDtoMapper.tilDto
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.filtrerAktivitetspengerHvisDeaktivert
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.finnRelevanteYtelsesTyper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -26,7 +23,6 @@ class YtelseService(
     private val fagsakPersonService: FagsakPersonService,
     private val ytelseClient: YtelseClient,
     private val behandlingService: BehandlingService,
-    private val unleashService: UnleashService,
 ) {
     fun hentYtelser(fagsakPersonId: FagsakPersonId): YtelserRegisterDto {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
@@ -39,7 +35,7 @@ class YtelseService(
                 TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
                 TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                 TypeYtelsePeriode.AKTIVITETSPENGER,
-            ).filtrerAktivitetspengerHvisDeaktivert()
+            )
 
         return ytelseClient
             .hentYtelser(
@@ -161,12 +157,9 @@ class YtelseService(
         tom: LocalDate,
     ): YtelsePerioderDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype).filtrerAktivitetspengerHvisDeaktivert()
+        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
         return hentYtelser(behandling.ident, fom, tom, typer)
     }
-
-    private fun List<TypeYtelsePeriode>.filtrerAktivitetspengerHvisDeaktivert(): List<TypeYtelsePeriode> =
-        filtrerAktivitetspengerHvisDeaktivert(unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER))
 
     fun hentYtelser(
         ident: String,

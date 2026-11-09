@@ -110,6 +110,7 @@ data class RegisterAktivitet(
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.Omstillingsstønad::class, name = "OMSTILLINGSSTØNAD"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.TiltakspengerTPSak::class, name = "TILTAKSPENGER_TPSAK"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.TiltakspengerArena::class, name = "TILTAKSPENGER_ARENA"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.Arbeidssøker::class, name = "ARBEIDSSØKER"),
 )
 sealed interface PeriodeGrunnlagYtelse {
     val fom: LocalDate
@@ -124,6 +125,7 @@ sealed interface PeriodeGrunnlagYtelse {
                 is TiltakspengerArena -> TypeYtelsePeriode.TILTAKSPENGER_ARENA
                 is TiltakspengerTPSak -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
                 is Aktivitetspenger -> TypeYtelsePeriode.AKTIVITETSPENGER
+                is Arbeidssøker -> TypeYtelsePeriode.ARBEIDSSØKER
             }
 
     data class AAP(
@@ -171,6 +173,11 @@ sealed interface PeriodeGrunnlagYtelse {
     ) : PeriodeGrunnlagYtelse
 
     data class Aktivitetspenger(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+    ) : PeriodeGrunnlagYtelse
+
+    data class Arbeidssøker(
         override val fom: LocalDate,
         override val tom: LocalDate?,
     ) : PeriodeGrunnlagYtelse

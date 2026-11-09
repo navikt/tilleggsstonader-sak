@@ -15,8 +15,8 @@ sealed interface AldersvilkårVurdering : VurderingerMålgruppe {
 }
 
 data class VurderingAktivitetspenger(
-    override val aldersvilkår: VurderingAldersVilkår,
-) : AldersvilkårVurdering
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+) : DekketAvAnnetRegelverkVurdering
 
 sealed interface MottarSykepengerForFulltidsstillingVurdering : VurderingerMålgruppe {
     val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling

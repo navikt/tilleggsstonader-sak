@@ -13,13 +13,17 @@
       "resultat": "OPPFYLT",
       "svar": "NEI"
     },
+    "lønnet": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    },
     "medlemskap": {
       "resultat": "OPPFYLT",
-      "svar": "JA"
+      "svar": "JA_IMPLISITT"
     },
     "mottarSykepengerForFulltidsstilling": {
       "resultat": "OPPFYLT",
-      "svar": "NEI"
+      "svar": "NEI_IMPLISITT"
     }
   }
 }
