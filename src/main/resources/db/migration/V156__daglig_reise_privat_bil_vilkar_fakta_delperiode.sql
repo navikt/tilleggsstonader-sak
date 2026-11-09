@@ -16,7 +16,10 @@ SET fakta = jsonb_set(
         )
             )::json
 WHERE fakta IS NOT NULL
-  AND fakta::jsonb ? 'faktaDelperioder';
+  AND fakta::jsonb ? 'faktaDelperioder'
+  AND jsonb_array_length(
+        NULLIF(fakta::jsonb -> 'faktaDelperioder', 'null'::jsonb)
+      ) > 0;
 
 
 UPDATE vedtak
@@ -48,4 +51,7 @@ SET data = (
                    )
            )::json
 )
-WHERE data::jsonb->'rammevedtakPrivatBil' IS NOT NULL;
+WHERE data::jsonb->'rammevedtakPrivatBil' IS NOT NULL
+  AND jsonb_array_length(
+        NULLIF(data::jsonb -> 'rammevedtakPrivatBil' -> 'reiser', 'null'::jsonb)
+      ) > 0;
