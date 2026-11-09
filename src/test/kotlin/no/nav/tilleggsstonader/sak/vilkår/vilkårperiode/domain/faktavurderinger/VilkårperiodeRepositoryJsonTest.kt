@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -17,10 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
-import tools.jackson.module.kotlin.convertValue
-import tools.jackson.module.kotlin.readValue
 import java.io.File
-import java.time.LocalDate
 import java.util.UUID
 
 class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
@@ -37,16 +35,16 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
     @ParameterizedTest
     @MethodSource("jsonFilProvider")
     fun `sjekk at deserialisering av json fungerer som forventet`(fil: FaktaVurderingerJsonFilesUtil.JsonFil) {
-        val json = FileUtil.readFile(fil.fullPath())
-        val id = UUID.randomUUID()
+        val forventet = FaktaVurderingRepositoryTestdata.forType(fil.typeFaktaOgVurdering())
+        val json = jsonMapper.writeValueAsString(forventet)
+        val id = UUID.nameUUIDFromBytes(fil.fullPath().toByteArray())
 
         opprettVilkårperiode(id, fil.typeVilkårperiode(), json)
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
-        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(vilkårperiode.faktaOgVurdering).toSortedMap()
-        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toSortedMap()
 
         assertThat(vilkårperiode.faktaOgVurdering).isInstanceOf(forventetType(fil.typeFaktaOgVurdering()))
-        assertThat(jsonFraFil).isEqualTo(jsonFraObj)
+        assertThat(vilkårperiode.faktaOgVurdering).isEqualTo(forventet)
+        FileUtil.assertFileJsonIsEqual(fil.fullPath(), vilkårperiode.faktaOgVurdering)
     }
 
     /**
@@ -79,13 +77,13 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             insertQuery.trimIndent(),
             mapOf(
                 "id" to id,
-                "globalId" to UUID.randomUUID(),
+                "globalId" to UUID.nameUUIDFromBytes("global-$id".toByteArray()),
                 "behandlingId" to behandling.id.id,
                 "forrigeVilkårperiodeId" to null,
                 "type" to type.tilDbType(),
                 "tiltaksvariant" to "GRUPPEAMO",
-                "fom" to LocalDate.now(),
-                "tom" to LocalDate.now(),
+                "fom" to (1 januar 2025),
+                "tom" to (31 januar 2025),
                 "faktaOgVurdering" to json,
                 "begrunnelse" to "begrunnelse",
                 "resultat" to "OPPFYLT",

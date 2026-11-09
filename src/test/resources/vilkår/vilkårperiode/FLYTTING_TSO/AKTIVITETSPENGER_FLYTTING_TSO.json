@@ -2,6 +2,10 @@
   "fakta": { },
   "type": "AKTIVITETSPENGER_FLYTTING_TSO",
   "vurderinger": {
+    "dekketAvAnnetRegelverk": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    },
     "lønnet": {
       "resultat": "OPPFYLT",
       "svar": "NEI"

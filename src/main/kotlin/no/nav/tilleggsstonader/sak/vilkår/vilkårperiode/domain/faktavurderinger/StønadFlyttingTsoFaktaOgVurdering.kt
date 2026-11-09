@@ -115,8 +115,10 @@ data class VurderingNedsattArbeidsevneFlyttingTso(
     LønnetVurdering
 
 data class VurderingAktivitetspengerFlyttingTso(
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
     override val lønnet: VurderingLønnet,
-) : LønnetVurdering
+) : LønnetVurdering,
+    DekketAvAnnetRegelverkVurdering
 
 sealed interface TypeFaktaOgVurderingFlyttingTso : TypeFaktaOgVurdering
 
