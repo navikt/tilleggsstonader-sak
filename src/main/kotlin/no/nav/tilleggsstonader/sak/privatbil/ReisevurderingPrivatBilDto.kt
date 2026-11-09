@@ -32,6 +32,7 @@ data class UkeVurderingDto(
     val avklartUkeId: UUID?,
     val avklartKjørtUkeStatus: AvklartKjørtUkeStatus?, // null hvis avklartKjørtUke ikke finnes
     val dager: List<DagDto>,
+    val skalBehandlesManuelt: Boolean?,
 )
 
 data class DagDto(

@@ -44,6 +44,8 @@ class OverskridAntallDagerIRammevedtakIntegrationTest : IntegrationTest() {
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                         ),
                 )
