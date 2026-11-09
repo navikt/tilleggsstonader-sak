@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.toDeepSortedMap
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaVurderingerJsonFilesUtil.tilTypeFaktaOgVurderingSuffix
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
-import tools.jackson.module.kotlin.convertValue
-import tools.jackson.module.kotlin.readValue
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -38,16 +35,15 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
     @ParameterizedTest
     @MethodSource("jsonFilProvider")
     fun `sjekk at deserialisering av json fungerer som forventet`(fil: VedtaksdataFilesUtil.JsonFil) {
-        val json = FileUtil.readFile(fil.fullPath())
+        val forventet = VedtaksdataRepositoryTestdata.forType(fil.typeVedtaksdata())
+        val json = jsonMapper.writeValueAsString(forventet)
 
-        opprettVedtak(fil.typeVedtaksdata().typeVedtak, json)
+        opprettVedtak(forventet.type.typeVedtak, json)
         val vedtak = repository.findByIdOrThrow(behandling.id)
-        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(vedtak.data).toDeepSortedMap()
-        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toDeepSortedMap()
 
         assertThat(vedtak.data).isInstanceOf(forventetType(fil.typeVedtaksdata()))
-        assertThat(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraObj))
-            .isEqualTo(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraFil))
+        assertThat(vedtak.data).isEqualTo(forventet)
+        FileUtil.assertFileJsonIsEqual(fil.fullPath(), vedtak.data)
     }
 
     @Disabled

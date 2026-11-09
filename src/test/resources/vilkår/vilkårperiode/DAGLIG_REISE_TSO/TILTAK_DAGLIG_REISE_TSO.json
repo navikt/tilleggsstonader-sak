@@ -5,8 +5,8 @@
   "type": "TILTAK_DAGLIG_REISE_TSO",
   "vurderinger": {
     "harUtgifter": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
+      "resultat": "IKKE_VURDERT",
+      "svar": null
     },
     "lønnet": {
       "resultat": "OPPFYLT",

@@ -3,9 +3,11 @@
   "type": "UFØRETRYGD_TILSYN_BARN",
   "vurderinger": {
     "aldersvilkår": {
-      "resultat": "IKKE_VURDERT",
-      "svar": "GAMMEL_MANGLER_DATA",
-      "vurderingFaktaEtterlevelse": null
+      "resultat": "OPPFYLT",
+      "svar": "JA",
+      "vurderingFaktaEtterlevelse": {
+        "fødselsdato": "2000-01-01"
+      }
     },
     "dekketAvAnnetRegelverk": {
       "resultat": "OPPFYLT",
@@ -13,7 +15,7 @@
     },
     "medlemskap": {
       "resultat": "OPPFYLT",
-      "svar": "JA"
+      "svar": "JA_IMPLISITT"
     },
     "mottarSykepengerForFulltidsstilling": {
       "resultat": "OPPFYLT",
