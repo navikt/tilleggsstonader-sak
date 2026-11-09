@@ -575,7 +575,10 @@ private fun mapMålgruppePassAvBarn(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerPassAvBarn(
-                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+                vurderinger =
+                    VurderingAktivitetspenger(
+                        VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -648,7 +651,10 @@ private fun mapMålgruppeLæremidler(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerLæremidler(
-                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+                vurderinger =
+                    VurderingAktivitetspenger(
+                        VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -717,7 +723,10 @@ private fun mapMålgruppeBoutgfiter(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerBoutgifter(
-                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+                vurderinger =
+                    VurderingAktivitetspenger(
+                        VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -789,7 +798,10 @@ private fun mapMålgruppeDagligReiseTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerDagligReiseTso(
-                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+                vurderinger =
+                    VurderingAktivitetspenger(
+                        VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -882,7 +894,10 @@ private fun mapMålgruppeReiseTilSamlingTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerReiseTilSamlingTso(
-                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+                vurderinger =
+                    VurderingAktivitetspenger(
+                        VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -1005,7 +1020,10 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerReiseOppstartAvslutningHjemreiseTso(
-                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+                vurderinger =
+                    VurderingAktivitetspenger(
+                        VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -1126,7 +1144,11 @@ private fun mapMålgruppeFlyttingTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerFlyttingTso(
-                vurderinger = VurderingAktivitetspengerFlyttingTso(lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet)),
+                vurderinger =
+                    VurderingAktivitetspengerFlyttingTso(
+                        lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet),
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->

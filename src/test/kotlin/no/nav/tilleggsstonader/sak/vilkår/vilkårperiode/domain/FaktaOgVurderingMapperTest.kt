@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
@@ -119,29 +118,6 @@ class FaktaOgVurderingMapperTest {
                 assertThat(map(type, null).utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
             }
         }
-    }
-
-    @Test
-    fun `aktivitetspenger har aldersvilkårsvurdering`() {
-        val målgruppe =
-            LagreVilkårperiode(
-                behandlingId = behandlingId,
-                type = MålgruppeType.AKTIVITETSPENGER,
-                fom = 1 januar 2025,
-                tom = 31 januar 2025,
-                faktaOgSvar = FaktaOgSvarMålgruppeDto(),
-            )
-
-        val faktaOgVurdering =
-            mapFaktaOgSvarDto(
-                vilkårperiode = målgruppe,
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-                fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(),
-            )
-
-        assertThat(faktaOgVurdering.vurderinger).isInstanceOf(AldersvilkårVurdering::class.java)
-        assertThat((faktaOgVurdering.vurderinger as AldersvilkårVurdering).aldersvilkår.svar).isEqualTo(SvarJaNei.JA)
-        assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 
     @Test
