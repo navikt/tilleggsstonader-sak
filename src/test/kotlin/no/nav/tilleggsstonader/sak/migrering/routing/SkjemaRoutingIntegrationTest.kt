@@ -214,73 +214,24 @@ class SkjemaRoutingIntegrationTest(
                 skjematype = Skjematype.SØKNAD_REISE_TIL_SAMLING,
             )
 
-        @Nested
-        inner class GammelLøsning {
-            @Test
-            fun `skal route til gammel løsning hvis person har fortrolig adresse`() {
-                mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
+        @Test
+        fun `skal route til gammel løsning hvis person har fortrolig adresse`() {
+            mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
 
-                val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
 
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
-            }
-
-            @Test
-            fun `skal route til gammel løsning hvis person har strengt fortrolig adresse`() {
-                mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-
-                val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
-
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
-            }
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
+            assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
         }
 
-        @Nested
-        inner class NyLøsning {
-            @Test
-            fun `skal alltid svare ny løsning hvis personen har blitt routet til ny løsning tidligere`() {
-                // todo gå igjennom tester, ingen bruker "send noen til ny løsning" stategien nå hva burde vi teste for her da,
-                //  evt kommentere ut en test  som kommenteres inn når den tas i bruk
-                testoppsettService.lagreSøknadRouting(
-                    SkjemaRouting(
-                        ident = jonasIdent,
-                        type = Skjematype.SØKNAD_REISE_TIL_SAMLING,
-                        detaljer = JsonWrapper("{}"),
-                    ),
-                )
+        @Test
+        fun `skal route til gammel løsning hvis person har strengt fortrolig adresse`() {
+            mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
 
-                val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
 
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isTrue()
-            }
-
-            @Test
-            fun `skal lagre routing og svare ny løsning hvis det finnes en behandling på personen`() {
-                val fagsak =
-                    fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
-                val reiseTilSamlingBehandling = behandling(fagsak)
-
-                testoppsettService.lagreFagsak(fagsak)
-                testoppsettService.lagre(behandling = reiseTilSamlingBehandling, opprettGrunnlagsdata = false)
-
-                val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
-
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isTrue()
-            }
-
-            @Test
-            fun `skal svare ny løsning hvis ingen tidligere data og maks antall ikke er nådd`() {
-                mockMaksAntall(Toggle.SØKNAD_ROUTING_REISE_TIL_SAMLING, 10)
-
-                val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
-
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isTrue()
-            }
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
+            assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
         }
     }
 
