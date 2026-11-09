@@ -6,4 +6,5 @@ data class RegelstrukturROAHDto(
     val oppstart: RegelstrukturDto,
     val avslutning: RegelstrukturDto,
     val hjemreise: RegelstrukturDto,
+    val midlertidigBostedPeriode: RegelstrukturDto,
 )
