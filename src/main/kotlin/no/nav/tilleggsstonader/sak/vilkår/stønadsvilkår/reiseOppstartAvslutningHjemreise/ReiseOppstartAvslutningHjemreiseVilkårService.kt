@@ -48,9 +48,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     private val unleashService: UnleashService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårROAH> =
-        vilkårRepository
-            .findByBehandlingId(behandlingId)
-            .medResultatFraParent()
+        vilkårService
+            .hentVilkår(behandlingId)
             .map { it.mapTilVilkårROAH() }
             .sortedBy { it.fom }
 

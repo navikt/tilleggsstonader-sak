@@ -229,9 +229,14 @@ class VilkårService(
         }
     }
 
+    /**
+     * Felles lesesti for vilkår. Resultatet til reiser under et paraplyvilkår er utledet fra paraplyen, og lagres ikke.
+     * Kode som skal lese det rå resultatet, for eksempel kopiering til revurdering, bruker [VilkårRepository] direkte.
+     */
     fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
+            .medResultatFraParent()
             .sortedWith(compareBy({ it.fom }, { it.tom }))
 
     /**
@@ -302,8 +307,5 @@ class VilkårService(
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
 
     fun hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandlingId: BehandlingId): List<Vilkår> =
-        vilkårRepository
-            .findByBehandlingId(behandlingId)
-            .medResultatFraParent()
-            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+        hentVilkår(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT }
 }
