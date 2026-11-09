@@ -8,17 +8,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Resultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 
 object ROAHRegelUtil {
-    fun finnRelevantVilkårsregel(typeReiseformål: TypeReiseformål): Vilkårsregel =
-        when (typeReiseformål) {
-            TypeReiseformål.OPPSTART, TypeReiseformål.AVSLUTNING -> OppstartAvslutningRegel()
-            TypeReiseformål.HJEMREISE -> HjemreiseRegel()
-        }
-
     fun harUtgifterTilReisenRegel(erHovedregel: Boolean) =
         RegelSteg(
             regelId = RegelId.ROAH_HAR_UTGIFTER_TIL_REISEN,
