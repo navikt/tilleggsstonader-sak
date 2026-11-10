@@ -22,8 +22,8 @@
         "fraTidligereVedtak": true,
         "grunnlag": {
           "beløpSomKanDekkes": null,
-          "erUtgifterDokumentert": true,
           "erUtgiftNødvendig": true,
+          "erUtgifterDokumentert": true,
           "tilbud": [ {
             "erValgt": false,
             "navn": "Flyttebyrå A",
