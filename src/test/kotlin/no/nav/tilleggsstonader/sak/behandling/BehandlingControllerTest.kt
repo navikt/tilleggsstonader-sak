@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -13,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -20,6 +22,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProble
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -30,6 +34,9 @@ import org.springframework.http.HttpStatus
 internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
+
+    @Autowired
+    lateinit var vedtakRepository: VedtakRepository
 
     @Autowired
     private lateinit var eksternBehandlingIdRepository: EksternBehandlingIdRepository
@@ -43,6 +50,76 @@ internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
             .hent(behandling.id)
             .expectStatus()
             .isForbidden()
+    }
+
+    @Test
+    internal fun `Skal vise kjøreliste etter lagret innvilgelse før endelig resultat`() {
+        val fagsak =
+            testoppsettService.lagreFagsak(
+                fagsak(identer = setOf(PersonIdent("12345678901")), stønadstype = Stønadstype.DAGLIG_REISE_TSO),
+            )
+        val forrigeBehandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    steg = StegType.BEHANDLING_FERDIGSTILT,
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
+            )
+        vedtakRepository.insert(DagligReiseTestUtil.innvilgelse(behandlingId = forrigeBehandling.id))
+        val behandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.REVURDERING,
+                    status = BehandlingStatus.UTREDES,
+                    steg = StegType.KJØRELISTE,
+                    forrigeIverksatteBehandlingId = forrigeBehandling.id,
+                ),
+            )
+        vedtakRepository.insert(DagligReiseTestUtil.innvilgelse(behandlingId = behandling.id))
+
+        val hentetBehandling = kall.behandling.hent(behandling.id)
+
+        assertThat(hentetBehandling.kanViseKjøreliste).isTrue
+    }
+
+    @Test
+    internal fun `Skal ikke vise kjøreliste før vedtaksvalg eller ved lagret avslag`() {
+        val fagsak =
+            testoppsettService.lagreFagsak(
+                fagsak(identer = setOf(PersonIdent("12345678901")), stønadstype = Stønadstype.DAGLIG_REISE_TSO),
+            )
+        val forrigeBehandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    steg = StegType.BEHANDLING_FERDIGSTILT,
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
+            )
+        vedtakRepository.insert(DagligReiseTestUtil.innvilgelse(behandlingId = forrigeBehandling.id))
+        val behandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.REVURDERING,
+                    status = BehandlingStatus.UTREDES,
+                    steg = StegType.BEREGNE_YTELSE,
+                    forrigeIverksatteBehandlingId = forrigeBehandling.id,
+                ),
+            )
+
+        assertThat(kall.behandling.hent(behandling.id).kanViseKjøreliste).isFalse
+
+        testoppsettService.oppdater(behandling.copy(steg = StegType.KJØRELISTE))
+        vedtakRepository.insert(DagligReiseTestUtil.avslag(behandlingId = behandling.id))
+
+        assertThat(kall.behandling.hent(behandling.id).kanViseKjøreliste).isFalse
     }
 
     @Test

@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.Tilordnet
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.tilDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -48,6 +49,7 @@ class BehandlingController(
     private val tilgangService: TilgangService,
     private val nullstillBehandlingService: NullstillBehandlingService,
     private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
+    private val dagligReiseVedtakService: DagligReiseVedtakService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -56,6 +58,7 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val kanViseKjøreliste = dagligReiseVedtakService.kanViseKjøreliste(saksbehandling)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
         val harÅpenKjørelistebehandling = behandlingService.harÅpenKjørelisteBehandling(saksbehandling.fagsakId)
 
@@ -68,6 +71,7 @@ class BehandlingController(
         return saksbehandling.tilDto(
             tilordnetSaksbehandler = tilordnetSaksbehandler,
             harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
+            kanViseKjøreliste = kanViseKjøreliste,
         )
     }
 

@@ -59,6 +59,7 @@ class AvslagDagligReiseIntegrationTest : IntegrationTest() {
         assertThat(avslag.årsakerAvslag).isEqualTo(listOf(ÅrsakAvslag.ANNET))
         assertThat(avslag.begrunnelse).isEqualTo("begrunnelse")
         assertThat(avslag.type).isEqualTo(TypeVedtak.AVSLAG)
+        assertThat(kall.behandling.hent(revurderingId).kanViseKjøreliste).isFalse
         assertIngenNyeUtbetalinger()
     }
 
