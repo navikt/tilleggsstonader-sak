@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.mockStrukturertSøknadForJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadForStønadstype
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
@@ -59,9 +61,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     ident: String = FnrGenerator.generer(),
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingContext {
-    val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype, ident)
-    mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
-    val behandling = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!
+    val behandling = opprettSøknadOgSendInnPåBruker(stønadstype, ident)
     gjennomførBehandlingsløp(
         behandlingId = behandling.id,
         ident = ident,
@@ -74,6 +74,15 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
         fagsakId = behandling.fagsakId,
         ident = ident,
     )
+}
+
+fun IntegrationTest.opprettSøknadOgSendInnPåBruker(
+    stønadstype: Stønadstype,
+    ident: String,
+): Behandling {
+    val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype, ident)
+    mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
+    return håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!
 }
 
 private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
