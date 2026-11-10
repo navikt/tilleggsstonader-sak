@@ -163,6 +163,8 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                                 BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
                             ),
                         erUtgifterDokumentert = erUtgifterDokumentert,
+                        erUtgiftNødvendig = true,
+                        beløpSomKanDekkes = null,
                     ),
                 beløp = BigDecimal("100"),
                 målgruppe = målgruppe,

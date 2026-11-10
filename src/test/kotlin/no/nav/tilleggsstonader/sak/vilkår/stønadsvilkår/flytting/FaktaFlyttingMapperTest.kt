@@ -32,6 +32,7 @@ class FaktaFlyttingMapperTest {
                 adresse = "Flytteveien 1",
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgiftDto,
+                beløpSomKanDekkes = null,
             ),
             FaktaFlytteSelvDto(
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
@@ -55,6 +56,7 @@ class FaktaFlyttingMapperTest {
                 adresse = "Flytteveien 1",
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgiftDto,
+                beløpSomKanDekkes = null,
             ),
             FaktaFlytteSelvDto(
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),

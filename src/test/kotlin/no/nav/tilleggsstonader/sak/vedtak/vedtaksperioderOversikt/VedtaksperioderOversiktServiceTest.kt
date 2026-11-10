@@ -314,6 +314,8 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                                                             ),
                                                         ),
                                                     erUtgifterDokumentert = true,
+                                                    erUtgiftNødvendig = true,
+                                                    beløpSomKanDekkes = null,
                                                 ),
                                         ),
                                     ),

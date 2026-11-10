@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.Lagre
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
+import java.math.BigDecimal
 
 object FlyttingVilkårValidering {
     private val flyttingRegel = FlyttingRegel()
@@ -28,6 +29,15 @@ object FlyttingVilkårValidering {
                 }
                 brukerfeilHvis(fakta.tilbud.any { it.pris != null && it.pris <= 0 }) {
                     "Prisen på tilbudet må være større enn 0"
+                }
+                if (fakta.nødvendigUtgift.erUtgiftenNødvendig.ja()) {
+                    brukerfeilHvis(fakta.beløpSomKanDekkes != null) {
+                        "Beløp som kan dekkes skal ikke være satt når hele utgiften er nødvendig"
+                    }
+                } else {
+                    brukerfeilHvis(fakta.beløpSomKanDekkes != null && fakta.beløpSomKanDekkes <= BigDecimal.ZERO) {
+                        "Beløp som kan dekkes må være større enn 0"
+                    }
                 }
             }
 
@@ -55,7 +65,8 @@ object FlyttingVilkårValidering {
                 SvarId.FLYTTEBYRÅ -> {
                     val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
                     fakta.tilbud.size == 2 &&
-                        fakta.tilbud.all { !it.navn.isNullOrBlank() && it.pris != null }
+                        fakta.tilbud.all { !it.navn.isNullOrBlank() && it.pris != null } &&
+                        (fakta.nødvendigUtgift.erUtgiftenNødvendig.ja() || fakta.beløpSomKanDekkes != null)
                 }
 
                 SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null

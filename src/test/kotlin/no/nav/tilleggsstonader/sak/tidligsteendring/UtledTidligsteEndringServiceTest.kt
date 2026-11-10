@@ -113,6 +113,7 @@ class UtledTidligsteEndringServiceTest {
                 dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgift,
                 adresse = "Syntetisk adresse",
+                beløpSomKanDekkes = null,
             )
         val original =
             vilkår(

@@ -1324,6 +1324,7 @@ object InterntVedtakTestdata {
                             dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             nødvendigUtgift = NødvendigUtgift(SvarJaNeiReiseTilSamling.JA, null),
                             adresse = "Flytteveien 1, 1234 Oslo",
+                            beløpSomKanDekkes = null,
                         ),
                 ),
                 vilkår(
@@ -1439,6 +1440,8 @@ object InterntVedtakTestdata {
                                             ),
                                         ),
                                     erUtgifterDokumentert = true,
+                                    erUtgiftNødvendig = true,
+                                    beløpSomKanDekkes = null,
                                 ),
                         ),
                         BeregningsresultatFlyttevilkår(

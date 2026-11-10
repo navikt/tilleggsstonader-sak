@@ -454,6 +454,7 @@ class InterntVedtakService(
                     dokumenterteUtgifter = fakta.dokumenterteUtgifter,
                     nødvendigUtgift = fakta.nødvendigUtgift,
                     adresse = fakta.adresse,
+                    beløpSomKanDekkes = fakta.beløpSomKanDekkes,
                 )
 
             is FaktaFlytteSelv ->

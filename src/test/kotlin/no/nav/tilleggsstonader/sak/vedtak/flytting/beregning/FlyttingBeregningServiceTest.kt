@@ -97,6 +97,7 @@ class FlyttingBeregningServiceTest {
                             dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
+                            beløpSomKanDekkes = null,
                         ),
                 ),
             )
@@ -113,10 +114,45 @@ class FlyttingBeregningServiceTest {
                             BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123"), erValgt = true),
                         ),
                     erUtgifterDokumentert = true,
+                    erUtgiftNødvendig = true,
+                    beløpSomKanDekkes = null,
                 ),
             )
         assertThat(resultat.målgruppe).isEqualTo(periode.målgruppe)
         assertThat(resultat.fraTidligereVedtak).isFalse()
+    }
+
+    @Test
+    fun `flyttebyrå bruker avrundet beløp som kan dekkes når hele utgiften ikke er nødvendig`() {
+        val periode = vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)
+        every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
+            listOf(
+                vilkår(
+                    flyttedato = 1 januar 2025,
+                    fakta =
+                        faktaFlyttebyrå().copy(
+                            nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Deler av utgiften er ikke nødvendig"),
+                            beløpSomKanDekkes = BigDecimal("80.6"),
+                        ),
+                ),
+            )
+
+        val resultat = beregningService.beregn(behandling, listOf(periode)).resultater.single()
+
+        assertThat(resultat.beløp).isEqualByComparingTo("81")
+        assertThat(resultat.grunnlag)
+            .isEqualTo(
+                BeregningsgrunnlagFlyttebyrå(
+                    tilbud =
+                        listOf(
+                            BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("123"), erValgt = true),
+                            BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("124"), erValgt = false),
+                        ),
+                    erUtgifterDokumentert = true,
+                    erUtgiftNødvendig = false,
+                    beløpSomKanDekkes = BigDecimal("80.6"),
+                ),
+            )
     }
 
     @Test
@@ -503,6 +539,7 @@ class FlyttingBeregningServiceTest {
         dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
         adresse = "Flytteveien 1",
         nødvendigUtgift = nødvendigUtgift,
+        beløpSomKanDekkes = null,
     )
 
     private fun faktaFlytteSelv(
@@ -543,6 +580,8 @@ class FlyttingBeregningServiceTest {
                         BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("600"), erValgt = false),
                     ),
                 erUtgifterDokumentert = true,
+                erUtgiftNødvendig = true,
+                beløpSomKanDekkes = null,
             ),
     )
 

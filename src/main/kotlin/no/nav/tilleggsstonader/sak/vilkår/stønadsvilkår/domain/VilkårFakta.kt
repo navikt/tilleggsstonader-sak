@@ -59,6 +59,7 @@ data class FaktaFlyttebyrå(
     val dokumenterteUtgifter: DokumenterteUtgifter,
     val nødvendigUtgift: NødvendigUtgift,
     override val adresse: String,
+    val beløpSomKanDekkes: BigDecimal?,
 ) : FlyttingVilkårFakta
 
 data class FlyttebyråTilbud(

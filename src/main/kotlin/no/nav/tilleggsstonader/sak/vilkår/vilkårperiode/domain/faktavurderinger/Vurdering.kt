@@ -20,6 +20,10 @@ enum class SvarJaNei {
     ;
 
     fun harVurdert(): Boolean = this != JA_IMPLISITT
+
+    fun ja(): Boolean = this == JA_IMPLISITT || this == JA
+
+    fun nei(): Boolean = this == NEI || this == NEI_IMPLISITT
 }
 
 enum class ResultatDelvilkårperiode {
