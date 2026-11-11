@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
@@ -55,7 +56,9 @@ class TotrinnskontrollService(
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
         } else {
-            feilHvis(sendTilBeslutterRequest.kommentarTilBeslutter != null) {
+            feilHvis(
+                sendTilBeslutterRequest.kommentarTilBeslutter != null && saksbehandling.årsak != BehandlingÅrsak.KJØRELISTE,
+            ) {
                 "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
             }
         }

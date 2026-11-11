@@ -9,6 +9,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -141,6 +142,17 @@ internal class TotrinnskontrollServiceTest {
 
         assertDoesNotThrow {
             totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest())
+        }
+    }
+
+    @Test
+    internal fun `skal ikke kaste feil for KJØRELISTE i sendtilBeslutter, uansett kommentar`() {
+        val behandling = saksbehandling(status = BehandlingStatus.UTREDES, årsak = BehandlingÅrsak.KJØRELISTE)
+        every {
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+        } returns null
+        assertDoesNotThrow {
+            totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest(kommentarTilBeslutter = "test kommentar"))
         }
     }
 
