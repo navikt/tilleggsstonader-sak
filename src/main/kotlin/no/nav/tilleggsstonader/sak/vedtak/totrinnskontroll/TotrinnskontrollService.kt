@@ -56,7 +56,7 @@ class TotrinnskontrollService(
             }
         } else {
             feilHvis(
-                sendTilBeslutterRequest.kommentarTilBeslutter != null && saksbehandling.erKjørelisteBehandling(),
+                sendTilBeslutterRequest.kommentarTilBeslutter != null && !saksbehandling.erKjørelisteBehandling(),
             ) {
                 "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
             }
