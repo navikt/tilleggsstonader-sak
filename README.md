@@ -4,6 +4,8 @@ Backend - saksbehandling for tilleggsstønader
 
 ## Kjøring lokalt
 
+Bruk JDK 25, og velg JDK 25 som prosjekt-JDK i IDE-en.
+
 ### Secrets
 
 Nødvendige secrets kan hentes fra cluster:

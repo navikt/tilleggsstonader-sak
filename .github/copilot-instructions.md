@@ -1,6 +1,6 @@
 # Copilot Instructions – tilleggsstonader-sak
 
-Backend saksbehandlingssystem for tilleggsstønader (barnetilsyn, læremidler, boutgifter, daglig reise). Bygget med Kotlin + Spring Boot 4 på Java 21, PostgreSQL og Kafka. Deployes til NAIS/GCP.
+Backend saksbehandlingssystem for tilleggsstønader (barnetilsyn, læremidler, boutgifter, daglig reise). Bygget med Kotlin + Spring Boot 4 på Java 25, PostgreSQL og Kafka. Deployes til NAIS/GCP.
 
 ## Bygg, test og lint
 
