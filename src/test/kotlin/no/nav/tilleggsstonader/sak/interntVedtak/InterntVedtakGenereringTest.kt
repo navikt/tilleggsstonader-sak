@@ -18,17 +18,25 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollServi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.springframework.boot.resttestclient.TestRestTemplate
-import org.springframework.boot.resttestclient.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
+import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.method
+import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
+import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 class InterntVedtakGenereringTest {
@@ -81,11 +89,13 @@ class InterntVedtakGenereringTest {
     }
 
     /**
-     * For å oppdatere html og pdf ved endringer i htmlify,
-     * 1. Fyr opp htmlify lokalt
-     * 2. Kjør:
-     *     SKRIV_TIL_FIL=true ./gradlew test --tests "no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf"
-     * 3. Formatter htmlfil etter generering for å unngå stor diff
+     * Bruk syntetiske testdata når du genererer HTML og PDF.
+     * Start htmlify lokalt, og kjør:
+     *     SKRIV_TIL_FIL=true HTMLIFY_URI=http://localhost:8001 ./gradlew test --tests 'no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf'
+     * Eller bruk htmlify i dev:
+     *     SKRIV_TIL_FIL=true HTMLIFY_URI=https://tilleggsstonader-htmlify.intern.dev.nav.no ./gradlew test --tests 'no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf'
+     * PDF-genereringen kaller eksisterende PDF-tjeneste i dev og krever intern nettverkstilgang.
+     * Formatter HTML-filen etter generering for å unngå stor diff.
      */
     @ParameterizedTest
     @EnumSource(
@@ -231,21 +241,64 @@ class InterntVedtakGenereringTest {
             }
     }
 
-    private fun lagHtmlifyClient(): HtmlifyClient {
-        val restTemplate = TestRestTemplate().restTemplate
+    @Test
+    fun `htmlify HTTP500 skal kaste feil`() {
+        val restTemplate = htmlifyRestTemplate()
+        val server = MockRestServiceServer.createServer(restTemplate)
+        val feiltekst = "Htmlify-feil"
+        server
+            .expect(requestTo(htmlifyEndpoint()))
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(
+                withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(feiltekst),
+            )
+
+        assertThatThrownBy { lagHtmlifyClient(restTemplate).generateHtml(testInterntVedtak()) }
+            .isInstanceOf(HttpServerErrorException::class.java)
+            .hasMessageContaining(feiltekst)
+
+        server.verify()
+    }
+
+    private fun testInterntVedtak(): InterntVedtak {
+        mock(Stønadstype.BARNETILSYN)
+        return service.lagInterntVedtak(behandlingId)
+    }
+
+    private fun lagHtmlifyClient(restTemplate: RestTemplate = htmlifyRestTemplate()): HtmlifyClient =
+        HtmlifyClient(htmlifyUri(), restTemplate)
+
+    private fun htmlifyRestTemplate(): RestTemplate {
+        val restTemplate = RestTemplate()
         restTemplate.messageConverters =
             listOf(
                 StringHttpMessageConverter(),
                 JacksonJsonHttpMessageConverter(JsonMapperProvider.jsonMapper),
             )
-        return HtmlifyClient(URI.create("http://localhost:8001"), restTemplate)
+        return restTemplate
     }
+
+    private fun htmlifyUri(): URI = URI.create(System.getenv("HTMLIFY_URI")?.takeIf { it.isNotBlank() } ?: DEFAULT_HTMLIFY_URI)
+
+    private fun htmlifyEndpoint(): String =
+        UriComponentsBuilder
+            .fromUri(htmlifyUri())
+            .pathSegment("api", "internt-vedtak")
+            .toUriString()
 
     private fun generatePdf(
         html: String,
         name: String,
     ) {
-        val url = "https://familie-dokument.intern.dev.nav.no/api/html-til-pdf"
+        skrivTilFil(name, hentPdf(html))
+    }
+
+    private fun hentPdf(
+        html: String,
+        restTemplate: RestTemplate = pdfRestTemplate(),
+    ): ByteArray {
         val request =
             HttpEntity(
                 html,
@@ -253,7 +306,13 @@ class InterntVedtakGenereringTest {
                     accept = listOf(MediaType.APPLICATION_PDF)
                 },
             )
-        val pdf = TestRestTemplate().postForEntity<ByteArray>(url, request).body!!
-        skrivTilFil(name, pdf)
+        return restTemplate.postForEntity(PDF_URL, request, ByteArray::class.java).body!!
+    }
+
+    private fun pdfRestTemplate(): RestTemplate = RestTemplate()
+
+    private companion object {
+        const val DEFAULT_HTMLIFY_URI = "http://localhost:8001"
+        const val PDF_URL = "https://familie-dokument.intern.dev.nav.no/api/html-til-pdf"
     }
 }
