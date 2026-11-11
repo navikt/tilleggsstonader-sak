@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
@@ -57,7 +56,7 @@ class TotrinnskontrollService(
             }
         } else {
             feilHvis(
-                sendTilBeslutterRequest.kommentarTilBeslutter != null && saksbehandling.årsak != BehandlingÅrsak.KJØRELISTE,
+                sendTilBeslutterRequest.kommentarTilBeslutter != null && saksbehandling.erKjørelisteBehandling(),
             ) {
                 "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
             }
