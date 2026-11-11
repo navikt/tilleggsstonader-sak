@@ -21,6 +21,8 @@
         "fom": "2025-01-15",
         "fraTidligereVedtak": true,
         "grunnlag": {
+          "beløpSomKanDekkes": null,
+          "erUtgiftNødvendig": true,
           "erUtgifterDokumentert": true,
           "tilbud": [ {
             "erValgt": false,
@@ -130,6 +132,7 @@
     } ],
     "fakta": {
       "adresse": "Flytteveien 1, 1234 Oslo",
+      "beløpSomKanDekkes": null,
       "dokumenterteUtgifter": {
         "begrunnelse": "Kvittering fra flyttebyrå",
         "erUtgifterDokumentert": "JA"

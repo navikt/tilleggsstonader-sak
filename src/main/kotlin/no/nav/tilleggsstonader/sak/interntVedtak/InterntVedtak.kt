@@ -232,6 +232,7 @@ data class VilkårFaktaFlyttebyråInterntVedtak(
     val dokumenterteUtgifter: DokumenterteUtgifter,
     val nødvendigUtgift: NødvendigUtgift,
     val adresse: String,
+    val beløpSomKanDekkes: BigDecimal?,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ
 }

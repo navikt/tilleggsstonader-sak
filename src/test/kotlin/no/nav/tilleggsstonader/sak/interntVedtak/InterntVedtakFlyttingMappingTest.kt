@@ -61,8 +61,9 @@ class InterntVedtakFlyttingMappingTest {
                 FaktaFlyttebyrå(
                     tilbud = listOf(FlyttebyråTilbud("Byrå A", 1200), FlyttebyråTilbud("Byrå B", 1000)),
                     dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
-                    nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
+                    nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Bare deler av utgiften er nødvendig"),
                     adresse = "Flytteveien 1",
+                    beløpSomKanDekkes = BigDecimal("900"),
                 )
             val flytteSelvFakta =
                 FaktaFlytteSelv(
@@ -96,6 +97,7 @@ class InterntVedtakFlyttingMappingTest {
                         dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, begrunnelse = "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = flyttebyråFakta.nødvendigUtgift,
                         adresse = "Flytteveien 1",
+                        beløpSomKanDekkes = BigDecimal("900"),
                     ),
                 )
             assertThat(flytteSelv.vilkår.single().fakta)
@@ -241,6 +243,8 @@ class InterntVedtakFlyttingMappingTest {
                                         BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("1000"), true),
                                     ),
                                 erUtgifterDokumentert = true,
+                                erUtgiftNødvendig = true,
+                                beløpSomKanDekkes = null,
                             ),
                     ),
                 ),

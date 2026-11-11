@@ -487,6 +487,8 @@ object VedtaksdataRepositoryTestdata {
                                                 BeregningsgrunnlagFlyttebyråTilbud("Syntetisk tilbud 2", BigDecimal("12000"), false),
                                             ),
                                         erUtgifterDokumentert = true,
+                                        erUtgiftNødvendig = true,
+                                        beløpSomKanDekkes = null,
                                     ),
                             ),
                         ),

@@ -18,6 +18,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 
 class FlyttingVilkårValideringTest {
     private val nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null)
@@ -35,10 +36,24 @@ class FlyttingVilkårValideringTest {
                     adresse = "Flytteveien 1",
                     dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     nødvendigUtgift = nødvendigUtgift,
+                    beløpSomKanDekkes = null,
                 ),
             )
         }
     }
+
+    private fun faktaFlyttebyråIkkeNødvendig(beløpSomKanDekkes: BigDecimal?) =
+        FaktaFlyttebyrå(
+            tilbud =
+                listOf(
+                    FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
+                    FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
+                ),
+            adresse = "Flytteveien 1",
+            dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+            nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Bare deler av utgiften er nødvendig"),
+            beløpSomKanDekkes = beløpSomKanDekkes,
+        )
 
     @Test
     fun `skal avvise like firmanavn selv med forskjellig mellomrom og store bokstaver`() {
@@ -53,6 +68,7 @@ class FlyttingVilkårValideringTest {
                     adresse = "Flytteveien 1",
                     dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     nødvendigUtgift = nødvendigUtgift,
+                    beløpSomKanDekkes = null,
                 ),
             )
         }
@@ -73,6 +89,7 @@ class FlyttingVilkårValideringTest {
                             dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
+                            beløpSomKanDekkes = null,
                         ),
                     )
                 }
@@ -97,6 +114,7 @@ class FlyttingVilkårValideringTest {
                         adresse = "Flytteveien 1",
                         dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgift,
+                        beløpSomKanDekkes = null,
                     ),
                 )
             }
@@ -145,6 +163,7 @@ class FlyttingVilkårValideringTest {
                     dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                     adresse = adresse,
                     nødvendigUtgift = nødvendigUtgift,
+                    beløpSomKanDekkes = null,
                 ),
             ).forEach { fakta ->
                 val feil =
@@ -190,6 +209,7 @@ class FlyttingVilkårValideringTest {
                             adresse = "Flytteveien 1",
                             dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                             nødvendigUtgift = nødvendigUtgift,
+                            beløpSomKanDekkes = null,
                         ),
                 ),
             ),
@@ -222,6 +242,7 @@ class FlyttingVilkårValideringTest {
                                 adresse = "Flytteveien 1",
                                 dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                                 nødvendigUtgift = nødvendigUtgift,
+                                beløpSomKanDekkes = null,
                             ),
                     ),
                 ),
@@ -315,10 +336,27 @@ class FlyttingVilkårValideringTest {
                             dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                             nødvendigUtgift = NødvendigUtgift(SvarJaNei.NEI, "Utgiften er for høy"),
                             adresse = "Flytteveien 1",
+                            beløpSomKanDekkes = BigDecimal("9000"),
                         ),
                 ),
             ),
         ).isTrue()
+    }
+
+    @Test
+    fun `skal ikke være fullstendig når beløp som kan dekkes mangler for unødvendig flytteutgift`() {
+        assertThat(
+            FlyttingVilkårValidering.erFullstendig(
+                lagreVilkår(
+                    svar =
+                        mapOf(
+                            *oppfylteSvarFremTilFlyttemåte,
+                            RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
+                        ),
+                    fakta = faktaFlyttebyråIkkeNødvendig(beløpSomKanDekkes = null),
+                ),
+            ),
+        ).isFalse()
     }
 
     private val oppfylteSvarFremTilFlyttemåte =

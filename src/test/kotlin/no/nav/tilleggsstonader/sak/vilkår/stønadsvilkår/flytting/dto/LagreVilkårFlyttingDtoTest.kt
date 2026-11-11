@@ -65,6 +65,7 @@ class LagreVilkårFlyttingDtoTest {
                 adresse = "Flytteveien 1",
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI),
                 nødvendigUtgift = nødvendigUtgiftDto,
+                beløpSomKanDekkes = null,
             ),
         )
     }

@@ -91,6 +91,7 @@ class StønadsvilkårTestdataDsl {
                                 "Kvittering fra flyttebyrå",
                             ),
                         nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.JA, null),
+                        beløpSomKanDekkes = null,
                     ),
             )
         }

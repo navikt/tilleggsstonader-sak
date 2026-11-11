@@ -9,6 +9,8 @@
       "fom": "2026-01-01",
       "fraTidligereVedtak": false,
       "grunnlag": {
+        "beløpSomKanDekkes": null,
+        "erUtgiftNødvendig": true,
         "erUtgifterDokumentert": true,
         "tilbud": [ {
           "erValgt": true,

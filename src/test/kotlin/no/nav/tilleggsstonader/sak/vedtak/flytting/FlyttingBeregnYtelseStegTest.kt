@@ -145,6 +145,8 @@ class FlyttingBeregnYtelseStegTest {
                                         BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
                                     ),
                                 erUtgifterDokumentert = true,
+                                erUtgiftNødvendig = true,
+                                beløpSomKanDekkes = null,
                             ),
                     ),
                 ),

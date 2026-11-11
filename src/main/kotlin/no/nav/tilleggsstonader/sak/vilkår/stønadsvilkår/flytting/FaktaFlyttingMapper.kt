@@ -24,6 +24,7 @@ object FaktaFlyttingMapper {
                     adresse = adresse,
                     dokumenterteUtgifter = dokumenterteUtgifter.tilDomene(),
                     nødvendigUtgift = nødvendigUtgift.tilDomene(),
+                    beløpSomKanDekkes = beløpSomKanDekkes,
                 )
 
             is FaktaFlytteSelvDto ->
@@ -51,6 +52,7 @@ object FaktaFlyttingMapper {
                     adresse = adresse,
                     dokumenterteUtgifter = dokumenterteUtgifter.tilDto(),
                     nødvendigUtgift = nødvendigUtgift.tilDto(),
+                    beløpSomKanDekkes = beløpSomKanDekkes,
                 )
 
             is FaktaFlytteSelv ->

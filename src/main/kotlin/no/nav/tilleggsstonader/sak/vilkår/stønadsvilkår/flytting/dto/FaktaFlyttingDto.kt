@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
+import java.math.BigDecimal
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -31,6 +32,7 @@ data class FaktaFlyttebyråDto(
     val dokumenterteUtgifter: DokumenterteUtgifterDto,
     val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
+    val beløpSomKanDekkes: BigDecimal?,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTEBYRÅ
 }

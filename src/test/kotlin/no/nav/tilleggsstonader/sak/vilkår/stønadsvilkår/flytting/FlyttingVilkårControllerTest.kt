@@ -94,6 +94,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     adresse = "Flytteveien 1",
                     dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     nødvendigUtgift = nødvendigUtgiftDto,
+                    beløpSomKanDekkes = null,
                 ),
         )
 
@@ -117,6 +118,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 adresse = "Flytteveien 1",
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgift,
+                beløpSomKanDekkes = null,
             )
         val flytteSelv =
             FaktaFlytteSelvDto(
@@ -239,6 +241,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         adresse = "Flytteveien 2",
                         dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgiftDto,
+                        beløpSomKanDekkes = null,
                     ),
             )
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
@@ -282,6 +285,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         adresse = "Flytteveien 1",
                         dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgiftDto,
+                        beløpSomKanDekkes = null,
                     ),
             )
 
@@ -302,6 +306,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         adresse = "Flytteveien 1",
                         dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                         nødvendigUtgift = nødvendigUtgiftDto,
+                        beløpSomKanDekkes = null,
                     ),
             )
 

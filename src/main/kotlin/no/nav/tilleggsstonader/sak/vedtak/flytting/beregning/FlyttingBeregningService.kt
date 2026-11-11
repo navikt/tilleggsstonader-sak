@@ -146,9 +146,18 @@ class FlyttingBeregningService(
         val grunnlag =
             BeregningsgrunnlagFlyttebyrå(
                 tilbud = tilbud.mapIndexed { indeks, tilbud -> tilbud.copy(erValgt = indeks == valgtTilbudIndeks) },
-                erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert == SvarJaNei.JA,
+                erUtgifterDokumentert = fakta.dokumenterteUtgifter.erUtgifterDokumentert.ja(),
+                erUtgiftNødvendig = fakta.nødvendigUtgift.erUtgiftenNødvendig.ja(),
+                beløpSomKanDekkes = fakta.beløpSomKanDekkes,
             )
-        val beløp = tilbud[valgtTilbudIndeks].pris.avrundetStønadsbeløp()
+
+        val beløp =
+            if (grunnlag.erUtgiftNødvendig) {
+                tilbud[valgtTilbudIndeks].pris
+            } else {
+                grunnlag.beløpSomKanDekkes
+                    ?: feil("Beløp som kan dekkes må være satt når hele utgiften ikke er nødvendig")
+            }.avrundetStønadsbeløp()
 
         return grunnlag to beløp
     }
