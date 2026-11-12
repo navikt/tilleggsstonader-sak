@@ -80,5 +80,12 @@ object ROAHVilkårValideringUtil {
         feilHvis(parentAktivitetId != nyttVilkår.aktivitetId) {
             "Reisen må høre til samme aktivitet som paraplyvilkåret"
         }
+
+        val parentFom = parentVilkår.fom
+        val parentTom = parentVilkår.tom
+        feilHvis(parentFom == null || parentTom == null) { "Paraplyvilkåret mangler periode" }
+        brukerfeilHvis(nyttVilkår.fom < parentFom || nyttVilkår.tom > parentTom) {
+            "Reisens periode må være innenfor paraplyvilkårets periode"
+        }
     }
 }
