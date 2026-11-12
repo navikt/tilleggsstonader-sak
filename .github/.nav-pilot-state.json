@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.11.04-221952-0b85e3a",
-  "source_sha": "0b85e3ab492b648ed9a182d5c60f97cc8aa55fef",
+  "version": "2026.11.11-094753-968a115",
+  "source_sha": "e493cefdc144fb09b1824dc56fcfbc28130c2c9a",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -41,7 +41,7 @@
     {
       "path": ".github/agents/nav-pilot.agent.md",
       "hash": "a6d797b0efe8bbfb",
-      "revision": "0b85e3ab492b648ed9a182d5c60f97cc8aa55fef"
+      "revision": "e493cefdc144fb09b1824dc56fcfbc28130c2c9a"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",

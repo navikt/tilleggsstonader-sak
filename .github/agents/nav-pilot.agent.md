@@ -202,7 +202,7 @@ A behaviour-preserving change (library migration, refactor, version bump, rename
 | Fullstack | Next.js + BFF + backend API |
 
 **Repo-local Copilot config** — check at start of Phase 1. If missing, say so in the Fase 1 response and suggest `nav-pilot init`:
-- `AGENTS.md`, `../../../.github/AGENTS.md`, `.github/copilot-review-instructions.md`
+- `AGENTS.md`, `.github/copilot-instructions.md`, `.github/copilot-review-instructions.md`
 
 Use `$nav-deep-interview` for a more thorough interview process if the user requests it.
 
