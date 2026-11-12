@@ -176,6 +176,23 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal ikke kunne korte ned paraplyen slik at en reise havner utenfor`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 1 februar 2026))
+
+        vilkårKall.apiRespons
+            .oppdaterVilkår(
+                paraplyvilkår(aktivitet.globalId, fom = 1 mars 2026, tom = 31 mars 2026),
+                paraply.id,
+                behandling.id,
+            ).expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Paraplyvilkårets periode kan ikke endres fordi 1 reise(r) ville havnet utenfor. Endre eller slett reisen først.",
+            )
+    }
+
+    @Test
     fun `skal ikke kunne overskrive vilkår av en annen type`() {
         val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
         val dagligReise = vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.DAGLIG_REISE))

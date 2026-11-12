@@ -67,6 +67,22 @@ object ROAHVilkårValideringUtil {
     }
 
     /**
+     * Paraplyens nye periode må fortsatt inneholde alle reisene som hører til den.
+     * [reiser] er reisene som refererer til paraplyen, uten slettede.
+     */
+    fun validerReiserErInnenforParaplyensNyePeriode(
+        nyttVilkår: LagreVilkårROAH,
+        reiser: List<Vilkår>,
+    ) {
+        if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
+        val antallUtenfor = reiser.count { !nyttVilkår.inneholder(it.mapTilVilkårROAH()) }
+        brukerfeilHvis(antallUtenfor > 0) {
+            "Paraplyvilkårets periode kan ikke endres fordi $antallUtenfor reise(r) ville havnet utenfor. " +
+                "Endre eller slett reisen først."
+        }
+    }
+
+    /**
      * En reise kan høre til et paraplyvilkår (midlertidig bosted), referert med paraplyvilkårets globalId.
      * [parentVilkår] er paraplyvilkåret slått opp i samme behandling, eller null hvis det ikke finnes.
      * [vilkårId] er null når vilkåret opprettes. Feilmeldingene inneholder ingen verdier fra vilkåret.

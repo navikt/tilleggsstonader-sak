@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -86,12 +87,53 @@ class ROAHVilkårValideringUtilTest {
             .hasMessageContaining("Til adresse må fylles ut")
     }
 
+    @Test
+    fun `ny paraplyperiode som fortsatt inneholder reisene er gyldig`() {
+        val reise = reiseVilkår(15 februar 2026)
+
+        assertThatCode {
+            ROAHVilkårValideringUtil.validerReiserErInnenforParaplyensNyePeriode(
+                midlertidigBosted("Fra", "Til", fom = 1 februar 2026, tom = 15 februar 2026),
+                listOf(reise),
+            )
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `ny paraplyperiode som utelater en reise gir varsel`() {
+        val reiseInnenfor = reiseVilkår(10 februar 2026)
+        val reiseUtenfor = reiseVilkår(20 februar 2026)
+
+        assertThatThrownBy {
+            ROAHVilkårValideringUtil.validerReiserErInnenforParaplyensNyePeriode(
+                midlertidigBosted("Fra", "Til", fom = 1 februar 2026, tom = 15 februar 2026),
+                listOf(reiseInnenfor, reiseUtenfor),
+            )
+        }.isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("1 reise(r) ville havnet utenfor")
+    }
+
+    private fun reiseVilkår(dato: LocalDate): Vilkår =
+        vilkår(
+            type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+            fom = dato,
+            tom = dato,
+            fakta =
+                FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+                    reiseId = ReiseId.random(),
+                    aktivitetId = aktivitetId,
+                    typeReiseformål = TypeReiseformål.AVSLUTNING,
+                ),
+        )
+
     private fun midlertidigBosted(
         fraAdresse: String,
         tilAdresse: String,
+        fom: LocalDate = 1 februar 2026,
+        tom: LocalDate = 28 februar 2026,
     ) = LagreVilkårMidlertidigBosted(
-        fom = 1 februar 2026,
-        tom = 28 februar 2026,
+        fom = fom,
+        tom = tom,
         aktivitetId = aktivitetId,
         svar = emptyMap(),
         fraAdresse = fraAdresse,

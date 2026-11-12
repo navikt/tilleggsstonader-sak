@@ -103,6 +103,10 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
 
         val eksisterendeVilkår = hentVilkårForBehandling(vilkårId, behandlingId)
         ROAHVilkårValideringUtil.validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
+        ROAHVilkårValideringUtil.validerReiserErInnenforParaplyensNyePeriode(
+            nyttVilkår,
+            hentReiserUnderParaply(eksisterendeVilkår),
+        )
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
         val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
@@ -173,6 +177,13 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         vilkår.parentVilkår?.let { parentId ->
             vilkårRepository.findByBehandlingId(vilkår.behandlingId).singleOrNull { it.globalId == parentId }
         }
+
+    private fun hentReiserUnderParaply(paraply: Vilkår): List<Vilkår> {
+        val paraplyGlobalId = paraply.globalId ?: return emptyList()
+        return vilkårRepository
+            .findByBehandlingId(paraply.behandlingId)
+            .filter { it.parentVilkår == paraplyGlobalId && it.status != VilkårStatus.SLETTET }
+    }
 
     private fun hentVilkårForBehandling(
         vilkårId: VilkårId,
