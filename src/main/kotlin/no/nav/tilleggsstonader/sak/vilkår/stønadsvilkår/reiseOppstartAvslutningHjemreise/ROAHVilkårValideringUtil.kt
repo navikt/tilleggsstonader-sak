@@ -42,7 +42,7 @@ object ROAHVilkårValideringUtil {
         }
         if (eksisterendeVilkår != null) {
             validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
-            validerReiserErInnenforParaplyensNyePeriode(
+            validerReiserMotEndretParaply(
                 nyttVilkår,
                 finnReiserUnderParaply(eksisterendeVilkår, vilkårIBehandling),
             )
@@ -129,15 +129,21 @@ object ROAHVilkårValideringUtil {
     }
 
     /**
-     * Paraplyens nye periode må fortsatt inneholde alle reisene som hører til den.
+     * Paraplyens nye periode må fortsatt inneholde alle reisene som hører til den,
+     * og paraplyen kan ikke flyttes til en annen aktivitet enn reisene har.
      * [reiser] er reisene som refererer til paraplyen, uten slettede.
      */
-    internal fun validerReiserErInnenforParaplyensNyePeriode(
+    internal fun validerReiserMotEndretParaply(
         nyttVilkår: LagreVilkårROAH,
         reiser: List<Vilkår>,
     ) {
         if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
-        val antallUtenfor = reiser.count { !nyttVilkår.inneholder(it.mapTilVilkårROAH()) }
+        val reiserROAH = reiser.map { it.mapTilVilkårROAH() }
+        brukerfeilHvis(reiserROAH.any { it.aktivitetId != nyttVilkår.aktivitetId }) {
+            "Aktiviteten kan ikke endres fordi det finnes reiser som hører til perioden hvor bruker bor borte. " +
+                "Endre eller slett reisene først."
+        }
+        val antallUtenfor = reiserROAH.count { !nyttVilkår.inneholder(it) }
         brukerfeilHvis(antallUtenfor > 0) {
             "Perioden hvor bruker bor borte kan ikke endres fordi $antallUtenfor reise(r) ville havnet utenfor. " +
                 "Endre eller slett reisen først."

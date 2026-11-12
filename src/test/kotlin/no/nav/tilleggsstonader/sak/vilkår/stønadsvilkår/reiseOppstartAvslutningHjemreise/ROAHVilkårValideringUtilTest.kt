@@ -94,7 +94,7 @@ class ROAHVilkårValideringUtilTest {
         val reise = reiseVilkår(15 februar 2026)
 
         assertThatCode {
-            ROAHVilkårValideringUtil.validerReiserErInnenforParaplyensNyePeriode(
+            ROAHVilkårValideringUtil.validerReiserMotEndretParaply(
                 midlertidigBosted("Fra", "Til", fom = 1 februar 2026, tom = 15 februar 2026),
                 listOf(reise),
             )
@@ -107,7 +107,7 @@ class ROAHVilkårValideringUtilTest {
         val reiseUtenfor = reiseVilkår(20 februar 2026)
 
         assertThatThrownBy {
-            ROAHVilkårValideringUtil.validerReiserErInnenforParaplyensNyePeriode(
+            ROAHVilkårValideringUtil.validerReiserMotEndretParaply(
                 midlertidigBosted("Fra", "Til", fom = 1 februar 2026, tom = 15 februar 2026),
                 listOf(reiseInnenfor, reiseUtenfor),
             )
@@ -152,6 +152,19 @@ class ROAHVilkårValideringUtilTest {
         }.doesNotThrowAnyException()
     }
 
+    @Test
+    fun `paraply kan ikke flyttes til annen aktivitet når den har reiser`() {
+        val reise = reiseVilkår(10 februar 2026)
+
+        assertThatThrownBy {
+            ROAHVilkårValideringUtil.validerReiserMotEndretParaply(
+                midlertidigBosted("Fra", "Til", aktivitetId = VilkårperiodeGlobalId.random()),
+                listOf(reise),
+            )
+        }.isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("Aktiviteten kan ikke endres")
+    }
+
     private fun reiseVilkår(dato: LocalDate): Vilkår =
         vilkår(
             type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
@@ -170,6 +183,7 @@ class ROAHVilkårValideringUtilTest {
         tilAdresse: String,
         fom: LocalDate = 1 februar 2026,
         tom: LocalDate = 28 februar 2026,
+        aktivitetId: VilkårperiodeGlobalId = this.aktivitetId,
     ) = LagreVilkårMidlertidigBosted(
         fom = fom,
         tom = tom,
