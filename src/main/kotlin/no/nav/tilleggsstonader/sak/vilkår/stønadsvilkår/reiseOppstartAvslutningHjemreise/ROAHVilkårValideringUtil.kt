@@ -4,10 +4,10 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
@@ -76,15 +76,11 @@ object ROAHVilkårValideringUtil {
             "Referansen peker ikke på et paraplyvilkår"
         }
 
-        val parentAktivitetId = (parentVilkår.fakta as? FaktaROAH)?.aktivitetId
-        feilHvis(parentAktivitetId != nyttVilkår.aktivitetId) {
+        val paraply = parentVilkår.mapTilVilkårROAH()
+        feilHvis(paraply.aktivitetId != nyttVilkår.aktivitetId) {
             "Reisen må høre til samme aktivitet som paraplyvilkåret"
         }
-
-        val parentFom = parentVilkår.fom
-        val parentTom = parentVilkår.tom
-        feilHvis(parentFom == null || parentTom == null) { "Paraplyvilkåret mangler periode" }
-        brukerfeilHvis(nyttVilkår.fom < parentFom || nyttVilkår.tom > parentTom) {
+        brukerfeilHvisIkke(paraply.inneholder(nyttVilkår)) {
             "Reisens periode må være innenfor paraplyvilkårets periode"
         }
     }

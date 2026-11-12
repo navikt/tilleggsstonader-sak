@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
@@ -28,7 +27,6 @@ data class VilkårReiseOppstartAvslutningHjemreise(
     override val slettetKommentar: String? = null,
     val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAH,
-    Periode<LocalDate>,
     Mergeable<LocalDate, VilkårReiseOppstartAvslutningHjemreise> {
     init {
         validatePeriode()

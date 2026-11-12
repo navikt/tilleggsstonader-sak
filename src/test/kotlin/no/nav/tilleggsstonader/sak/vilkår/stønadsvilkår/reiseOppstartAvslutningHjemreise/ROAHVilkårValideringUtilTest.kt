@@ -52,8 +52,8 @@ class ROAHVilkårValideringUtilTest {
         val paraply = paraply(fom = null, tom = null)
 
         assertThatThrownBy { valider(reise(1 februar 2026, 28 februar 2026), paraply) }
-            .isInstanceOf(Feil::class.java)
-            .hasMessageContaining("Paraplyvilkåret mangler periode")
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessageContaining("Forventer at fom er satt")
     }
 
     @Test
