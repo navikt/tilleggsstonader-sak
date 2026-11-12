@@ -161,7 +161,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 behandling.id,
                 paraplyvilkår(aktivitet.globalId, fom = 1 februar 2026, tom = 28 februar 2026),
             )
-        val melding = "Reisens periode må være innenfor paraplyvilkårets periode"
+        val melding = "Reisens periode må være innenfor perioden hvor bruker bor borte"
 
         // Aktiviteten gjelder januar til mars, paraplyen bare februar
         vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 1 februar 2026))
@@ -188,7 +188,29 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 behandling.id,
             ).expectProblemDetail(
                 HttpStatus.BAD_REQUEST,
-                "Paraplyvilkårets periode kan ikke endres fordi 1 reise(r) ville havnet utenfor. Endre eller slett reisen først.",
+                "Perioden hvor bruker bor borte kan ikke endres fordi 1 reise(r) ville havnet utenfor. Endre eller slett reisen først.",
+            )
+    }
+
+    @Test
+    fun `skal ikke kunne lagre overlappende paraplyvilkår på samme aktivitet`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        vilkårKall.opprettParaplyvilkår(
+            behandling.id,
+            paraplyvilkår(aktivitet.globalId, fom = 1 februar 2026, tom = 15 februar 2026),
+        )
+
+        vilkårKall.opprettParaplyvilkår(
+            behandling.id,
+            paraplyvilkår(aktivitet.globalId, fom = 16 februar 2026, tom = 28 februar 2026),
+        )
+        vilkårKall.apiRespons
+            .opprettVilkår(
+                behandling.id,
+                paraplyvilkår(aktivitet.globalId, fom = 15 februar 2026, tom = 20 februar 2026),
+            ).expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Perioden hvor bruker bor borte overlapper med en annen periode hvor bruker bor borte på samme aktivitet",
             )
     }
 

@@ -36,6 +36,7 @@ object ROAHVilkårValideringUtil {
     ) {
         validerAktivitet(nyttVilkår, aktivitet)
         validerMidlertidigBosted(nyttVilkår)
+        validerIkkeOverlappendeParaplyvilkår(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
         if (nyttVilkår is LagreVilkårReiseOppstartAvslutningHjemreise) {
             validerReiseMotParaply(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
         }
@@ -45,6 +46,24 @@ object ROAHVilkårValideringUtil {
                 nyttVilkår,
                 finnReiserUnderParaply(eksisterendeVilkår, vilkårIBehandling),
             )
+        }
+    }
+
+    /** Paraplyvilkår på samme aktivitet kan ikke overlappe hverandre. Slettede paraplyvilkår ignoreres. */
+    internal fun validerIkkeOverlappendeParaplyvilkår(
+        nyttVilkår: LagreVilkårROAH,
+        eksisterendeVilkår: Vilkår?,
+        vilkårIBehandling: List<Vilkår>,
+    ) {
+        if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
+        val overlapper =
+            vilkårIBehandling
+                .filter { it.type == VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE }
+                .filter { it.id != eksisterendeVilkår?.id && it.status != VilkårStatus.SLETTET }
+                .map { it.mapTilVilkårROAH() }
+                .any { it.aktivitetId == nyttVilkår.aktivitetId && it.overlapper(nyttVilkår) }
+        brukerfeilHvis(overlapper) {
+            "Perioden hvor bruker bor borte overlapper med en annen periode hvor bruker bor borte på samme aktivitet"
         }
     }
 
@@ -120,7 +139,7 @@ object ROAHVilkårValideringUtil {
         if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
         val antallUtenfor = reiser.count { !nyttVilkår.inneholder(it.mapTilVilkårROAH()) }
         brukerfeilHvis(antallUtenfor > 0) {
-            "Paraplyvilkårets periode kan ikke endres fordi $antallUtenfor reise(r) ville havnet utenfor. " +
+            "Perioden hvor bruker bor borte kan ikke endres fordi $antallUtenfor reise(r) ville havnet utenfor. " +
                 "Endre eller slett reisen først."
         }
     }
@@ -147,7 +166,7 @@ object ROAHVilkårValideringUtil {
             "Reisen må høre til samme aktivitet som paraplyvilkåret"
         }
         brukerfeilHvisIkke(paraply.inneholder(nyttVilkår)) {
-            "Reisens periode må være innenfor paraplyvilkårets periode"
+            "Reisens periode må være innenfor perioden hvor bruker bor borte"
         }
     }
 }

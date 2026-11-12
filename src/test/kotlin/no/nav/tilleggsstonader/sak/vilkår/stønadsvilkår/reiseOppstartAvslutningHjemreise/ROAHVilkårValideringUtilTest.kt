@@ -10,7 +10,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOpps
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
@@ -37,7 +39,7 @@ class ROAHVilkårValideringUtilTest {
 
         assertThatThrownBy { valider(reise(31 januar 2026, 28 februar 2026), paraply) }
             .isInstanceOf(ApiFeil::class.java)
-            .hasMessageContaining("Reisens periode må være innenfor paraplyvilkårets periode")
+            .hasMessageContaining("Reisens periode må være innenfor perioden hvor bruker bor borte")
     }
 
     @Test
@@ -46,7 +48,7 @@ class ROAHVilkårValideringUtilTest {
 
         assertThatThrownBy { valider(reise(1 februar 2026, 1 mars 2026), paraply) }
             .isInstanceOf(ApiFeil::class.java)
-            .hasMessageContaining("Reisens periode må være innenfor paraplyvilkårets periode")
+            .hasMessageContaining("Reisens periode må være innenfor perioden hvor bruker bor borte")
     }
 
     @Test
@@ -111,6 +113,43 @@ class ROAHVilkårValideringUtilTest {
             )
         }.isInstanceOf(ApiFeil::class.java)
             .hasMessageContaining("1 reise(r) ville havnet utenfor")
+    }
+
+    @Test
+    fun `paraplyvilkår som overlapper et annet på samme aktivitet avvises`() {
+        val eksisterende = paraply(fom = 1 februar 2026, tom = 15 februar 2026)
+
+        assertThatThrownBy {
+            ROAHVilkårValideringUtil.validerIkkeOverlappendeParaplyvilkår(
+                midlertidigBosted("Fra", "Til", fom = 15 februar 2026, tom = 28 februar 2026),
+                eksisterendeVilkår = null,
+                vilkårIBehandling = listOf(eksisterende),
+            )
+        }.isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("overlapper med en annen periode hvor bruker bor borte")
+    }
+
+    @Test
+    fun `paraplyvilkår som grenser til, er på annen aktivitet, er slettet eller er seg selv, er gyldig`() {
+        val eksisterende = paraply(fom = 1 februar 2026, tom = 15 februar 2026)
+        val annenAktivitet = paraply(fom = 1 februar 2026, tom = 28 februar 2026, aktivitetId = VilkårperiodeGlobalId.random())
+        val slettet =
+            paraply(
+                fom = 1 februar 2026,
+                tom = 28 februar 2026,
+            ).copy(status = VilkårStatus.SLETTET, resultat = Vilkårsresultat.SLETTET, slettetKommentar = "slettet")
+
+        fun valider(
+            nytt: LagreVilkårMidlertidigBosted,
+            eksisterendeVilkår: Vilkår? = null,
+            vilkår: List<Vilkår>,
+        ) = ROAHVilkårValideringUtil.validerIkkeOverlappendeParaplyvilkår(nytt, eksisterendeVilkår, vilkår)
+
+        assertThatCode {
+            valider(midlertidigBosted("Fra", "Til", fom = 16 februar 2026, tom = 28 februar 2026), vilkår = listOf(eksisterende))
+            valider(midlertidigBosted("Fra", "Til"), vilkår = listOf(annenAktivitet, slettet))
+            valider(midlertidigBosted("Fra", "Til", fom = 10 februar 2026, tom = 20 februar 2026), eksisterende, listOf(eksisterende))
+        }.doesNotThrowAnyException()
     }
 
     private fun reiseVilkår(dato: LocalDate): Vilkår =
