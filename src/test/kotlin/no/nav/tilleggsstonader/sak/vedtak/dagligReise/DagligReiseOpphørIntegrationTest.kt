@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,6 +63,34 @@ class DagligReiseOpphørIntegrationTest(
 
         assertThat(andelerOpphør.size).isNotEqualTo(andelerFørstegangsbehandling.size)
         assertThat(andelerOpphør.maxByOrNull { it.tom }!!.tom).isBeforeOrEqualTo(14 mars 2025)
+    }
+
+    @Test
+    fun `skal kunne opphøre alt når man også sletter alle vilkår`() {
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
+                defaultDagligReiseTsoTestdata(2 januar 2025, 6 juni 2025)
+            }
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                vilkår {
+                    slettDagligReise { v ->
+                        v.single().id to SlettVilkårRequestDto("sletteslett")
+                    }
+                }
+                vedtak {
+                    opphør(opphørsdato = 2 januar 2025)
+                }
+            }
+
+        val beregningsresultat = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId).data.beregningsresultat
+        assertThat(beregningsresultat.offentligTransport).isNull()
+        val andelerOpphør = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
+        assertThat(andelerOpphør).isEmpty()
     }
 
     @Test

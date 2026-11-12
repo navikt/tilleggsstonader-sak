@@ -42,7 +42,9 @@ class DagligReiseBeregningService(
         val oppfylteVilkårDagligReise =
             vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
 
-        validerFinnesReiser(oppfylteVilkårDagligReise)
+        if (typeVedtak == TypeVedtak.INNVILGELSE) {
+            validerFinnesReiser(oppfylteVilkårDagligReise)
+        }
 
         val brukersNavKontor =
             if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
