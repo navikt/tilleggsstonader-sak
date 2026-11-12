@@ -291,7 +291,7 @@ data class TidligsteEndringIBehandlingUtleder(
                     minOf(requireNotNull(vilkårNå.tom), requireNotNull(vilkårTidligereBehandling.tom))
 
                 faktaNå.reiseId != faktaTidligere.reiseId ||
-                    faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
+                    faktaNå.totalReiseavstand.compareTo(faktaTidligere.totalReiseavstand) != 0 ||
                     normaliserPrivatBilDelperioder(faktaNå, sammenligningsFom, sammenligningsTom) !=
                     normaliserPrivatBilDelperioder(faktaTidligere, sammenligningsFom, sammenligningsTom)
             }

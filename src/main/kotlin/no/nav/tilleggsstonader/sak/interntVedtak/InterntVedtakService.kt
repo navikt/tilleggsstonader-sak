@@ -486,7 +486,7 @@ class InterntVedtakService(
             is FaktaDagligReisePrivatBil ->
                 VilkårFaktaPrivatBilInterntVedtak(
                     reiseId = fakta.reiseId,
-                    reiseavstandEnVei = fakta.reiseavstandEnVei,
+                    totalReiseavstand = fakta.totalReiseavstand,
                     faktaDelperioder = fakta.faktaDelperioder,
                     adresse = fakta.adresse,
                 )

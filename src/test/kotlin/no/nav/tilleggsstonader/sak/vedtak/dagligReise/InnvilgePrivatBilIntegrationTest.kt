@@ -161,7 +161,7 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
             vilkårPrivatBil.fakta.mapTilFakta(vilkårPrivatBil.reiseId, vilkårPrivatBil.adresse) as FaktaPrivatBil
 
         assertThat(fakta.reiseId).isNotNull
-        assertThat(fakta.reiseavstandEnVei).isEqualTo(BigDecimal(10))
+        assertThat(fakta.totalReiseavstand).isEqualTo(BigDecimal(20))
         assertThat(fakta.faktaDelperioder).hasSize(2)
         assertThat(fakta.faktaDelperioder[0].fom).isEqualTo(fomDelperiode1)
         assertThat(fakta.faktaDelperioder[0].tom).isEqualTo(tomDelperiode1)

@@ -34,7 +34,7 @@ fun oppsummerBeregningPrivatBil(
 fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: RammevedtakForReiseMedPrivatBil) =
     OppsummertBeregningForReiseDto(
         reiseId = this.reiseId,
-        reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,
+        totalReiseavstand = rammevedtakForReise.grunnlag.totalReiseavstand,
         aktivitetsadresse = rammevedtakForReise.aktivitetsadresse,
         perioder =
             this.perioder
@@ -82,7 +82,7 @@ data class PrivatBilOppsummertBeregningDto(
 
 data class OppsummertBeregningForReiseDto(
     val reiseId: ReiseId,
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val aktivitetsadresse: String?,
     val perioder: List<OppsummertBeregningForPeriodeDto>,
     val fraTidligereVedtak: Boolean,

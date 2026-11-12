@@ -177,7 +177,7 @@ class PrivatBilRammevedtakBeregningService(
                                         )
                                 val dagsatsUtenParkering =
                                     beregnDagsatsUtenParkering(
-                                        reiseavstandEnVei = reise.reiseavstandEnVei,
+                                        totalReiseavstand = reise.totalReiseavstand,
                                         ekstrakostnader =
                                             RammeForReiseMedPrivatEkstrakostnader(
                                                 bompengerPerDag = delperiode.bompengerPerDag,
@@ -214,19 +214,18 @@ class PrivatBilRammevedtakBeregningService(
             fom = reise.fom,
             tom = reise.tom,
             delperioder = delperioder.sortedBy { it.fom },
-            reiseavstandEnVei = reise.reiseavstandEnVei,
+            totalReiseavstand = reise.totalReiseavstand,
             vedtaksperioder = vedtaksperioder,
         )
     }
 
     private fun beregnDagsatsUtenParkering(
-        reiseavstandEnVei: BigDecimal,
+        totalReiseavstand: BigDecimal,
         ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
         kilometersats: BigDecimal,
     ): BigDecimal {
         val kostnadKjøring =
-            reiseavstandEnVei
-                .multiply(BigDecimal.valueOf(2))
+            totalReiseavstand
                 .multiply(kilometersats)
                 .setScale(2, RoundingMode.HALF_UP)
 

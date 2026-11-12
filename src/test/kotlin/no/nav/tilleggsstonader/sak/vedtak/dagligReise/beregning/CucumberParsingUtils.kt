@@ -126,7 +126,7 @@ fun mapFaktaPrivatBil(
     FaktaPrivatBil(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
-        reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
+        totalReiseavstand = parseBigDecimal(DomenenøkkelPrivatBil.TOTAL_REISEAVSTAND, rad),
         faktaDelperioder = listOf(dummyDelperiode()),
         aktivitetId = aktivitetId,
     )
