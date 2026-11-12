@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.fjernTilordningPåÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettSøknadOgSendInnPåBruker
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
@@ -128,6 +129,61 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
             }
         assertThat(kjørelistebehandlinger).hasSize(1)
         val kjørelistebehandling = kjørelistebehandlinger.single()
+
+        val reisevurderingForReise =
+            kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id).single {
+                it.reiseId ==
+                    ReiseId.fromString(reiseId)
+            }
+        assertThat(reisevurderingForReise.uker).allMatch { it.kjørelisteInnsendtDato != null }
+    }
+
+    @Test
+    fun `skal kun opprettes en kjørelistebehandling om opprettes revurdering mellom to kjørelister`() {
+        val fom = 2 mars 2026
+        val tom = 15 mars 2026
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+
+                sendInnKjøreliste {
+                    periode = Datoperiode(fom, 8 mars 2026)
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 50))
+                }
+            }
+
+        // Sender inn søknad, blir til revurdering
+        opprettSøknadOgSendInnPåBruker(Stønadstype.DAGLIG_REISE_TSO, behandlingContext.ident)
+
+        val behandlingFørSisteKjøreliste = testoppsettService.hentBehandlinger(fagsakId = behandlingContext.fagsakId)
+        assertThat(behandlingFørSisteKjøreliste.filter { it.erKjørelisteBehandling() }).hasSize(1)
+        assertThat(behandlingFørSisteKjøreliste.filter { it.type == BehandlingType.REVURDERING }).hasSize(1)
+
+        val rammevedtak = kall.privatBil.hentRammevedtak(behandlingContext.ident)
+        val reiseId = rammevedtak.single().reiseId
+
+        sendInnKjøreliste(
+            kjøreliste =
+                kjørelisteSkjema(
+                    reiseId = reiseId,
+                    periode = Datoperiode(9 mars 2026, tom),
+                    dagerKjørt =
+                        listOf(
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 50),
+                        ),
+                ),
+            ident = behandlingContext.ident,
+        )
+
+        val kjørelistebehandlingerEtterToInnsendeKjørelister =
+            testoppsettService.hentBehandlinger(fagsakId = behandlingContext.fagsakId).filter {
+                it.type ==
+                    BehandlingType.KJØRELISTE
+            }
+        assertThat(kjørelistebehandlingerEtterToInnsendeKjørelister).hasSize(1)
+        val kjørelistebehandling = kjørelistebehandlingerEtterToInnsendeKjørelister.single()
 
         val reisevurderingForReise =
             kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id).single {
