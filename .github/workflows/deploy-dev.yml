@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       skip-checks:
-        description: "Hopp over testing og linting"
+        description: "Hopp over tester"
         type: boolean
         required: false
         default: false
@@ -18,3 +18,4 @@ jobs:
     with:
       cluster: "dev-gcp"
       manifest: ".nais/preprod.yaml"
+      skip-tests: ${{ inputs.skip-checks }}
