@@ -78,9 +78,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFeatureToggle()
-        validerAktivitet(nyttVilkår, behandlingId)
-        ROAHVilkårValideringUtil.validerMidlertidigBosted(nyttVilkår)
-        validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId = null)
+        validerVilkår(nyttVilkår, behandlingId, eksisterendeVilkår = null)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -97,16 +95,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFeatureToggle()
-        validerAktivitet(nyttVilkår, behandlingId)
-        ROAHVilkårValideringUtil.validerMidlertidigBosted(nyttVilkår)
-        validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId)
-
         val eksisterendeVilkår = hentVilkårForBehandling(vilkårId, behandlingId)
-        ROAHVilkårValideringUtil.validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
-        ROAHVilkårValideringUtil.validerReiserErInnenforParaplyensNyePeriode(
-            nyttVilkår,
-            hentReiserUnderParaply(eksisterendeVilkår),
-        )
+        validerVilkår(nyttVilkår, behandlingId, eksisterendeVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
         val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
@@ -178,13 +168,6 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
             vilkårRepository.findByBehandlingId(vilkår.behandlingId).singleOrNull { it.globalId == parentId }
         }
 
-    private fun hentReiserUnderParaply(paraply: Vilkår): List<Vilkår> {
-        val paraplyGlobalId = paraply.globalId ?: return emptyList()
-        return vilkårRepository
-            .findByBehandlingId(paraply.behandlingId)
-            .filter { it.parentVilkår == paraplyGlobalId && it.status != VilkårStatus.SLETTET }
-    }
-
     private fun hentVilkårForBehandling(
         vilkårId: VilkårId,
         behandlingId: BehandlingId,
@@ -194,22 +177,17 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         return vilkår
     }
 
-    /**
-     * globalId er ikke unik på tvers av behandlinger, så paraplyvilkåret slås alltid opp i samme behandling.
-     */
-    private fun validerTilhørendeParaplyvilkår(
+    private fun validerVilkår(
         nyttVilkår: LagreVilkårROAH,
         behandlingId: BehandlingId,
-        vilkårId: VilkårId?,
+        eksisterendeVilkår: Vilkår?,
     ) {
-        if (nyttVilkår !is LagreVilkårReiseOppstartAvslutningHjemreise) return
-        val parentVilkårGlobalId = nyttVilkår.parentVilkår ?: return
-
-        val parentVilkår =
-            vilkårRepository
-                .findByBehandlingId(behandlingId)
-                .singleOrNull { it.globalId == parentVilkårGlobalId }
-        ROAHVilkårValideringUtil.validerTilhørendeParaplyvilkår(nyttVilkår, parentVilkår, vilkårId)
+        ROAHVilkårValideringUtil.validerVilkår(
+            nyttVilkår = nyttVilkår,
+            aktivitet = vilkårperiodeService.hentAktivitet(nyttVilkår.aktivitetId, behandlingId),
+            eksisterendeVilkår = eksisterendeVilkår,
+            vilkårIBehandling = vilkårRepository.findByBehandlingId(behandlingId),
+        )
     }
 
     private fun utledStatus(eksisterendeVilkår: Vilkår?): VilkårStatus? =
@@ -241,13 +219,5 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         feilHvis(!kanBehandleReiseOppstartAvslutningHjemreise) {
             "TS-sak støtter foreløpig ikke behandling av saker som gjelder reise oppstart, avslutning eller hjemreise"
         }
-    }
-
-    private fun validerAktivitet(
-        nyttVilkår: LagreVilkårROAH,
-        behandlingId: BehandlingId,
-    ) {
-        val aktivitet = vilkårperiodeService.hentAktivitet(nyttVilkår.aktivitetId, behandlingId)
-        ROAHVilkårValideringUtil.validerAktivitet(nyttVilkår, aktivitet)
     }
 }

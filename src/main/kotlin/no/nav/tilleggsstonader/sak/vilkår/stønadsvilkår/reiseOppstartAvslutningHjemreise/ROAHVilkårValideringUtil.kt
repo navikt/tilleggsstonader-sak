@@ -24,10 +24,53 @@ object ROAHVilkårValideringUtil {
         )
 
     /**
+     * Validerer et vilkår som skal lagres. Kalles fra servicen etter at den har hentet det som trengs.
+     * [aktivitet] er aktiviteten vilkåret refererer til. [eksisterendeVilkår] er null når vilkåret opprettes.
+     * [vilkårIBehandling] er alle vilkår i behandlingen, siden globalId ikke er unik på tvers av behandlinger.
+     */
+    fun validerVilkår(
+        nyttVilkår: LagreVilkårROAH,
+        aktivitet: VilkårperiodeAktivitet?,
+        eksisterendeVilkår: Vilkår?,
+        vilkårIBehandling: List<Vilkår>,
+    ) {
+        validerAktivitet(nyttVilkår, aktivitet)
+        validerMidlertidigBosted(nyttVilkår)
+        if (nyttVilkår is LagreVilkårReiseOppstartAvslutningHjemreise) {
+            validerReiseMotParaply(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
+        }
+        if (eksisterendeVilkår != null) {
+            validerKanOppdatereVilkår(eksisterendeVilkår, nyttVilkår)
+            validerReiserErInnenforParaplyensNyePeriode(
+                nyttVilkår,
+                finnReiserUnderParaply(eksisterendeVilkår, vilkårIBehandling),
+            )
+        }
+    }
+
+    private fun validerReiseMotParaply(
+        nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
+        eksisterendeVilkår: Vilkår?,
+        vilkårIBehandling: List<Vilkår>,
+    ) {
+        val parentGlobalId = nyttVilkår.parentVilkår ?: return
+        val parentVilkår = vilkårIBehandling.singleOrNull { it.globalId == parentGlobalId }
+        validerTilhørendeParaplyvilkår(nyttVilkår, parentVilkår, eksisterendeVilkår?.id)
+    }
+
+    private fun finnReiserUnderParaply(
+        paraply: Vilkår,
+        vilkårIBehandling: List<Vilkår>,
+    ): List<Vilkår> {
+        val paraplyGlobalId = paraply.globalId ?: return emptyList()
+        return vilkårIBehandling.filter { it.parentVilkår == paraplyGlobalId && it.status != VilkårStatus.SLETTET }
+    }
+
+    /**
      * Endepunktet kan bare oppdatere vilkår for reise oppstart, avslutning og hjemreise, ikke andre vilkårstyper.
      * En reise kan heller ikke bli et paraplyvilkår, eller omvendt, ved oppdatering.
      */
-    fun validerKanOppdatereVilkår(
+    internal fun validerKanOppdatereVilkår(
         eksisterendeVilkår: Vilkår,
         nyttVilkår: LagreVilkårROAH,
     ) {
@@ -44,7 +87,7 @@ object ROAHVilkårValideringUtil {
     /**
      * Aktivitet valideres likt for TSO og TSR (i motsetning til reise til samling, der dette kun valideres for TSR).
      */
-    fun validerAktivitet(
+    internal fun validerAktivitet(
         nyttVilkår: LagreVilkårROAH,
         aktivitet: VilkårperiodeAktivitet?,
     ) {
@@ -60,7 +103,7 @@ object ROAHVilkårValideringUtil {
     }
 
     /** Paraplyvilkåret for midlertidig bosted må ha begge adressene satt. Perioden er påkrevd av typen. */
-    fun validerMidlertidigBosted(nyttVilkår: LagreVilkårROAH) {
+    internal fun validerMidlertidigBosted(nyttVilkår: LagreVilkårROAH) {
         if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
         brukerfeilHvis(nyttVilkår.fraAdresse.isBlank()) { "Fra adresse må fylles ut" }
         brukerfeilHvis(nyttVilkår.tilAdresse.isBlank()) { "Til adresse må fylles ut" }
@@ -70,7 +113,7 @@ object ROAHVilkårValideringUtil {
      * Paraplyens nye periode må fortsatt inneholde alle reisene som hører til den.
      * [reiser] er reisene som refererer til paraplyen, uten slettede.
      */
-    fun validerReiserErInnenforParaplyensNyePeriode(
+    internal fun validerReiserErInnenforParaplyensNyePeriode(
         nyttVilkår: LagreVilkårROAH,
         reiser: List<Vilkår>,
     ) {
@@ -87,7 +130,7 @@ object ROAHVilkårValideringUtil {
      * [parentVilkår] er paraplyvilkåret slått opp i samme behandling, eller null hvis det ikke finnes.
      * [vilkårId] er null når vilkåret opprettes. Feilmeldingene inneholder ingen verdier fra vilkåret.
      */
-    fun validerTilhørendeParaplyvilkår(
+    internal fun validerTilhørendeParaplyvilkår(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
         parentVilkår: Vilkår?,
         vilkårId: VilkårId?,
