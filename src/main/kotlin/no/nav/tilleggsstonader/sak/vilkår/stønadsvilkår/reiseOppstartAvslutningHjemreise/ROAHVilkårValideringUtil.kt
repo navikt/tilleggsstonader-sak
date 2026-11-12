@@ -59,6 +59,13 @@ object ROAHVilkårValideringUtil {
         }
     }
 
+    /** Paraplyvilkåret for midlertidig bosted må ha begge adressene satt. Perioden er påkrevd av typen. */
+    fun validerMidlertidigBosted(nyttVilkår: LagreVilkårROAH) {
+        if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
+        brukerfeilHvis(nyttVilkår.fraAdresse.isBlank()) { "Fra adresse må fylles ut" }
+        brukerfeilHvis(nyttVilkår.tilAdresse.isBlank()) { "Til adresse må fylles ut" }
+    }
+
     /**
      * En reise kan høre til et paraplyvilkår (midlertidig bosted), referert med paraplyvilkårets globalId.
      * [parentVilkår] er paraplyvilkåret slått opp i samme behandling, eller null hvis det ikke finnes.

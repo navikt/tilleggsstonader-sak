@@ -79,6 +79,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerBehandling(behandling)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandlingId)
+        ROAHVilkårValideringUtil.validerMidlertidigBosted(nyttVilkår)
         validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId = null)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
@@ -97,6 +98,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         validerBehandling(behandling)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandlingId)
+        ROAHVilkårValideringUtil.validerMidlertidigBosted(nyttVilkår)
         validerTilhørendeParaplyvilkår(nyttVilkår, behandlingId, vilkårId)
 
         val eksisterendeVilkår = hentVilkårForBehandling(vilkårId, behandlingId)

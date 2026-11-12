@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -64,6 +65,38 @@ class ROAHVilkårValideringUtilTest {
             .isInstanceOf(Feil::class.java)
             .hasMessageContaining("Reisen må høre til samme aktivitet som paraplyvilkåret")
     }
+
+    @Test
+    fun `paraplyvilkår med adresser er gyldig`() {
+        assertThatCode { ROAHVilkårValideringUtil.validerMidlertidigBosted(midlertidigBosted("Fra", "Til")) }
+            .doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `paraplyvilkår uten fra adresse avvises som brukerfeil`() {
+        assertThatThrownBy { ROAHVilkårValideringUtil.validerMidlertidigBosted(midlertidigBosted(" ", "Til")) }
+            .isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("Fra adresse må fylles ut")
+    }
+
+    @Test
+    fun `paraplyvilkår uten til adresse avvises som brukerfeil`() {
+        assertThatThrownBy { ROAHVilkårValideringUtil.validerMidlertidigBosted(midlertidigBosted("Fra", "")) }
+            .isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("Til adresse må fylles ut")
+    }
+
+    private fun midlertidigBosted(
+        fraAdresse: String,
+        tilAdresse: String,
+    ) = LagreVilkårMidlertidigBosted(
+        fom = 1 februar 2026,
+        tom = 28 februar 2026,
+        aktivitetId = aktivitetId,
+        svar = emptyMap(),
+        fraAdresse = fraAdresse,
+        tilAdresse = tilAdresse,
+    )
 
     private fun valider(
         reise: LagreVilkårReiseOppstartAvslutningHjemreise,
