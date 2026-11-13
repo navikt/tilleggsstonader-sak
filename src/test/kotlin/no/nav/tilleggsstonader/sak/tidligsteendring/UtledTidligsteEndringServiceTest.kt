@@ -564,6 +564,33 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
+    fun `uendret totalavstand med ulik desimalskala gir ingen tidligste endring`() {
+        val gammelFakta = faktaPrivatBil(totalReiseavstand = BigDecimal("21.0")).mapTilVilkårFakta()
+        val gammeltVilkår =
+            vilkår(
+                behandlingId = sisteIverksatteBehandling.id,
+                type = VilkårType.DAGLIG_REISE,
+                fom = originalFom,
+                tom = originalTom,
+                fakta = gammelFakta,
+            )
+        vilkårSisteIverksatteBehandling = listOf(gammeltVilkår)
+        vilkår =
+            listOf(
+                gammeltVilkår.copy(
+                    behandlingId = behandling.id,
+                    fakta = gammelFakta.copy(totalReiseavstand = BigDecimal("21")),
+                ),
+            )
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
+
+        assertThat(
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandling.id, vedtaksperioder),
+        ).isNull()
+    }
+
+    @Test
     fun `utled tidligste endring når skalBehandlesManuelt endres for privat bil`() {
         val fom = originalFom
         val tom = originalTom
@@ -587,7 +614,7 @@ class UtledTidligsteEndringServiceTest {
         val gammelFakta =
             FaktaDagligReisePrivatBil(
                 reiseId = privatBilFakta.reiseId,
-                reiseavstandEnVei = privatBilFakta.reiseavstandEnVei,
+                totalReiseavstand = privatBilFakta.totalReiseavstand,
                 faktaDelperioder = privatBilFakta.faktaDelperioder,
                 adresse = privatBilFakta.adresse,
                 aktivitetId = privatBilFakta.aktivitetId,

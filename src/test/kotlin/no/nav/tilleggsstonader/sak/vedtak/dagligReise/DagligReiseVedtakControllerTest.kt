@@ -259,7 +259,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     defaultDagligReisePrivatBilTsoTestdata(
                         fom,
                         tom,
-                        reiseavstandEnVei = 10.toBigDecimal(),
+                        totalReiseavstand = 20.toBigDecimal(),
                         delperioder = delperioder,
                     )
 
@@ -283,7 +283,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
             assertThat(oppsummertBeregning.reiser).hasSize(1)
 
             val oppsummertReise = oppsummertBeregning.reiser.single()
-            assertThat(oppsummertReise.reiseavstandEnVei).isEqualTo(10.toBigDecimal())
+            assertThat(oppsummertReise.totalReiseavstand).isEqualTo(20.toBigDecimal())
             assertThat(oppsummertReise.perioder).hasSize(3)
 
             validerOppsummertUke(

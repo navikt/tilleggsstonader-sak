@@ -625,7 +625,7 @@ fun faktaOffentligTransport(
 fun faktaPrivatBil(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
-    reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
+    totalReiseavstand: BigDecimal = 20.toBigDecimal(),
     reiseperioder: List<FaktaDelperiodePrivatBil> =
         listOf(
             FaktaDelperiodePrivatBil(
@@ -649,7 +649,7 @@ fun faktaPrivatBil(
         ),
 ) = FaktaPrivatBil(
     reiseId = reiseId,
-    reiseavstandEnVei = reiseavstandEnVei,
+    totalReiseavstand = totalReiseavstand,
     faktaDelperioder = reiseperioder,
     adresse = adresse,
     aktivitetId = dummyAktivitetId,
@@ -881,7 +881,7 @@ fun lagreDagligReisePrivatBilDto(
     tom: LocalDate = 31 januar 2025,
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
-    reiseavstandEnVei: BigDecimal = BigDecimal(10),
+    totalReiseavstand: BigDecimal = BigDecimal(20),
     delperioder: List<FaktaDelperiodePrivatBilDto> =
         listOf(
             FaktaDelperiodePrivatBilDto(
@@ -907,7 +907,7 @@ fun lagreDagligReisePrivatBilDto(
     aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
-            reiseavstandEnVei = reiseavstandEnVei,
+            totalReiseavstand = totalReiseavstand,
             faktaDelperioder = delperioder,
             adresse = adresse,
             aktivitetId = aktivitetId,

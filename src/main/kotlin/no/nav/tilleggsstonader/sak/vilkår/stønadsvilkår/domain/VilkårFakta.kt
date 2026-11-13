@@ -181,7 +181,7 @@ data class FaktaDagligReiseOffentligTransport(
 
 data class FaktaDagligReisePrivatBil(
     override val reiseId: ReiseId,
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
     val aktivitetId: VilkårperiodeGlobalId,

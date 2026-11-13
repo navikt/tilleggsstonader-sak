@@ -163,7 +163,7 @@ class FaktaDagligReiseTest {
                                     begrunnelseManuellBehandling = "",
                                 ),
                             ),
-                        reiseavstandEnVei = BigDecimal(10),
+                        totalReiseavstand = BigDecimal(20),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
@@ -189,7 +189,7 @@ class FaktaDagligReiseTest {
                                     begrunnelseManuellBehandling = "",
                                 ),
                             ),
-                        reiseavstandEnVei = BigDecimal(10),
+                        totalReiseavstand = BigDecimal(20),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
@@ -215,7 +215,7 @@ class FaktaDagligReiseTest {
                                     begrunnelseManuellBehandling = "",
                                 ),
                             ),
-                        reiseavstandEnVei = BigDecimal("-10"),
+                        totalReiseavstand = BigDecimal("-20"),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
@@ -229,7 +229,7 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reiseavstandEnVei = BigDecimal(10),
+                        totalReiseavstand = BigDecimal(20),
                         faktaDelperioder =
                             listOf(
                                 FaktaDelperiodePrivatBil(
@@ -255,7 +255,7 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reiseavstandEnVei = BigDecimal(10),
+                        totalReiseavstand = BigDecimal(20),
                         faktaDelperioder =
                             listOf(
                                 FaktaDelperiodePrivatBil(
@@ -309,7 +309,7 @@ class FaktaDagligReiseTest {
             bompengerPerDag: BigDecimal? = null,
             fergekostnadPerDag: BigDecimal? = null,
         ) = FaktaDagligReisePrivatBilDto(
-            reiseavstandEnVei = BigDecimal("10"),
+            totalReiseavstand = BigDecimal("20"),
             faktaDelperioder =
                 listOf(
                     FaktaDelperiodePrivatBilDto(

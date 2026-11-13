@@ -50,7 +50,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
     fun `innvilger rammevedtak og sender inn kjøreliste som blir godkjent, uke blir sendt til utbetaling`() {
         val fom = 2 februar 2026
         val tom = 22 februar 2026
-        val reiseavstandEnVei = BigDecimal(7.9)
+        val totalReiseavstand = BigDecimal(15.8)
         val kjørteDager =
             listOf(
                 KjørtDag(dato = 2 februar 2026, parkeringsutgift = 50),
@@ -90,7 +90,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                         privatBil(
                             fom,
                             tom,
-                            reiseavstandEnVei = reiseavstandEnVei,
+                            totalReiseavstand = totalReiseavstand,
                             delperioder = delperioder,
                         )
                     }
@@ -110,7 +110,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
         gjennomførKjørelisteBehandling(kjørelisteBehandling)
 
-        val forventetBeløp = kjørteDager.kalkulerForventetBeløp(reiseavstandEnVei)
+        val forventetBeløp = kjørteDager.kalkulerForventetBeløp(totalReiseavstand)
         assertAndelOpprettet(
             andelerForKjørelistebehandling = tilkjentYtelseRepository.findByBehandlingId(kjørelisteBehandling.id)?.andelerTilkjentYtelse,
             forventetBeløp = forventetBeløp,
@@ -177,8 +177,8 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
                 vilkår {
                     opprett {
-                        privatBil(fom, tom, reiseavstandEnVei = 10.toBigDecimal())
-                        privatBil(fom, tom, reiseavstandEnVei = 100.toBigDecimal())
+                        privatBil(fom, tom, totalReiseavstand = 20.toBigDecimal())
+                        privatBil(fom, tom, totalReiseavstand = 200.toBigDecimal())
                     }
                 }
             }
@@ -284,13 +284,12 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(andel.reiseId).isNotNull
     }
 
-    private fun List<KjørtDag>.kalkulerForventetBeløp(reiseavstandEnVei: BigDecimal): Int =
+    private fun List<KjørtDag>.kalkulerForventetBeløp(totalReiseavstand: BigDecimal): Int =
         sumOf { kjørtDag ->
             satsPrivatBilProvider
                 .finnSatsForÅr(kjørtDag.dato.year)
                 .beløp
-                .multiply(reiseavstandEnVei)
-                .multiply(2.toBigDecimal())
+                .multiply(totalReiseavstand)
                 .plus(kjørtDag.parkeringsutgift!!.toBigDecimal())
         }.avrundetStønadsbeløp()
             .toInt()

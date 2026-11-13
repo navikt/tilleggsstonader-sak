@@ -59,7 +59,7 @@ data class FaktaDagligReiseOffentligTransportDto(
 }
 
 data class FaktaDagligReisePrivatBilDto(
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
     val aktivitetId: VilkårperiodeGlobalId,
     val adresse: String?,
@@ -75,7 +75,7 @@ data class FaktaDagligReisePrivatBilDto(
 
         return FaktaPrivatBil(
             reiseId = reiseId,
-            reiseavstandEnVei = reiseavstandEnVei,
+            totalReiseavstand = totalReiseavstand,
             faktaDelperioder =
                 faktaDelperioder.map {
                     FaktaDelperiodePrivatBil(

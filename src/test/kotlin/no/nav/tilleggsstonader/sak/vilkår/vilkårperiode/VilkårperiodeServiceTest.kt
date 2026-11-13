@@ -483,7 +483,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                     fakta =
                         FaktaDagligReisePrivatBil(
                             reiseId = ReiseId.random(),
-                            reiseavstandEnVei = BigDecimal(10),
+                            totalReiseavstand = BigDecimal(20),
                             faktaDelperioder =
                                 listOf(
                                     FaktaDelperiodePrivatBil(

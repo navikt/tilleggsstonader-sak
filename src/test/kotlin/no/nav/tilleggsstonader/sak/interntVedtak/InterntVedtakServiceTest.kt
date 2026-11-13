@@ -544,7 +544,7 @@ class InterntVedtakServiceTest {
                 assertThat(faktiskGrunnlag.fom).isEqualTo(forventetGrunnlag.fom)
                 assertThat(faktiskGrunnlag.tom).isEqualTo(forventetGrunnlag.tom)
                 assertThat(faktiskGrunnlag.vedtaksperioder).isEqualTo(forventetGrunnlag.vedtaksperioder)
-                assertThat(faktiskGrunnlag.reiseavstandEnVei).isEqualTo(forventetGrunnlag.reiseavstandEnVei)
+                assertThat(faktiskGrunnlag.totalReiseavstand).isEqualTo(forventetGrunnlag.totalReiseavstand)
 
                 assertThat(faktiskGrunnlag.delperioder).hasSameSizeAs(forventetGrunnlag.delperioder)
                 faktiskGrunnlag.delperioder.forEachIndexed { delIndex, faktiskDelperiode ->

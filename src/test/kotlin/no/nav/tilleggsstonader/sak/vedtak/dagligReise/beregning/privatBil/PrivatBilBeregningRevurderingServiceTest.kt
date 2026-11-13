@@ -41,7 +41,7 @@ class PrivatBilBeregningRevurderingServiceTest {
         aktivitetType = no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType.TILTAK,
         tiltaksvariant = null,
         delPerioder = emptyList(),
-        reiseavstandEnVei = java.math.BigDecimal.TEN,
+        totalReiseavstand = java.math.BigDecimal.valueOf(20),
         status = status,
     )
 

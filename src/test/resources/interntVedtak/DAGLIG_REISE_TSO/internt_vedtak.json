@@ -119,7 +119,7 @@
           "ukeår": 2025
         } ],
         "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-        "reiseavstandEnVei": 40.0,
+        "totalReiseavstand": 80.0,
         "totaltStønadsbeløpMedPerioderFraForrigeVedtak": 1600,
         "totaltStønadsbeløpUtenPerioderFraForrigeVedtak": 1600
       } ],
@@ -247,8 +247,8 @@
           "tom": "2025-02-28"
         } ],
         "fom": "2025-01-01",
-        "reiseavstandEnVei": 40.0,
         "tom": "2025-02-28",
+        "totalReiseavstand": 80.0,
         "vedtaksperioder": [ {
           "aktivitet": "TILTAK",
           "fom": "2025-01-01",
@@ -317,7 +317,7 @@
         "tom": "2025-02-28"
       } ],
       "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-      "reiseavstandEnVei": 40,
+      "totalReiseavstand": 80,
       "type": "DAGLIG_REISE_PRIVAT_BIL"
     },
     "fom": "2025-01-01",
