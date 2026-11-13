@@ -199,8 +199,8 @@ class FlyttingBeregningService(
         return grunnlag to beløp.avrundetStønadsbeløp()
     }
 
-    private fun Int?.tilBeløp(): BigDecimal {
-        feilHvis(this != null && this < 0) { "Tilleggskostnader kan ikke være negative" }
-        return this?.toBigDecimal() ?: BigDecimal.ZERO
+    private fun BigDecimal?.tilBeløp(): BigDecimal {
+        feilHvis(this != null && this < BigDecimal.ZERO) { "Tilleggskostnader kan ikke være negative" }
+        return this ?: BigDecimal.ZERO
     }
 }

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
+import java.math.BigDecimal
 
 class LagreVilkårFlyttingDtoTest {
     @Test
@@ -66,6 +67,29 @@ class LagreVilkårFlyttingDtoTest {
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI),
                 nødvendigUtgift = nødvendigUtgiftDto,
                 beløpSomKanDekkes = null,
+            ),
+        )
+    }
+
+    @Test
+    fun `skal deserialisere egen kjøring med desimalkostnader`() {
+        val fakta =
+            jsonMapper.readValue<FaktaFlyttingDto>(
+                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "avstandEnVei": 250, "henger": 1500.25, "leiebil": 1250.50, "bompenger": 25.75, "ferge": 100.05, "parkering": 44.40, "annet": 35.99, "dokumenterteUtgifter": {"erUtgifterDokumentert": "JA", "begrunnelse": "Kvittering fra flyttebyrå"}, "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
+            )
+
+        assertThat(fakta).isEqualTo(
+            FaktaFlytteSelvDto(
+                dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                adresse = "Flytteveien 1",
+                avstandEnVei = 250,
+                henger = BigDecimal("1500.25"),
+                leiebil = BigDecimal("1250.50"),
+                bompenger = BigDecimal("25.75"),
+                ferge = BigDecimal("100.05"),
+                parkering = BigDecimal("44.40"),
+                annet = BigDecimal("35.99"),
+                nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
     }
