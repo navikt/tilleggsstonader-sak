@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
+import java.math.BigDecimal
 
 class FaktaFlyttingMapperTest {
     @Test
@@ -61,12 +62,12 @@ class FaktaFlyttingMapperTest {
             FaktaFlytteSelvDto(
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 avstandEnVei = 250,
-                henger = 1500,
-                leiebil = null,
-                bompenger = 0,
-                ferge = null,
-                parkering = 100,
-                annet = null,
+                henger = BigDecimal("1500.25"),
+                leiebil = BigDecimal("1250.50"),
+                bompenger = BigDecimal("25.75"),
+                ferge = BigDecimal("100.05"),
+                parkering = BigDecimal("44.40"),
+                annet = BigDecimal("35.99"),
                 adresse = "Flytteveien 1",
                 nødvendigUtgift = nødvendigUtgiftDto,
             ),

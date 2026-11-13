@@ -122,18 +122,50 @@ class FlyttingVilkårValideringTest {
     }
 
     @Test
-    fun `skal avvise negativ kostnad for henger`() {
-        assertThrows<ApiFeil> {
+    fun `skal avvise negative desimalkostnader for alle tilleggskostnader`() {
+        val fakta =
+            FaktaFlytteSelv(
+                dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
+                avstandEnVei = 250,
+                henger = null,
+                leiebil = null,
+                bompenger = null,
+                ferge = null,
+                parkering = null,
+                annet = null,
+                adresse = "Flytteveien 1",
+                nødvendigUtgift = nødvendigUtgift,
+            )
+        val ugyldigeFakta =
+            listOf(
+                fakta.copy(henger = BigDecimal("-0.01")),
+                fakta.copy(leiebil = BigDecimal("-0.01")),
+                fakta.copy(bompenger = BigDecimal("-0.01")),
+                fakta.copy(ferge = BigDecimal("-0.01")),
+                fakta.copy(parkering = BigDecimal("-0.01")),
+                fakta.copy(annet = BigDecimal("-0.01")),
+            )
+
+        ugyldigeFakta.forEach { ugyldigFakta ->
+            assertThrows<ApiFeil> {
+                FlyttingVilkårValidering.validerOppgitteFakta(ugyldigFakta)
+            }
+        }
+    }
+
+    @Test
+    fun `skal godta null og positive desimalkostnader`() {
+        assertDoesNotThrow {
             FlyttingVilkårValidering.validerOppgitteFakta(
                 FaktaFlytteSelv(
                     dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     avstandEnVei = 250,
-                    henger = -1,
-                    leiebil = null,
-                    bompenger = null,
+                    henger = null,
+                    leiebil = BigDecimal.ZERO,
+                    bompenger = BigDecimal("0.01"),
                     ferge = null,
-                    parkering = null,
-                    annet = null,
+                    parkering = BigDecimal("25.50"),
+                    annet = BigDecimal.ZERO,
                     adresse = "Flytteveien 1",
                     nødvendigUtgift = nødvendigUtgift,
                 ),

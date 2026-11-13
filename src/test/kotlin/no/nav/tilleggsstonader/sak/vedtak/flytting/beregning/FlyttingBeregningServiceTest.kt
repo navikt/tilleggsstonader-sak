@@ -44,6 +44,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -202,12 +203,12 @@ class FlyttingBeregningServiceTest {
                                     "Kvittering fra flyttebyrå",
                                 ),
                             avstandEnVei = 100,
-                            henger = 100,
-                            leiebil = 50,
-                            bompenger = 20,
-                            ferge = 30,
-                            parkering = 40,
-                            annet = 60,
+                            henger = BigDecimal("100"),
+                            leiebil = BigDecimal("50"),
+                            bompenger = BigDecimal("20"),
+                            ferge = BigDecimal("30"),
+                            parkering = BigDecimal("40"),
+                            annet = BigDecimal("60"),
                             adresse = "Flytteveien 1",
                             nødvendigUtgift = nødvendigUtgift,
                         ),
@@ -230,6 +231,53 @@ class FlyttingBeregningServiceTest {
                     ferge = BigDecimal("30"),
                     parkering = BigDecimal("40"),
                     annet = BigDecimal("60"),
+                ),
+            )
+    }
+
+    @ParameterizedTest
+    @CsvSource("0.24, 288", "0.25, 289")
+    fun `egen flytting summerer desimalkostnader før avrunding`(
+        leiebil: String,
+        forventetBeløp: String,
+    ) {
+        every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
+            listOf(
+                vilkår(
+                    flyttedato = 1 januar 2025,
+                    fakta =
+                        faktaFlytteSelv(
+                            avstandEnVei = 100,
+                            henger = BigDecimal("0.25"),
+                            leiebil = BigDecimal(leiebil),
+                            bompenger = null,
+                            ferge = null,
+                            parkering = null,
+                            annet = null,
+                        ),
+                ),
+            )
+
+        val resultat =
+            beregningService
+                .beregn(behandling, listOf(vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)))
+                .resultater
+                .single()
+
+        assertThat(resultat.beløp).isEqualByComparingTo(forventetBeløp)
+        assertThat(resultat.grunnlag)
+            .isEqualTo(
+                BeregningsgrunnlagFlytteSelv(
+                    erUtgifterDokumentert = true,
+                    avstandEnVei = 100,
+                    sats = BigDecimal("2.88"),
+                    satsBekreftet = true,
+                    henger = BigDecimal("0.25"),
+                    leiebil = BigDecimal(leiebil),
+                    bompenger = BigDecimal.ZERO,
+                    ferge = BigDecimal.ZERO,
+                    parkering = BigDecimal.ZERO,
+                    annet = BigDecimal.ZERO,
                 ),
             )
     }
@@ -433,10 +481,12 @@ class FlyttingBeregningServiceTest {
             listOf(
                 faktaFlytteSelv(avstandEnVei = null),
                 faktaFlytteSelv(avstandEnVei = -1),
-                faktaFlytteSelv(henger = -1),
-                faktaFlytteSelv(bompenger = -1),
-                faktaFlytteSelv(ferge = -1),
-                faktaFlytteSelv(parkering = -1),
+                faktaFlytteSelv(henger = BigDecimal("-0.01")),
+                faktaFlytteSelv(leiebil = BigDecimal("-0.01")),
+                faktaFlytteSelv(bompenger = BigDecimal("-0.01")),
+                faktaFlytteSelv(ferge = BigDecimal("-0.01")),
+                faktaFlytteSelv(parkering = BigDecimal("-0.01")),
+                faktaFlytteSelv(annet = BigDecimal("-0.01")),
             )
 
         ugyldigeFakta.forEach { fakta ->
@@ -544,12 +594,12 @@ class FlyttingBeregningServiceTest {
 
     private fun faktaFlytteSelv(
         avstandEnVei: Int? = 100,
-        henger: Int? = 10,
-        leiebil: Int? = null,
-        bompenger: Int? = 20,
-        ferge: Int? = 30,
-        parkering: Int? = 40,
-        annet: Int? = null,
+        henger: BigDecimal? = BigDecimal("10"),
+        leiebil: BigDecimal? = null,
+        bompenger: BigDecimal? = BigDecimal("20"),
+        ferge: BigDecimal? = BigDecimal("30"),
+        parkering: BigDecimal? = BigDecimal("40"),
+        annet: BigDecimal? = null,
     ) = FaktaFlytteSelv(
         dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
         avstandEnVei = avstandEnVei,
