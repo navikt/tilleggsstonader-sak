@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
@@ -37,6 +38,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.Flyttetilbud
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.FlyttingDetaljer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.UtgifterEgenFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeInfo
@@ -802,5 +804,34 @@ internal class BehandlingFaktaServiceTest {
                     dokumenter = listOf(Dokument("dokumentInfoId")),
                 ),
             )
+
+        val søknadMedEgenFlytting =
+            søknad.copy(
+                data =
+                    søknad.data.copy(
+                        flyttingDetaljer =
+                            flyttingDetaljer.copy(
+                                flyttemåte = Flyttemåte.FLYTTER_SELV,
+                                utgifterEgenFlytting =
+                                    UtgifterEgenFlytting(
+                                        avstand = BigDecimal("10"),
+                                        drivstoffType = DrivstoffType.BENSIN,
+                                        hengerleie = null,
+                                        leiebil = null,
+                                        bom = null,
+                                        parkering = null,
+                                        ferje = null,
+                                        annet = null,
+                                    ),
+                                flyttetilbud = null,
+                            ),
+                    ),
+            )
+        every { søknadService.hentSøknadFlytting(behandlingId) } returns søknadMedEgenFlytting
+
+        val faktaMedEgenFlytting = service.hentFakta(behandlingId) as BehandlingFaktaFlyttingDto
+
+        assertThat(faktaMedEgenFlytting.flyttingDetaljer?.utgifterEgenFlytting?.drivstoffType)
+            .isEqualTo(DrivstoffType.BENSIN)
     }
 }

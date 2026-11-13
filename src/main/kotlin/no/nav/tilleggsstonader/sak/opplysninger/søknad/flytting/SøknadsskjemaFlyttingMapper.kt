@@ -67,6 +67,7 @@ object SøknadsskjemaFlyttingMapper {
                 detaljer.utgifterEgenFlytting?.let {
                     UtgifterEgenFlytting(
                         avstand = it.avstand.verdi,
+                        drivstoffType = it.drivstoffType.verdi,
                         hengerleie = it.hengerleie?.verdi,
                         leiebil = it.leiebil?.verdi,
                         bom = it.bom?.verdi,

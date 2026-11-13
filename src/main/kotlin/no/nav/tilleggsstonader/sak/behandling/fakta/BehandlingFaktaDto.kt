@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnne
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.DrivstoffType
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteEgenBil
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteOffentligTransport
@@ -178,6 +178,7 @@ data class FaktaAdresse(
 
 data class FaktaUtgifterEgenFlytting(
     val avstand: BigDecimal,
+    val drivstoffType: DrivstoffType,
     val hengerleie: BigDecimal?,
     val leiebil: BigDecimal?,
     val bom: BigDecimal?,
