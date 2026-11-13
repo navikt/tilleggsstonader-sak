@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import java.math.BigDecimal
 
 class FlyttingVilkårControllerTest : IntegrationTest() {
     private val fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO)
@@ -69,11 +70,11 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 FaktaFlytteSelvDto(
                     dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                     avstandEnVei = 100,
-                    henger = 1500,
+                    henger = BigDecimal(1500),
                     leiebil = null,
-                    bompenger = 300,
-                    ferge = 400,
-                    parkering = 100,
+                    bompenger = BigDecimal(300),
+                    ferge = BigDecimal(400),
+                    parkering = BigDecimal(100),
                     annet = null,
                     adresse = "Flytteveien 1",
                     nødvendigUtgift = nødvendigUtgiftDto,
@@ -123,12 +124,12 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         val flytteSelv =
             FaktaFlytteSelvDto(
                 avstandEnVei = 250,
-                henger = 1500,
-                leiebil = null,
-                bompenger = 0,
-                ferge = null,
-                parkering = 100,
-                annet = null,
+                henger = BigDecimal("1500.25"),
+                leiebil = BigDecimal("250.5"),
+                bompenger = BigDecimal("75.75"),
+                ferge = BigDecimal("120.125"),
+                parkering = BigDecimal("9.99"),
+                annet = BigDecimal("33.33"),
                 adresse = "Flytteveien 2",
                 dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
                 nødvendigUtgift = nødvendigUtgift,
@@ -189,11 +190,11 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     FaktaFlytteSelvDto(
                         dokumenterteUtgifter = DokumenterteUtgifterDto(SvarJaNei.NEI, "Kvittering fra flyttebyrå"),
                         avstandEnVei = 200,
-                        henger = 2000,
+                        henger = BigDecimal(2000),
                         leiebil = null,
-                        bompenger = 500,
-                        ferge = 600,
-                        parkering = 200,
+                        bompenger = BigDecimal(500),
+                        ferge = BigDecimal(600),
+                        parkering = BigDecimal(200),
                         annet = null,
                         adresse = "Flytteveien 2",
                         nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.NEI, "Utgiften er for høy"),

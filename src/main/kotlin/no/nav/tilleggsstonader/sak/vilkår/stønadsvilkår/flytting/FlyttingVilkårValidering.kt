@@ -47,7 +47,7 @@ object FlyttingVilkårValidering {
                 }
                 listOfNotNull(fakta.henger, fakta.leiebil, fakta.bompenger, fakta.ferge, fakta.parkering, fakta.annet)
                     .forEach { beløp ->
-                        brukerfeilHvis(beløp < 0) { "Kostnader kan ikke være negative" }
+                        brukerfeilHvis(beløp < BigDecimal.ZERO) { "Kostnader kan ikke være negative" }
                     }
             }
 

@@ -330,12 +330,12 @@ class UtledTidligsteEndringServiceTest {
         val fakta =
             FaktaFlytteSelv(
                 100,
-                100,
-                100,
-                100,
-                100,
-                100,
-                100,
+                BigDecimal(100),
+                BigDecimal(100),
+                BigDecimal(100),
+                BigDecimal(100),
+                BigDecimal(100),
+                BigDecimal(100),
                 nødvendigUtgift,
                 "Syntetisk adresse",
                 dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
@@ -353,12 +353,12 @@ class UtledTidligsteEndringServiceTest {
             )
         listOf(
             fakta.copy(avstandEnVei = 200),
-            fakta.copy(henger = 200),
-            fakta.copy(leiebil = 200),
-            fakta.copy(bompenger = 200),
-            fakta.copy(ferge = 200),
-            fakta.copy(parkering = 200),
-            fakta.copy(annet = 200),
+            fakta.copy(henger = BigDecimal(200)),
+            fakta.copy(leiebil = BigDecimal(200)),
+            fakta.copy(bompenger = BigDecimal(200)),
+            fakta.copy(ferge = BigDecimal(200)),
+            fakta.copy(parkering = BigDecimal(200)),
+            fakta.copy(annet = BigDecimal(200)),
             fakta.copy(dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.NEI, "Kvittering fra flyttebyrå")),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)

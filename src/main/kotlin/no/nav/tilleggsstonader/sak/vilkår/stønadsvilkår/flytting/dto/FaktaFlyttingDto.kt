@@ -44,12 +44,12 @@ data class FlyttebyråTilbudDto(
 
 data class FaktaFlytteSelvDto(
     val avstandEnVei: Int? = null,
-    val henger: Int? = null,
-    val leiebil: Int? = null,
-    val bompenger: Int? = null,
-    val ferge: Int? = null,
-    val parkering: Int? = null,
-    val annet: Int? = null,
+    val henger: BigDecimal? = null,
+    val leiebil: BigDecimal? = null,
+    val bompenger: BigDecimal? = null,
+    val ferge: BigDecimal? = null,
+    val parkering: BigDecimal? = null,
+    val annet: BigDecimal? = null,
     val nødvendigUtgift: NødvendigUtgiftDto,
     override val adresse: String,
     val dokumenterteUtgifter: DokumenterteUtgifterDto,
