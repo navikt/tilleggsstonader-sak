@@ -55,7 +55,9 @@ class TotrinnskontrollService(
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
         } else {
-            feilHvis(sendTilBeslutterRequest.kommentarTilBeslutter != null) {
+            feilHvis(
+                sendTilBeslutterRequest.kommentarTilBeslutter != null && !saksbehandling.erKjørelisteBehandling(),
+            ) {
                 "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
             }
         }
