@@ -72,7 +72,7 @@ object VilkårDagligReiseMapper {
     private fun FaktaDagligReisePrivatBil.mapTilFakta() =
         FaktaPrivatBil(
             reiseId = this.reiseId,
-            reiseavstandEnVei = this.reiseavstandEnVei,
+            totalReiseavstand = this.totalReiseavstand,
             faktaDelperioder =
                 this.faktaDelperioder.map {
                     FaktaDelperiodePrivatBil(

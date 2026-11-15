@@ -357,7 +357,7 @@ class OpprettStønadsvilkårDsl {
     fun privatBil(
         fom: LocalDate,
         tom: LocalDate,
-        reiseavstandEnVei: BigDecimal = BigDecimal(10),
+        totalReiseavstand: BigDecimal = BigDecimal(20),
         delperioder: List<FaktaDelperiodePrivatBilDto>,
         hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {
@@ -366,7 +366,7 @@ class OpprettStønadsvilkårDsl {
                 fom = fom,
                 tom = tom,
                 reiseId = ReiseId.random(),
-                reiseavstandEnVei = reiseavstandEnVei,
+                totalReiseavstand = totalReiseavstand,
                 delperioder = delperioder,
                 aktivitetId = hentAktivitetId(aktiviteter),
             )
@@ -376,7 +376,7 @@ class OpprettStønadsvilkårDsl {
     fun privatBil(
         fom: LocalDate,
         tom: LocalDate,
-        reiseavstandEnVei: BigDecimal = BigDecimal(10),
+        totalReiseavstand: BigDecimal = BigDecimal(20),
         reisedagerPerUke: Int = 5,
         hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {
@@ -385,7 +385,7 @@ class OpprettStønadsvilkårDsl {
                 fom = fom,
                 tom = tom,
                 reiseId = ReiseId.random(),
-                reiseavstandEnVei = reiseavstandEnVei,
+                totalReiseavstand = totalReiseavstand,
                 delperioder =
                     listOf(
                         FaktaDelperiodePrivatBilDto(

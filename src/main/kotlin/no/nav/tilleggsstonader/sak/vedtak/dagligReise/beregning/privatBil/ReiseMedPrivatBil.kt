@@ -21,7 +21,7 @@ data class ReiseMedPrivatBil(
     val aktivitetType: AktivitetType,
     val tiltaksvariant: TypeAktivitet?,
     val delPerioder: List<ReiseMedPrivatBilDelperiode>,
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val status: VilkårStatus?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
@@ -73,7 +73,7 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(
         tom = this.tom,
         aktivitetsadresse = this.fakta.adresse,
         reiseId = this.fakta.reiseId,
-        reiseavstandEnVei = fakta.reiseavstandEnVei,
+        totalReiseavstand = fakta.totalReiseavstand,
         delPerioder =
             fakta.faktaDelperioder.map { delperiode ->
                 ReiseMedPrivatBilDelperiode(

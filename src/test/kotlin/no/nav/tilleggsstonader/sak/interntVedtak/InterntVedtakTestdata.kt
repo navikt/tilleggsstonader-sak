@@ -802,7 +802,7 @@ object InterntVedtakTestdata {
                                                 begrunnelseManuellBehandling = null,
                                             ),
                                         ),
-                                    reiseavstandEnVei = BigDecimal.valueOf(40.0),
+                                    totalReiseavstand = BigDecimal.valueOf(80.0),
                                     vedtaksperioder = vedtaksperioder,
                                 ),
                         ),
@@ -1033,7 +1033,7 @@ object InterntVedtakTestdata {
                         FaktaDagligReisePrivatBil(
                             reiseId = dummyReiseId,
                             adresse = "Tiltaksgata 1",
-                            reiseavstandEnVei = BigDecimal(40.0),
+                            totalReiseavstand = BigDecimal(80.0),
                             faktaDelperioder =
                                 listOf(
                                     FaktaDelperiodePrivatBil(

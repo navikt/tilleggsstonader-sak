@@ -195,7 +195,7 @@ class ValiderManuellKjørelisteTest {
                 fom = fom,
                 tom = tom,
                 delperioder = emptyList(),
-                reiseavstandEnVei = BigDecimal("10"),
+                totalReiseavstand = BigDecimal("20"),
                 vedtaksperioder = emptyList(),
             ),
     )

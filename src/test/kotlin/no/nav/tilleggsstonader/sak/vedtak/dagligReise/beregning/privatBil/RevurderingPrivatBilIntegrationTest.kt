@@ -249,7 +249,7 @@ class RevurderingPrivatBilIntegrationTest(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 ) {
                     vilkår {
-                        endrePrivatBilFakta { copy(reiseavstandEnVei = "67".toBigDecimal()) }
+                        endrePrivatBilFakta { copy(totalReiseavstand = "134".toBigDecimal()) }
                     }
                 }
 

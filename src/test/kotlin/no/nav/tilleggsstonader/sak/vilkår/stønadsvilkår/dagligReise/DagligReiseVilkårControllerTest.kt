@@ -154,7 +154,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
             nyttVilkår.copy(
                 fakta =
                     faktaPrivatBil(
-                        reiseavstandEnVei = BigDecimal("10"),
+                        totalReiseavstand = BigDecimal("20"),
                         aktivitet = aktivitet,
                     ),
             )
@@ -304,14 +304,14 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     )
 
     private fun faktaPrivatBil(
-        reiseavstandEnVei: BigDecimal = BigDecimal("10"),
+        totalReiseavstand: BigDecimal = BigDecimal("20"),
         fom: LocalDate = 1 januar 2026,
         tom: LocalDate = 31 januar 2026,
         bompengerPerDag: BigDecimal? = null,
         fergekostnadPerDag: BigDecimal? = null,
         aktivitet: VilkårperiodeDto,
     ) = FaktaDagligReisePrivatBilDto(
-        reiseavstandEnVei = reiseavstandEnVei,
+        totalReiseavstand = totalReiseavstand,
         faktaDelperioder =
             listOf(
                 FaktaDelperiodePrivatBilDto(
