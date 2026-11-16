@@ -18,40 +18,30 @@ import java.time.LocalDateTime
  */
 data class Behandling(
     @Id
-    val id: BehandlingId = BehandlingId.random(),
-    val fagsakId: FagsakId,
-    val forrigeIverksatteBehandlingId: BehandlingId? = null,
+    override val id: BehandlingId = BehandlingId.random(),
+    override val fagsakId: FagsakId,
+    override val forrigeIverksatteBehandlingId: BehandlingId? = null,
     // @Version ?
     val versjon: Int = 0,
     override val type: BehandlingType,
     @Column("behandling_metode")
-    val behandlingMetode: BehandlingMetode,
+    override val behandlingMetode: BehandlingMetode,
     override val status: BehandlingStatus,
-    val steg: StegType,
-    val kategori: BehandlingKategori,
+    override val steg: StegType,
+    override val kategori: BehandlingKategori,
     @Column("arsak")
     override val årsak: BehandlingÅrsak,
-    val kravMottatt: LocalDate? = null,
+    override val kravMottatt: LocalDate? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-    val resultat: BehandlingResultat,
+    override val resultat: BehandlingResultat,
     @Column("henlagt_arsak")
-    val henlagtÅrsak: HenlagtÅrsak? = null,
-    val henlagtBegrunnelse: String? = null,
-    val vedtakstidspunkt: LocalDateTime? = null,
+    override val henlagtÅrsak: HenlagtÅrsak? = null,
+    override val henlagtBegrunnelse: String? = null,
+    override val vedtakstidspunkt: LocalDateTime? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    val årsakMetadata: ÅrsakMetadata? = null,
+    override val årsakMetadata: ÅrsakMetadata? = null,
 ) : ErBehandling {
-    fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
-
-    fun erAktiv(): Boolean = !(erFerdigstilt() || status == BehandlingStatus.SATT_PÅ_VENT)
-
-    fun vedtakstidspunktEllerFeil(): LocalDateTime = this.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=$id")
-
-    fun erHenlagt(): Boolean = resultat == BehandlingResultat.HENLAGT
-
-    fun erOpphørt(): Boolean = resultat == BehandlingResultat.OPPHØRT
-
     init {
         if (erHenlagt()) {
             feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }

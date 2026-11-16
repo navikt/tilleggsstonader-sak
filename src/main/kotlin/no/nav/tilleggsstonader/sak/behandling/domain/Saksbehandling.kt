@@ -14,27 +14,27 @@ import java.time.LocalDateTime
  * Aggregert behandling og fagsak
  */
 data class Saksbehandling(
-    val id: BehandlingId,
+    override val id: BehandlingId,
     val eksternId: Long,
-    val forrigeIverksatteBehandlingId: BehandlingId? = null,
+    override val forrigeIverksatteBehandlingId: BehandlingId? = null,
     override val type: BehandlingType,
     @Column("behandling_metode")
-    val behandlingMetode: BehandlingMetode,
+    override val behandlingMetode: BehandlingMetode,
     override val status: BehandlingStatus,
-    val steg: StegType,
-    val kategori: BehandlingKategori,
+    override val steg: StegType,
+    override val kategori: BehandlingKategori,
     @Column("arsak")
     override val årsak: BehandlingÅrsak,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    val årsakMetadata: ÅrsakMetadata? = null,
-    val kravMottatt: LocalDate? = null,
-    val resultat: BehandlingResultat,
-    val vedtakstidspunkt: LocalDateTime?,
+    override val årsakMetadata: ÅrsakMetadata? = null,
+    override val kravMottatt: LocalDate? = null,
+    override val resultat: BehandlingResultat,
+    override val vedtakstidspunkt: LocalDateTime?,
     @Column("henlagt_arsak")
-    val henlagtÅrsak: HenlagtÅrsak? = null,
-    val henlagtBegrunnelse: String? = null,
+    override val henlagtÅrsak: HenlagtÅrsak? = null,
+    override val henlagtBegrunnelse: String? = null,
     val ident: String,
-    val fagsakId: FagsakId,
+    override val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,
     val eksternFagsakId: Long,
     @Column("stonadstype")
