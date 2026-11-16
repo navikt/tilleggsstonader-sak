@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFa
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.KnyttetTilAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
@@ -233,6 +234,10 @@ class VilkårperiodeService(
             )
         }
 
+        if (oppdatert.fom != eksisterendeVilkårperiode.fom || oppdatert.tom != eksisterendeVilkårperiode.tom) {
+            validerPeriodeInneholderTilknyttedeVilkår(oppdatert)
+        }
+
         return vilkårperiodeRepository.update(oppdatert)
     }
 
@@ -324,18 +329,31 @@ class VilkårperiodeService(
         }
     }
 
+    private fun hentAktiveVilkårKnyttetTilAktivitet(
+        behandlingId: BehandlingId,
+        globalId: VilkårperiodeGlobalId,
+    ): List<Vilkår> =
+        vilkårRepository
+            .findByBehandlingId(behandlingId)
+            .filter { it.status != VilkårStatus.SLETTET }
+            .filter { (it.fakta as? KnyttetTilAktivitet)?.aktivitetId == globalId }
+
     private fun validerAktivitetIkkeReferertAvVilkår(
         behandlingId: BehandlingId,
         globalId: VilkårperiodeGlobalId,
     ) {
-        val erReferert =
-            vilkårRepository
-                .findByBehandlingId(behandlingId)
-                .filter { it.status != VilkårStatus.SLETTET }
-                .any { (it.fakta as? KnyttetTilAktivitet)?.aktivitetId == globalId }
+        brukerfeilHvis(hentAktiveVilkårKnyttetTilAktivitet(behandlingId, globalId).isNotEmpty()) {
+            "Aktiviteten har vilkår knyttet til seg og kan ikke slettes eller endres"
+        }
+    }
 
-        brukerfeilHvis(erReferert) {
-            "Aktiviteten har vilkår knyttet til seg. Vurderingene på aktiviteten kan ikke endres og aktiviteten ikke ikke slettes.  "
+    private fun validerPeriodeInneholderTilknyttedeVilkår(oppdatert: Vilkårperiode) {
+        val vilkårUtenforPerioden =
+            hentAktiveVilkårKnyttetTilAktivitet(oppdatert.behandlingId, oppdatert.globalId)
+                .filter { (it.fom != null && it.fom < oppdatert.fom) || (it.tom != null && it.tom > oppdatert.tom) }
+
+        brukerfeilHvis(vilkårUtenforPerioden.isNotEmpty()) {
+            "Perioden kan ikke gjøres kortere enn vilkårene som er knyttet til aktiviteten"
         }
     }
 }

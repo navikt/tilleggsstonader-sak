@@ -515,6 +515,63 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                 .hasMessageContaining("Aktiviteten har vilkår knyttet til seg")
         }
 
+        private fun lagParaplyvilkår(
+            fom: LocalDate = lagretAktivitet.fom,
+            tom: LocalDate = lagretAktivitet.tom,
+            status: VilkårStatus = VilkårStatus.NY,
+        ) = lagROAHVilkår(
+            type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+            fakta =
+                FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                    aktivitetId = lagretAktivitet.globalId,
+                    fraAdresse = "Hjemveien 1",
+                    tilAdresse = "Tiltaksveien 1",
+                ),
+            status = status,
+            fom = fom,
+            tom = tom,
+        )
+
+        @Test
+        fun `skal ikke kunne forkorte aktivitetens periode til kortere enn tilknyttede vilkår`() {
+            lagParaplyvilkår()
+
+            val forkortetFom = lagretAktivitet.tilOppdatering().copy(fom = lagretAktivitet.fom.plusDays(1))
+            val forkortetTom = lagretAktivitet.tilOppdatering().copy(tom = lagretAktivitet.tom.minusDays(1))
+
+            listOf(forkortetFom, forkortetTom).forEach {
+                assertThatThrownBy { vilkårperiodeService.oppdaterVilkårperiode(lagretAktivitet.id, it) }
+                    .hasMessageContaining("Perioden kan ikke gjøres kortere enn vilkårene")
+            }
+        }
+
+        @Test
+        fun `skal kunne forlenge aktivitetens periode og forkorte den så lenge vilkårene er innenfor`() {
+            lagParaplyvilkår(fom = lagretAktivitet.fom.plusDays(1), tom = lagretAktivitet.tom.minusDays(1))
+
+            vilkårperiodeService.oppdaterVilkårperiode(
+                lagretAktivitet.id,
+                lagretAktivitet.tilOppdatering().copy(tom = lagretAktivitet.tom.plusDays(3)),
+            )
+            vilkårperiodeService.oppdaterVilkårperiode(
+                lagretAktivitet.id,
+                lagretAktivitet.tilOppdatering().copy(
+                    fom = lagretAktivitet.fom.plusDays(1),
+                    tom = lagretAktivitet.tom.minusDays(1),
+                ),
+            )
+        }
+
+        @Test
+        fun `skal kunne forkorte aktivitetens periode hvis tilknyttet vilkår er slettet`() {
+            lagParaplyvilkår(status = VilkårStatus.SLETTET)
+
+            vilkårperiodeService.oppdaterVilkårperiode(
+                lagretAktivitet.id,
+                lagretAktivitet.tilOppdatering().copy(tom = lagretAktivitet.tom.minusDays(1)),
+            )
+        }
+
         @Test
         fun `skal tillate sletting av aktivitet hvis refererende ROAH-vilkår er slettet`() {
             lagROAHVilkår(
@@ -586,11 +643,15 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             type: VilkårType,
             fakta: VilkårFakta,
             status: VilkårStatus = VilkårStatus.NY,
+            fom: LocalDate = lagretAktivitet.fom,
+            tom: LocalDate = lagretAktivitet.tom,
         ) {
             vilkårRepository.insert(
                 vilkår(
                     behandlingId = lagretAktivitet.behandlingId,
                     type = type,
+                    fom = fom,
+                    tom = tom,
                     status = status,
                     slettetKommentar = if (status == VilkårStatus.SLETTET) "kommentar" else null,
                     fakta = fakta,
