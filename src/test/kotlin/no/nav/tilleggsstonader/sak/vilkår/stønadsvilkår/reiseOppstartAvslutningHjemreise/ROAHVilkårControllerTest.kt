@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -153,6 +154,67 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal avvise reise med periode utenfor paraplyvilkårets periode`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply =
+            vilkårKall.opprettParaplyvilkår(
+                behandling.id,
+                paraplyvilkår(aktivitet.globalId, fom = 1 februar 2026, tom = 28 februar 2026),
+            )
+        val melding = "Reisens periode må være innenfor perioden hvor bruker bor borte"
+
+        // Aktiviteten gjelder januar til mars, paraplyen bare februar
+        vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 1 februar 2026))
+        vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 28 februar 2026))
+
+        vilkårKall.apiRespons
+            .opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 31 januar 2026))
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, melding)
+        vilkårKall.apiRespons
+            .opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 1 mars 2026))
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, melding)
+    }
+
+    @Test
+    fun `skal ikke kunne korte ned paraplyen slik at en reise havner utenfor`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId, fom = 1 februar 2026))
+
+        vilkårKall.apiRespons
+            .oppdaterVilkår(
+                paraplyvilkår(aktivitet.globalId, fom = 1 mars 2026, tom = 31 mars 2026),
+                paraply.id,
+                behandling.id,
+            ).expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Perioden hvor bruker bor borte kan ikke endres fordi 1 reise(r) ville havnet utenfor. Endre eller slett reisen først.",
+            )
+    }
+
+    @Test
+    fun `skal ikke kunne lagre overlappende paraplyvilkår på samme aktivitet`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        vilkårKall.opprettParaplyvilkår(
+            behandling.id,
+            paraplyvilkår(aktivitet.globalId, fom = 1 februar 2026, tom = 15 februar 2026),
+        )
+
+        vilkårKall.opprettParaplyvilkår(
+            behandling.id,
+            paraplyvilkår(aktivitet.globalId, fom = 16 februar 2026, tom = 28 februar 2026),
+        )
+        vilkårKall.apiRespons
+            .opprettVilkår(
+                behandling.id,
+                paraplyvilkår(aktivitet.globalId, fom = 15 februar 2026, tom = 20 februar 2026),
+            ).expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Perioden hvor bruker bor borte overlapper med en annen periode hvor bruker bor borte på samme aktivitet",
+            )
+    }
+
+    @Test
     fun `skal ikke kunne overskrive vilkår av en annen type`() {
         val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
         val dagligReise = vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.DAGLIG_REISE))
@@ -281,8 +343,9 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     private fun reise(
         aktivitetId: VilkårperiodeGlobalId,
         parentVilkår: VilkårGlobalId? = null,
+        fom: LocalDate = 1 januar 2026,
     ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
-        fom = 1 januar 2026,
+        fom = fom,
         tom = null,
         reiseId = ReiseId.random(),
         aktivitetId = aktivitetId,
@@ -306,9 +369,11 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         aktivitetId: VilkårperiodeGlobalId,
         fraAdresse: String = "Adresse 1",
         svar: Map<RegelId, SvarOgBegrunnelseDto> = ROAHTestUtil.oppfylteSvarMidlertidigBostedDto(),
+        fom: LocalDate = 1 januar 2026,
+        tom: LocalDate = 31 mars 2026,
     ) = LagreVilkårMidlertidigBostedDto(
-        fom = 1 januar 2026,
-        tom = 31 mars 2026,
+        fom = fom,
+        tom = tom,
         aktivitetId = aktivitetId,
         svar = svar,
         fraAdresse = fraAdresse,

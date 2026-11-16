@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
-import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -15,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårAktivitetValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -31,7 +31,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -196,14 +195,6 @@ class ReiseTilSamlingVilkårService(
             "Aktivitet må velges"
         }
         val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
-        brukerfeilHvis(aktivitet == null) {
-            "Aktiviteten finnes ikke"
-        }
-        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
-            "Aktiviteten er ikke oppfylt"
-        }
-        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
-            "Aktiviteten er ikke oppfylt hele vilkårperioden"
-        }
+        VilkårAktivitetValidering.validerAktivitetOppfyltHeleVilkåret(aktivitet, nyttVilkår)
     }
 }

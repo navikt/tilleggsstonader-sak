@@ -14,13 +14,13 @@ import java.time.LocalDate
  * Et vilkår for reise oppstart, avslutning og hjemreise er enten en reise ([VilkårReiseOppstartAvslutningHjemreise])
  * eller et paraplyvilkår for midlertidig bosted ([VilkårMidlertidigBosted]) som reiser kan høre til.
  */
-sealed interface VilkårROAH {
+sealed interface VilkårROAH : Periode<LocalDate> {
     val id: VilkårId
     val globalId: VilkårGlobalId?
     val behandlingId: BehandlingId
     val aktivitetId: VilkårperiodeGlobalId
-    val fom: LocalDate
-    val tom: LocalDate
+    override val fom: LocalDate
+    override val tom: LocalDate
     val resultat: Vilkårsresultat
     val status: VilkårStatus?
     val delvilkårsett: List<Delvilkår>
@@ -41,8 +41,7 @@ data class VilkårMidlertidigBosted(
     override val slettetKommentar: String? = null,
     val fraAdresse: String,
     val tilAdresse: String,
-) : VilkårROAH,
-    Periode<LocalDate> {
+) : VilkårROAH {
     init {
         validatePeriode()
     }
