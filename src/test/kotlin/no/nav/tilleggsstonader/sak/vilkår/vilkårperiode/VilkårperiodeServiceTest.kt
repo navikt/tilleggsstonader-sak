@@ -483,7 +483,6 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             }.hasMessageContaining("Aktiviteten har vilkår knyttet til seg")
         }
 
-
         @Test
         fun `skal kaste feil hvis aktivitet er referert av en ROAH-reise`() {
             lagROAHVilkår(
@@ -604,7 +603,6 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                 lagretAktivitet.id,
                 SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
             )
-
     }
 
     @Nested

@@ -165,6 +165,43 @@ class ROAHVilkårValideringUtilTest {
             .hasMessageContaining("Aktiviteten kan ikke endres")
     }
 
+    @Test
+    fun `paraplyvilkår med reiser knyttet til seg kan ikke slettes`() {
+        val paraply = paraply(fom = 1 februar 2026, tom = 28 februar 2026)
+        val reise = reiseVilkår(10 februar 2026).copy(parentVilkår = paraply.globalId)
+
+        assertThatThrownBy {
+            ROAHVilkårValideringUtil.validerKanSlettes(paraply, listOf(paraply, reise))
+        }.isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("har reiser knyttet til seg og kan ikke slettes")
+    }
+
+    @Test
+    fun `paraplyvilkår kan slettes hvis reisene er slettet eller ikke finnes`() {
+        val paraply = paraply(fom = 1 februar 2026, tom = 28 februar 2026)
+        val slettetReise =
+            reiseVilkår(10 februar 2026).copy(
+                parentVilkår = paraply.globalId,
+                status = VilkårStatus.SLETTET,
+                slettetKommentar = "kommentar",
+            )
+
+        assertThatCode {
+            ROAHVilkårValideringUtil.validerKanSlettes(paraply, listOf(paraply))
+            ROAHVilkårValideringUtil.validerKanSlettes(paraply, listOf(paraply, slettetReise))
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    fun `reise kan slettes selv om den har parent`() {
+        val paraply = paraply(fom = 1 februar 2026, tom = 28 februar 2026)
+        val reise = reiseVilkår(10 februar 2026).copy(parentVilkår = paraply.globalId)
+
+        assertThatCode {
+            ROAHVilkårValideringUtil.validerKanSlettes(reise, listOf(paraply, reise))
+        }.doesNotThrowAnyException()
+    }
+
     private fun reiseVilkår(dato: LocalDate): Vilkår =
         vilkår(
             type = VilkårType.ROAH_OPPSTART_AVSLUTNING,

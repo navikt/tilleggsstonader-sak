@@ -110,6 +110,17 @@ object ROAHVilkårValideringUtil {
         brukerfeilHvis(nyttVilkår.tilAdresse.isBlank()) { "Til adresse må fylles ut" }
     }
 
+    /** Et paraplyvilkår kan ikke slettes så lenge det finnes reiser (som ikke er slettet) som hører til det. */
+    internal fun validerKanSlettes(
+        vilkår: Vilkår,
+        vilkårIBehandling: List<Vilkår>,
+    ) {
+        if (vilkår.type != VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE) return
+        brukerfeilHvis(finnReiserUnderParaply(vilkår, vilkårIBehandling).isNotEmpty()) {
+            "Perioden hvor bruker bor borte har reiser knyttet til seg og kan ikke slettes. Slett reisene først."
+        }
+    }
+
     /**
      * Paraplyens nye periode må fortsatt inneholde alle reisene som hører til den,
      * og paraplyen kan ikke flyttes til en annen aktivitet enn reisene har.

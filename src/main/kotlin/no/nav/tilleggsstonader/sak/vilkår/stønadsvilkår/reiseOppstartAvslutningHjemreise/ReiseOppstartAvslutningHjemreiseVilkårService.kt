@@ -109,14 +109,17 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         behandlingId: BehandlingId,
         vilkårId: VilkårId,
         slettetKommentar: String?,
-    ): SlettetVilkårResultat =
-        vilkårService.slettVilkår(
+    ): SlettetVilkårResultat {
+        val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
+        ROAHVilkårValideringUtil.validerKanSlettes(vilkår, vilkårRepository.findByBehandlingId(vilkår.behandlingId))
+        return vilkårService.slettVilkår(
             SlettVilkårRequest(
                 id = vilkårId,
                 behandlingId = behandlingId,
                 kommentar = slettetKommentar,
             ),
         )
+    }
 
     private fun lagVilkårMedVurderingerOgResultat(
         behandlingId: BehandlingId,
