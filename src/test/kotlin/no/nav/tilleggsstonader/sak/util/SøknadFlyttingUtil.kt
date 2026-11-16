@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråTilbud
@@ -71,6 +72,7 @@ object SøknadFlyttingUtil {
                                 if (flyttemåte == Flyttemåte.FLYTTER_SELV) {
                                     UtgifterEgenFlyttingAvsnitt(
                                         avstand = VerdiFelt(BigDecimal("120.25"), "Avstand"),
+                                        drivstoffType = EnumFelt("Drivstofftype", DrivstoffType.BENSIN, "Bensin", emptyList()),
                                         hengerleie = VerdiFelt(BigDecimal("500.00"), "Hengerleie"),
                                         leiebil = VerdiFelt(BigDecimal("800.00"), "Leiebil"),
                                         bom = VerdiFelt(BigDecimal("0.00"), "Bom"),

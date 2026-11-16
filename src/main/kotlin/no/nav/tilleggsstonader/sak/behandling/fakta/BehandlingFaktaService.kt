@@ -251,6 +251,7 @@ class BehandlingFaktaService(
                 detaljer.utgifterEgenFlytting?.let {
                     FaktaUtgifterEgenFlytting(
                         avstand = it.avstand,
+                        drivstoffType = it.drivstoffType,
                         hengerleie = it.hengerleie,
                         leiebil = it.leiebil,
                         bom = it.bom,

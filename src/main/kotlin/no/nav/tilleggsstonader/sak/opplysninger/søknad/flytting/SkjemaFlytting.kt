@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting
 
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
@@ -31,6 +32,7 @@ data class FlyttingDetaljer(
 
 data class UtgifterEgenFlytting(
     val avstand: BigDecimal,
+    val drivstoffType: DrivstoffType,
     val hengerleie: BigDecimal?,
     val leiebil: BigDecimal?,
     val bom: BigDecimal?,
