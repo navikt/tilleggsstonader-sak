@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårAktivitetValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
@@ -32,7 +33,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Re
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -221,15 +221,7 @@ class DagligReiseVilkårService(
     ) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
         val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
-        brukerfeilHvis(aktivitet == null) {
-            "Aktiviteten finnes ikke"
-        }
-        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
-            "Aktiviteten er ikke oppfylt"
-        }
-        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
-            "Aktiviteten er ikke oppfylt hele vilkårperioden"
-        }
+        VilkårAktivitetValidering.validerAktivitetOppfyltHeleVilkåret(aktivitet, nyttVilkår)
     }
 
     private fun validerAktivitetForOffentligTransport(

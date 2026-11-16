@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårAktivitetValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -11,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
 
 /** Validering av vilkår for reise oppstart, avslutning og hjemreise (ROAH). Uten oppslag, slik at den kan enhetstestes. */
@@ -34,7 +34,7 @@ object ROAHVilkårValideringUtil {
         eksisterendeVilkår: Vilkår?,
         vilkårIBehandling: List<Vilkår>,
     ) {
-        validerAktivitet(nyttVilkår, aktivitet)
+        VilkårAktivitetValidering.validerAktivitetOppfyltHeleVilkåret(aktivitet, nyttVilkår)
         validerMidlertidigBosted(nyttVilkår)
         validerIkkeOverlappendeParaplyvilkår(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
         if (nyttVilkår is LagreVilkårReiseOppstartAvslutningHjemreise) {
@@ -100,24 +100,6 @@ object ROAHVilkårValideringUtil {
         val erNyttVilkårParaplyvilkår = nyttVilkår is LagreVilkårMidlertidigBosted
         feilHvis(erEksisterendeVilkårParaplyvilkår != erNyttVilkårParaplyvilkår) {
             "Kan ikke endre mellom reise og paraplyvilkår"
-        }
-    }
-
-    /**
-     * Aktivitet valideres likt for TSO og TSR (i motsetning til reise til samling, der dette kun valideres for TSR).
-     */
-    internal fun validerAktivitet(
-        nyttVilkår: LagreVilkårROAH,
-        aktivitet: VilkårperiodeAktivitet?,
-    ) {
-        brukerfeilHvis(aktivitet == null) {
-            "Aktiviteten finnes ikke"
-        }
-        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
-            "Aktiviteten er ikke oppfylt"
-        }
-        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
-            "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
     }
 
