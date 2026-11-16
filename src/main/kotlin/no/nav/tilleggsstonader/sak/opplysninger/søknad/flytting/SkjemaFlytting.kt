@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting
 
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
-import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
