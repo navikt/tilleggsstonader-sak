@@ -18,10 +18,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.KnyttetTilAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
@@ -228,7 +227,7 @@ class VilkårperiodeService(
             )
 
         if (eksisterendeVilkårperiode.resultat == ResultatVilkårperiode.OPPFYLT && oppdatert.resultat != ResultatVilkårperiode.OPPFYLT) {
-            validerAktivitetIkkeReferertAvDagligReiseVilkår(
+            validerAktivitetIkkeReferertAvVilkår(
                 eksisterendeVilkårperiode.behandlingId,
                 eksisterendeVilkårperiode.globalId,
             )
@@ -247,7 +246,7 @@ class VilkårperiodeService(
 
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-        validerAktivitetIkkeReferertAvDagligReiseVilkår(vilkårperiode.behandlingId, vilkårperiode.globalId)
+        validerAktivitetIkkeReferertAvVilkår(vilkårperiode.behandlingId, vilkårperiode.globalId)
 
         if (vilkårperiode.kanSlettesPermanent()) {
             vilkårperiodeRepository.deleteById(vilkårperiode.id)
@@ -325,19 +324,18 @@ class VilkårperiodeService(
         }
     }
 
-    private fun validerAktivitetIkkeReferertAvDagligReiseVilkår(
+    private fun validerAktivitetIkkeReferertAvVilkår(
         behandlingId: BehandlingId,
         globalId: VilkårperiodeGlobalId,
     ) {
         val erReferert =
             vilkårRepository
                 .findByBehandlingId(behandlingId)
-                .filter { it.type == VilkårType.DAGLIG_REISE }
                 .filter { it.status != VilkårStatus.SLETTET }
-                .any { (it.fakta as? FaktaDagligReisePrivatBil)?.aktivitetId == globalId }
+                .any { (it.fakta as? KnyttetTilAktivitet)?.aktivitetId == globalId }
 
         brukerfeilHvis(erReferert) {
-            "Aktiviteten er knyttet til et vilkår for daglig reise og kan ikke slettes eller endres"
+            "Aktiviteten har vilkår knyttet til seg og kan ikke slettes eller endres"
         }
     }
 }

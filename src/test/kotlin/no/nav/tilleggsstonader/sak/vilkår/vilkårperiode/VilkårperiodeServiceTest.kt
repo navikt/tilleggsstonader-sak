@@ -25,10 +25,14 @@ import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
@@ -470,6 +474,82 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                 )
         }
 
+        @Test
+        fun `skal kaste feil hvis aktivitet er referert av et aktivt dagligReise-vilkår`() {
+            lagDagligReiseVilkår(lagretAktivitet.globalId)
+
+            assertThatThrownBy {
+                slettAktivitet()
+            }.hasMessageContaining("Aktiviteten har vilkår knyttet til seg")
+        }
+
+
+        @Test
+        fun `skal kaste feil hvis aktivitet er referert av en ROAH-reise`() {
+            lagROAHVilkår(
+                type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                fakta =
+                    FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+                        reiseId = ReiseId.random(),
+                        aktivitetId = lagretAktivitet.globalId,
+                        typeReiseformål = TypeReiseformål.OPPSTART,
+                    ),
+            )
+
+            assertThatThrownBy { slettAktivitet() }
+                .hasMessageContaining("Aktiviteten har vilkår knyttet til seg")
+        }
+
+        @Test
+        fun `skal kaste feil hvis aktivitet er referert av et ROAH midlertidig bosted-vilkår`() {
+            lagROAHVilkår(
+                type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                fakta =
+                    FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                        aktivitetId = lagretAktivitet.globalId,
+                        fraAdresse = "Hjemveien 1",
+                        tilAdresse = "Tiltaksveien 1",
+                    ),
+            )
+
+            assertThatThrownBy { slettAktivitet() }
+                .hasMessageContaining("Aktiviteten har vilkår knyttet til seg")
+        }
+
+        @Test
+        fun `skal tillate sletting av aktivitet hvis refererende ROAH-vilkår er slettet`() {
+            lagROAHVilkår(
+                type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                fakta =
+                    FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                        aktivitetId = lagretAktivitet.globalId,
+                        fraAdresse = "Hjemveien 1",
+                        tilAdresse = "Tiltaksveien 1",
+                    ),
+                status = VilkårStatus.SLETTET,
+            )
+
+            slettAktivitet()
+        }
+
+        @Test
+        fun `skal tillate sletting av aktivitet hvis refererende dagligReise-vilkår er slettet`() {
+            lagDagligReiseVilkår(lagretAktivitet.globalId, status = VilkårStatus.SLETTET)
+
+            vilkårperiodeService.slettVilkårperiode(
+                lagretAktivitet.id,
+                SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
+            )
+        }
+
+        @Test
+        fun `skal tillate sletting av aktivitet hvis ingen dagligReise-vilkår refererer den`() {
+            vilkårperiodeService.slettVilkårperiode(
+                lagretAktivitet.id,
+                SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
+            )
+        }
+
         private fun lagDagligReiseVilkår(
             aktivitetGlobalId: VilkårperiodeGlobalId,
             status: VilkårStatus = VilkårStatus.NY,
@@ -503,35 +583,28 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             )
         }
 
-        @Test
-        fun `skal kaste feil hvis aktivitet er referert av et aktivt dagligReise-vilkår`() {
-            lagDagligReiseVilkår(lagretAktivitet.globalId)
-
-            assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(
-                    lagretAktivitet.id,
-                    SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
-                )
-            }.hasMessageContaining("Aktiviteten er knyttet til et vilkår for daglig reise")
+        private fun lagROAHVilkår(
+            type: VilkårType,
+            fakta: VilkårFakta,
+            status: VilkårStatus = VilkårStatus.NY,
+        ) {
+            vilkårRepository.insert(
+                vilkår(
+                    behandlingId = lagretAktivitet.behandlingId,
+                    type = type,
+                    status = status,
+                    slettetKommentar = if (status == VilkårStatus.SLETTET) "kommentar" else null,
+                    fakta = fakta,
+                ),
+            )
         }
 
-        @Test
-        fun `skal tillate sletting av aktivitet hvis refererende dagligReise-vilkår er slettet`() {
-            lagDagligReiseVilkår(lagretAktivitet.globalId, status = VilkårStatus.SLETTET)
-
+        private fun slettAktivitet() =
             vilkårperiodeService.slettVilkårperiode(
                 lagretAktivitet.id,
                 SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
             )
-        }
 
-        @Test
-        fun `skal tillate sletting av aktivitet hvis ingen dagligReise-vilkår refererer den`() {
-            vilkårperiodeService.slettVilkårperiode(
-                lagretAktivitet.id,
-                SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
-            )
-        }
     }
 
     @Nested

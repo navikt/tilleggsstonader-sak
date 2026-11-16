@@ -46,6 +46,14 @@ import java.time.LocalDate
 )
 sealed interface VilkårFakta
 
+/**
+ * Fakta som refererer til en aktivitet. Aktiviteten kan ikke slettes eller settes til ikke oppfylt
+ * så lenge et ikke-slettet vilkår refererer til den.
+ */
+sealed interface KnyttetTilAktivitet {
+    val aktivitetId: VilkårperiodeGlobalId
+}
+
 sealed interface ReiseVilkårFakta : VilkårFakta {
     val reiseId: ReiseId
     val adresse: String?
@@ -121,8 +129,10 @@ data class FaktaReiseTilSamlingUbestemt(
     override val adresse: String?,
 ) : ReiseVilkårFakta
 
-sealed interface FaktaROAH : VilkårFakta {
-    val aktivitetId: VilkårperiodeGlobalId
+sealed interface FaktaROAH :
+    VilkårFakta,
+    KnyttetTilAktivitet {
+    override val aktivitetId: VilkårperiodeGlobalId
 }
 
 sealed interface FaktaROAHReise : FaktaROAH {
@@ -184,8 +194,9 @@ data class FaktaDagligReisePrivatBil(
     val totalReiseavstand: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
-    val aktivitetId: VilkårperiodeGlobalId,
-) : ReiseVilkårFakta
+    override val aktivitetId: VilkårperiodeGlobalId,
+) : ReiseVilkårFakta,
+    KnyttetTilAktivitet
 
 data class FaktaDelperiodePrivatBil(
     override val fom: LocalDate,
