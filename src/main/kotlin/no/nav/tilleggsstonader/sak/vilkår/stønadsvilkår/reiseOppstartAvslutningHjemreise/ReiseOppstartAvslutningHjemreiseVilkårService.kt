@@ -110,7 +110,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         vilkårId: VilkårId,
         slettetKommentar: String?,
     ): SlettetVilkårResultat {
-        val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
+        val vilkår = hentVilkårForBehandling(vilkårId, behandlingId)
         ROAHVilkårValideringUtil.validerKanSlettes(vilkår, vilkårRepository.findByBehandlingId(vilkår.behandlingId))
         return vilkårService.slettVilkår(
             SlettVilkårRequest(

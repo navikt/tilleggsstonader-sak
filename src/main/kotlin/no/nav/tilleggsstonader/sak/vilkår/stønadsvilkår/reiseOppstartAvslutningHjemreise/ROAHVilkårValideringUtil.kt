@@ -85,6 +85,12 @@ object ROAHVilkårValideringUtil {
         return vilkårIBehandling.filter { it.parentVilkår == paraplyGlobalId && it.status != VilkårStatus.SLETTET }
     }
 
+    private fun validerErROAHVilkår(vilkår: Vilkår) {
+        feilHvis(vilkår.type !in ROAH_VILKÅRSTYPER) {
+            "Vilkåret er ikke et vilkår for reise oppstart, avslutning og hjemreise"
+        }
+    }
+
     /**
      * Endepunktet kan bare oppdatere vilkår for reise oppstart, avslutning og hjemreise, ikke andre vilkårstyper.
      * En reise kan heller ikke bli et paraplyvilkår, eller omvendt, ved oppdatering.
@@ -93,9 +99,7 @@ object ROAHVilkårValideringUtil {
         eksisterendeVilkår: Vilkår,
         nyttVilkår: LagreVilkårROAH,
     ) {
-        feilHvis(eksisterendeVilkår.type !in ROAH_VILKÅRSTYPER) {
-            "Vilkåret er ikke et vilkår for reise oppstart, avslutning og hjemreise"
-        }
+        validerErROAHVilkår(eksisterendeVilkår)
         val erEksisterendeVilkårParaplyvilkår = eksisterendeVilkår.type == VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE
         val erNyttVilkårParaplyvilkår = nyttVilkår is LagreVilkårMidlertidigBosted
         feilHvis(erEksisterendeVilkårParaplyvilkår != erNyttVilkårParaplyvilkår) {
@@ -110,11 +114,15 @@ object ROAHVilkårValideringUtil {
         brukerfeilHvis(nyttVilkår.tilAdresse.isBlank()) { "Til adresse må fylles ut" }
     }
 
-    /** Et paraplyvilkår kan ikke slettes så lenge det finnes reiser (som ikke er slettet) som hører til det. */
+    /**
+     * Endepunktet kan bare slette ROAH-vilkår, og et paraplyvilkår kan ikke slettes så lenge det finnes
+     * reiser (som ikke er slettet) som hører til det.
+     */
     internal fun validerKanSlettes(
         vilkår: Vilkår,
         vilkårIBehandling: List<Vilkår>,
     ) {
+        validerErROAHVilkår(vilkår)
         if (vilkår.type != VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE) return
         brukerfeilHvis(finnReiserUnderParaply(vilkår, vilkårIBehandling).isNotEmpty()) {
             "Perioden hvor bruker bor borte har reiser knyttet til seg og kan ikke slettes. Slett reisene først."

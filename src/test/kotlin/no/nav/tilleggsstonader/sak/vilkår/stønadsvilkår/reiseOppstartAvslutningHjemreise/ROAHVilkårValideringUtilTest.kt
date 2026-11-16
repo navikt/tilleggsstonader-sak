@@ -193,6 +193,16 @@ class ROAHVilkårValideringUtilTest {
     }
 
     @Test
+    fun `vilkår som ikke er ROAH-vilkår kan ikke slettes`() {
+        val annetVilkår = vilkår(type = VilkårType.DAGLIG_REISE)
+
+        assertThatThrownBy {
+            ROAHVilkårValideringUtil.validerKanSlettes(annetVilkår, listOf(annetVilkår))
+        }.isInstanceOf(Feil::class.java)
+            .hasMessageContaining("ikke et vilkår for reise oppstart, avslutning og hjemreise")
+    }
+
+    @Test
     fun `reise kan slettes selv om den har parent`() {
         val paraply = paraply(fom = 1 februar 2026, tom = 28 februar 2026)
         val reise = reiseVilkår(10 februar 2026).copy(parentVilkår = paraply.globalId)
