@@ -17,14 +17,14 @@ data class Saksbehandling(
     val id: BehandlingId,
     val eksternId: Long,
     val forrigeIverksatteBehandlingId: BehandlingId? = null,
-    val type: BehandlingType,
+    override val type: BehandlingType,
     @Column("behandling_metode")
     val behandlingMetode: BehandlingMetode,
-    val status: BehandlingStatus,
+    override val status: BehandlingStatus,
     val steg: StegType,
     val kategori: BehandlingKategori,
     @Column("arsak")
-    val årsak: BehandlingÅrsak,
+    override val årsak: BehandlingÅrsak,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val årsakMetadata: ÅrsakMetadata? = null,
     val kravMottatt: LocalDate? = null,
@@ -43,16 +43,11 @@ data class Saksbehandling(
     val opprettetTid: LocalDateTime,
     val endretAv: String,
     val endretTid: LocalDateTime,
-) {
+) : ErBehandling {
     val skalSendeBrev: Boolean = !skalIkkeSendeBrev
     val skalIkkeSendeBrev get() = erÅrsakUtenBrev || erSatsendring
     val erÅrsakUtenBrev
         get() = årsak == BehandlingÅrsak.KORRIGERING_UTEN_BREV || årsak == BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
-    val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     val harStatusOpprettet get() = status == BehandlingStatus.OPPRETTET
-
-    fun erFerdigstilt(): Boolean = status == BehandlingStatus.FERDIGSTILT
-
-    fun erKjørelisteBehandling(): Boolean = type == BehandlingType.KJØRELISTE
 }

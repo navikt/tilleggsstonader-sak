@@ -23,14 +23,14 @@ data class Behandling(
     val forrigeIverksatteBehandlingId: BehandlingId? = null,
     // @Version ?
     val versjon: Int = 0,
-    val type: BehandlingType,
+    override val type: BehandlingType,
     @Column("behandling_metode")
     val behandlingMetode: BehandlingMetode,
-    val status: BehandlingStatus,
+    override val status: BehandlingStatus,
     val steg: StegType,
     val kategori: BehandlingKategori,
     @Column("arsak")
-    val årsak: BehandlingÅrsak,
+    override val årsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -41,10 +41,8 @@ data class Behandling(
     val vedtakstidspunkt: LocalDateTime? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val årsakMetadata: ÅrsakMetadata? = null,
-) {
+) : ErBehandling {
     fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
-
-    fun erFerdigstilt(): Boolean = status == BehandlingStatus.FERDIGSTILT
 
     fun erAktiv(): Boolean = !(erFerdigstilt() || status == BehandlingStatus.SATT_PÅ_VENT)
 
@@ -53,10 +51,6 @@ data class Behandling(
     fun erHenlagt(): Boolean = resultat == BehandlingResultat.HENLAGT
 
     fun erOpphørt(): Boolean = resultat == BehandlingResultat.OPPHØRT
-
-    fun erKjørelisteBehandling(): Boolean = type == BehandlingType.KJØRELISTE
-
-    val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     init {
         if (erHenlagt()) {
