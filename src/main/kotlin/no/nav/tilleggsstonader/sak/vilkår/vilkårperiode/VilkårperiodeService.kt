@@ -335,7 +335,7 @@ class VilkårperiodeService(
                 .any { (it.fakta as? KnyttetTilAktivitet)?.aktivitetId == globalId }
 
         brukerfeilHvis(erReferert) {
-            "Aktiviteten har vilkår knyttet til seg og kan ikke slettes eller endres"
+            "Aktiviteten har vilkår knyttet til seg. Vurderingene på aktiviteten kan ikke endres og aktiviteten ikke ikke slettes.  "
         }
     }
 }
