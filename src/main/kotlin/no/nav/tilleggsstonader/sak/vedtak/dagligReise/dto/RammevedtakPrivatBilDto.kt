@@ -18,7 +18,7 @@ data class RammeForReiseMedPrivatBilDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val delperioder: List<DelperiodeDto>,
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val aktivitetsadresse: String?,
     val fraTidligereVedtak: Boolean,
 )
@@ -66,7 +66,7 @@ fun RammevedtakForReiseMedPrivatBil.tilDto(beregningsplan: Beregningsplan?): Ram
                     begrunnelseManuellBehandling = delperiode.begrunnelseManuellBehandling,
                 )
             },
-        reiseavstandEnVei = grunnlag.reiseavstandEnVei,
+        totalReiseavstand = grunnlag.totalReiseavstand,
         aktivitetsadresse = aktivitetsadresse,
         fraTidligereVedtak = beregningsplan?.tidligsteEndring?.let { it >= grunnlag.tom } ?: false,
     )

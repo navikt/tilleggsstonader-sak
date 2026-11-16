@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -24,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -192,6 +196,22 @@ class DagligReiseVedtakService(
     fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
         if (forrigeIverksatteBehandlingId == null) return false
         return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
+    }
+
+    fun skalBehandleKjøreliste(saksbehandling: Saksbehandling): Boolean {
+        val vedtakstype = vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
+        if (vedtakstype != TypeVedtak.INNVILGELSE && vedtakstype != TypeVedtak.OPPHØR) return false
+        return forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)
+    }
+
+    fun kanViseKjøreliste(saksbehandling: Saksbehandling): Boolean {
+        if (!saksbehandling.stønadstype.gjelderDagligReise()) return false
+        if (saksbehandling.resultat == BehandlingResultat.HENLAGT || saksbehandling.resultat == BehandlingResultat.AVSLÅTT) {
+            return false
+        }
+        if (saksbehandling.erKjørelisteBehandling()) return true
+        if (!saksbehandling.steg.kommerEtter(StegType.BEREGNE_YTELSE)) return false
+        return skalBehandleKjøreliste(saksbehandling)
     }
 
     private fun oppdaterVedtakMedNyttRammevedtakPrivatBil(

@@ -40,11 +40,13 @@ data class BehandlingDto(
     val årsakMetadata: ÅrsakMetadata?,
     val harÅpenKjørelistebehandling: Boolean,
     val tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
+    val kanViseKjøreliste: Boolean? = null,
 )
 
 fun Saksbehandling.tilDto(
     tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
     harÅpenKjørelistebehandling: Boolean,
+    kanViseKjøreliste: Boolean? = null,
 ): BehandlingDto =
     BehandlingDto(
         id = this.id,
@@ -67,6 +69,7 @@ fun Saksbehandling.tilDto(
         vedtaksdato = this.vedtakstidspunkt,
         årsakMetadata = this.årsakMetadata,
         harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
+        kanViseKjøreliste = kanViseKjøreliste,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
     )
 

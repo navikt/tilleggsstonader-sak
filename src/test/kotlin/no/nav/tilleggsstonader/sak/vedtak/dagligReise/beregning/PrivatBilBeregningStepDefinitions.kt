@@ -184,7 +184,7 @@ class PrivatBilBeregningStepDefinitions {
 
             assertThat(gjeldendeReise.grunnlag.fom).isEqualTo(forventetRammevedtak.fom)
             assertThat(gjeldendeReise.grunnlag.tom).isEqualTo(forventetRammevedtak.tom)
-            assertThat(gjeldendeReise.grunnlag.reiseavstandEnVei).isEqualTo(forventetRammevedtak.reiseavstandEnVei)
+            assertThat(gjeldendeReise.grunnlag.totalReiseavstand).isEqualTo(forventetRammevedtak.totalReiseavstand)
         }
     }
 
@@ -199,7 +199,7 @@ class PrivatBilBeregningStepDefinitions {
 
             assertThat(gjeldendeReise.grunnlag.fom).isEqualTo(forventetRammevedtak.fom)
             assertThat(gjeldendeReise.grunnlag.tom).isEqualTo(forventetRammevedtak.tom)
-            assertThat(gjeldendeReise.grunnlag.reiseavstandEnVei).isEqualTo(forventetRammevedtak.reiseavstandEnVei)
+            assertThat(gjeldendeReise.grunnlag.totalReiseavstand).isEqualTo(forventetRammevedtak.totalReiseavstand)
         }
     }
 
@@ -295,12 +295,12 @@ class PrivatBilBeregningStepDefinitions {
         dataTable.mapRad { rad ->
             val fom = parseDato(DomenenøkkelFelles.FOM, rad)
             val tom = parseDato(DomenenøkkelFelles.TOM, rad)
-            val reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad)
+            val totalReiseavstand = parseBigDecimal(DomenenøkkelPrivatBil.TOTAL_REISEAVSTAND, rad)
             RammevedtakCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
                 fom = fom,
                 tom = tom,
-                reiseavstandEnVei = reiseavstandEnVei,
+                totalReiseavstand = totalReiseavstand,
             )
         }
 
@@ -343,7 +343,7 @@ enum class DomenenøkkelPrivatBil(
     override val nøkkel: String,
 ) : Domenenøkkel {
     ANTALL_REISEDAGER_PER_UKE("Antall reisedager per uke"),
-    REISEAVSTAND_EN_VEI("Reiseavstand"),
+    TOTAL_REISEAVSTAND("Total reiseavstand"),
     BOMPENGER("Bompenger"),
     FERGEKOSTNAD("Fergekostnad"),
     REISENR("Reisenr"),
@@ -357,7 +357,7 @@ data class RammevedtakCucumber(
     val reiseNr: Int,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val reiseavstandEnVei: BigDecimal? = null,
+    val totalReiseavstand: BigDecimal? = null,
 ) : Periode<LocalDate>
 
 data class DelperiodeCucumber(

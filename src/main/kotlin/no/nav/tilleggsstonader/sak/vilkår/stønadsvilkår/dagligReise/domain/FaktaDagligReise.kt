@@ -133,7 +133,7 @@ data class FaktaOffentligTransport(
 
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
     val aktivitetId: VilkårperiodeGlobalId,
@@ -145,7 +145,7 @@ data class FaktaPrivatBil(
     }
 
     private fun validerIngenNegativReiseavstand() {
-        brukerfeilHvis(reiseavstandEnVei <= BigDecimal.ZERO) {
+        brukerfeilHvis(totalReiseavstand <= BigDecimal.ZERO) {
             "Reiseavstanden må være større enn 0"
         }
     }
@@ -153,7 +153,7 @@ data class FaktaPrivatBil(
     override fun mapTilVilkårFakta() =
         FaktaDagligReisePrivatBil(
             reiseId = reiseId,
-            reiseavstandEnVei = reiseavstandEnVei,
+            totalReiseavstand = totalReiseavstand,
             faktaDelperioder =
                 faktaDelperioder.map {
                     FaktaDelperiodePrivatBil(

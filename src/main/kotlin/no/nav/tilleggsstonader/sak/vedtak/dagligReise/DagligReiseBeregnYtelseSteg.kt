@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -48,11 +47,7 @@ class DagligReiseBeregnYtelseSteg(
      * inneholdt et rammevedtak for privat bil.
      */
     override fun nesteSteg(saksbehandling: Saksbehandling): StegType {
-        val gjelderAvslag = vedtakRepository.findByIdOrNull(saksbehandling.id)?.type == TypeVedtak.AVSLAG
-        val forrigeIverksatteBehandlingHarRammevedtakForPrivatBil =
-            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)
-
-        if (forrigeIverksatteBehandlingHarRammevedtakForPrivatBil && !gjelderAvslag) {
+        if (dagligReiseVedtakService.skalBehandleKjøreliste(saksbehandling)) {
             return StegType.KJØRELISTE
         }
 

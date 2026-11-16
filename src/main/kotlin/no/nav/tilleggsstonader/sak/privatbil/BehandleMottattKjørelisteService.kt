@@ -105,13 +105,19 @@ class BehandleMottattKjørelisteService(
     private fun finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste: Kjøreliste): Behandling? =
         behandlingRepository
             .findByFagsakId(kjøreliste.fagsakId)
-            .filter { it.type == BehandlingType.KJØRELISTE && it.status == BehandlingStatus.OPPRETTET }
-            .sortedByDescending { it.sporbar.opprettetTid }
-            .firstOrNull { !erPåbegynt(it) }
-            ?.also { logger.info("Gjenbruker eksisterende kjørelistebehandling=${it.id} for fagsak=${kjøreliste.fagsakId}") }
+            .filter {
+                (it.type == BehandlingType.KJØRELISTE && it.årsak != BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) &&
+                    (it.status == BehandlingStatus.OPPRETTET || it.status == BehandlingStatus.SATT_PÅ_VENT)
+            }.filter { !erPåbegynt(it) }
+            .maxByOrNull { it.sporbar.opprettetTid }
+            ?.also {
+                logger.info(
+                    "Gjenbruker eksisterende kjørelistebehandling=${it.id} med status=${it.status} for fagsak=${kjøreliste.fagsakId}",
+                )
+            }
 
     private fun erPåbegynt(behandling: Behandling): Boolean {
-        if (behandling.status != BehandlingStatus.OPPRETTET) {
+        if (behandling.status !in listOf(BehandlingStatus.OPPRETTET, BehandlingStatus.SATT_PÅ_VENT)) {
             return true
         }
 

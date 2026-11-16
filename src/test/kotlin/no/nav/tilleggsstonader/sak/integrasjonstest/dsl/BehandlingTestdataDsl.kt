@@ -72,7 +72,7 @@ class BehandlingTestdataDsl internal constructor() {
     fun defaultDagligReisePrivatBilTsoTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
-        reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
+        totalReiseavstand: BigDecimal = 20.toBigDecimal(),
         delperioder: List<FaktaDelperiodePrivatBilDto> =
             listOf(
                 FaktaDelperiodePrivatBilDto(
@@ -104,7 +104,7 @@ class BehandlingTestdataDsl internal constructor() {
                     tom,
                     delperioder = delperioder,
                     hentAktivitetId = hentAktivitetId,
-                    reiseavstandEnVei = reiseavstandEnVei,
+                    totalReiseavstand = totalReiseavstand,
                 )
             }
         }
@@ -113,7 +113,7 @@ class BehandlingTestdataDsl internal constructor() {
     fun defaultDagligReisePrivatBilTsrTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
-        reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
+        totalReiseavstand: BigDecimal = 20.toBigDecimal(),
         delperioder: List<FaktaDelperiodePrivatBilDto> =
             listOf(
                 FaktaDelperiodePrivatBilDto(
@@ -145,7 +145,7 @@ class BehandlingTestdataDsl internal constructor() {
                     tom,
                     delperioder = delperioder,
                     hentAktivitetId = hentAktivitetId,
-                    reiseavstandEnVei = reiseavstandEnVei,
+                    totalReiseavstand = totalReiseavstand,
                 )
             }
         }

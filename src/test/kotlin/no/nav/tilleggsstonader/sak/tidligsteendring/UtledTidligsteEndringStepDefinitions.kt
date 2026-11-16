@@ -267,7 +267,7 @@ class UtledTidligsteEndringStepDefinitions {
         reisenr: Int,
     ) = FaktaDagligReisePrivatBil(
         reiseId = reiseIdFraReisenr(reisenr),
-        reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
+        totalReiseavstand = parseBigDecimal(DomenenøkkelPrivatBil.TOTAL_REISEAVSTAND, rad),
         faktaDelperioder = emptyList(),
         adresse = "Tiltaksveien 1",
         aktivitetId = VilkårperiodeGlobalId.random(),

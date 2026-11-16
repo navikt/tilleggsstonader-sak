@@ -46,7 +46,7 @@ object VilkårDagligReiseDtoMapper {
 
     private fun FaktaPrivatBil.tilDto(aktivitetType: String) =
         FaktaDagligReisePrivatBilDto(
-            reiseavstandEnVei = reiseavstandEnVei,
+            totalReiseavstand = totalReiseavstand,
             faktaDelperioder =
                 faktaDelperioder.map {
                     FaktaDelperiodePrivatBilDto(

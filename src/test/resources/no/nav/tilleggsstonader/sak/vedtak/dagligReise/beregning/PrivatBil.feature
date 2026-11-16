@@ -9,8 +9,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 06.01.2025 | 19.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 06.01.2025 | 19.01.2025 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 06.01.2025 | 19.01.2025 | 20           |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -19,8 +19,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 06.01.2025 | 19.01.2025 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 06.01.2025 | 19.01.2025 | 20           |
 
     Og vi forventer følgende delperioder for rammevedtak
       | Reisenr | DelperiodeNr | Fom        | Tom        | Antall reisedager per uke |
@@ -36,9 +36,9 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 01.01.2026 | 31.01.2026 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.01.2026 | 18.01.2026 | 10           |
-      | 2       | 11.01.2026 | 31.01.2026 | 8            |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.01.2026 | 18.01.2026 | 20           |
+      | 2       | 11.01.2026 | 31.01.2026 | 16            |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Bompenger | Fergekostnad | Antall reisedager per uke |
@@ -48,9 +48,9 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.01.2026 | 18.01.2026 | 10           |
-      | 2       | 11.01.2026 | 31.01.2026 | 8            |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.01.2026 | 18.01.2026 | 20           |
+      | 2       | 11.01.2026 | 31.01.2026 | 16            |
 
     Og vi forventer følgende delperioder for rammevedtak
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -68,8 +68,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 06.01.2025 | 12.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 06.01.2025 | 12.01.2025 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 06.01.2025 | 12.01.2025 | 20           |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Bompenger | Fergekostnad | Antall reisedager per uke |
@@ -78,8 +78,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 06.01.2025 | 12.01.2025 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 06.01.2025 | 12.01.2025 | 20           |
 
     Og vi forventer følgende delperioder for rammevedtak
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -97,8 +97,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 16.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | UTDANNING |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.01.2025 | 30.01.2025 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.01.2025 | 30.01.2025 | 20           |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -107,8 +107,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.01.2025 | 30.01.2025 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.01.2025 | 30.01.2025 | 20           |
 
     Og vi forventer følgende vedtaksperioder for rammevedtak med reiseNr=1
       | Fom        | Tom        | Målgruppe           | Aktivitet |
@@ -123,8 +123,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 17.01.2025 | 30.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Antall reisedager per uke | Reiseavstand |
-      | 1       | 01.01.2025 | 30.01.2025 | 5                         | 10           |
+      | Reisenr | Fom        | Tom        | Antall reisedager per uke | Total reiseavstand |
+      | 1       | 01.01.2025 | 30.01.2025 | 5                         | 20           |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -141,8 +141,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 01.12.2026 | 15.01.2027 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.12.2026 | 15.01.2027 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.12.2026 | 15.01.2027 | 20           |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -151,8 +151,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.12.2026 | 15.01.2027 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.12.2026 | 15.01.2027 | 20           |
 
     Og vi forventer følgende delperioder for rammevedtak
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -169,8 +169,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 01.12.2025 | 15.01.2027 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.12.2025 | 15.01.2027 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.12.2025 | 15.01.2027 | 20           |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
@@ -182,8 +182,8 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
-      | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.12.2025 | 15.01.2027 | 10           |
+      | Reisenr | Fom        | Tom        | Total reiseavstand |
+      | 1       | 01.12.2025 | 15.01.2027 | 20           |
 
     Og vi forventer følgende delperioder for rammevedtak
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |

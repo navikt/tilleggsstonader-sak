@@ -102,7 +102,7 @@ data class RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val delperioder: List<RammeForReiseMedPrivatBilDelperiode>,
-    val reiseavstandEnVei: BigDecimal,
+    val totalReiseavstand: BigDecimal,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate>,
     KopierPeriode<RammevedtakForReiseMedPrivatBilBeregningsgrunnlag> {
