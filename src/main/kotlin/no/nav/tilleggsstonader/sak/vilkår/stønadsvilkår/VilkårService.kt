@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feil
@@ -99,6 +100,11 @@ class VilkårService(
             )
         return oppdatertVilkår
     }
+
+    /** Bare disse stønadene sletter vilkår via det felles slette-endepunktet. De andre har egne endepunkter. */
+    fun kanSlettesFraFellesSletteEndepunkt(behandlingId: BehandlingId): Boolean =
+        behandlingService.hentSaksbehandling(behandlingId).stønadstype in
+            setOf(Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER)
 
     @Transactional
     fun slettVilkår(slettVilkårRequest: SlettVilkårRequest): SlettetVilkårResultat {

@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
@@ -337,6 +338,23 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         val resultat = vilkårKall.slettVilkår(behandling.id, paraply.id, SlettVilkårRequestDto())
 
         assertThat(resultat.slettetPermanent).isTrue
+    }
+
+    @Test
+    fun `skal ikke kunne slette ROAH-vilkår via det generelle vilkår-endepunktet`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        val reise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId))
+
+        listOf(paraply.id, reise.id).forEach { vilkårId ->
+            kall.vilkår.apiRespons
+                .slettVilkår(SlettVilkårRequest(id = vilkårId, behandlingId = behandling.id))
+                .expectProblemDetail(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Vilkår for denne stønadstypen kan ikke slettes her",
+                )
+            assertThat(vilkårRepository.findByIdOrThrow(vilkårId).status).isEqualTo(VilkårStatus.NY)
+        }
     }
 
     @Test
