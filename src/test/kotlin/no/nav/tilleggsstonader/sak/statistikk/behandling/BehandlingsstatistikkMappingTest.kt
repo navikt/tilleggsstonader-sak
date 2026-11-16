@@ -177,6 +177,7 @@ class BehandlingsstatistikkMappingTest {
         val behandlingId = BehandlingId(UUID.randomUUID())
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
+        val beslutterId = "Beslutteren"
 
         val henvendelseTidspunkt = LocalDateTime.now()
         val hendelseTidspunkt = LocalDateTime.now()
@@ -203,6 +204,7 @@ class BehandlingsstatistikkMappingTest {
                 tekniskTid = tekniskTid,
                 søkerHarStrengtFortroligAdresse = true,
                 sisteOppgaveForBehandling = sisteOppgaveForBehandling,
+                beslutterId = beslutterId,
             )
 
         val expected =
@@ -235,8 +237,8 @@ class BehandlingsstatistikkMappingTest {
                 utbetaltTid = null,
                 forventetOppstartTid = null,
                 papirSøknad = null,
-                ansvarligBeslutter = null,
-                totrinnsbehandling = false,
+                ansvarligBeslutter = beslutterId,
+                totrinnsbehandling = true,
                 vilkårsprøving = emptyList(),
                 venteAarsak = null,
                 behandlingBegrunnelse = null,
@@ -253,6 +255,7 @@ class BehandlingsstatistikkMappingTest {
         val behandlingId = BehandlingId(UUID.randomUUID())
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
+        val beslutterId = "Beslutteren"
 
         val henvendelseTidspunkt = LocalDateTime.now()
         val hendelseTidspunkt = LocalDateTime.now()
@@ -279,6 +282,7 @@ class BehandlingsstatistikkMappingTest {
                 tekniskTid = tekniskTid,
                 søkerHarStrengtFortroligAdresse = true,
                 sisteOppgaveForBehandling = sisteOppgaveForBehandling,
+                beslutterId = beslutterId,
             )
 
         val expected =
@@ -311,8 +315,8 @@ class BehandlingsstatistikkMappingTest {
                 utbetaltTid = null,
                 forventetOppstartTid = null,
                 papirSøknad = null,
-                ansvarligBeslutter = null,
-                totrinnsbehandling = false,
+                ansvarligBeslutter = "SKJERMET",
+                totrinnsbehandling = true,
                 vilkårsprøving = emptyList(),
                 venteAarsak = null,
                 behandlingBegrunnelse = null,
@@ -596,6 +600,7 @@ class BehandlingsstatistikkMappingTest {
         tekniskTid: LocalDateTime,
         søkerHarStrengtFortroligAdresse: Boolean = false,
         sisteOppgaveForBehandling: Oppgave? = null,
+        beslutterId: String? = null,
     ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
         saksbehandling = saksbehandling,
         henvendelseTidspunkt = henvendelseTidspunkt,
@@ -604,7 +609,7 @@ class BehandlingsstatistikkMappingTest {
         søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
         saksbehandlerId = saksbehandlerId,
         sisteOppgaveForBehandling = sisteOppgaveForBehandling,
-        beslutterId = null,
+        beslutterId = beslutterId,
         tekniskTid = tekniskTid,
         relatertBehandlingId = null,
     )
