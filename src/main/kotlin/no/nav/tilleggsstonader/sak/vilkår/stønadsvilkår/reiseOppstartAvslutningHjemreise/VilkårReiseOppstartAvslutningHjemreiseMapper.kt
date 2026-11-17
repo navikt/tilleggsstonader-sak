@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.tilVilkårType
 
 object VilkårReiseOppstartAvslutningHjemreiseMapper {
@@ -30,7 +30,7 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
         }
 
     private fun Vilkår.mapTilReise(fakta: FaktaROAHReise) =
-        VilkårReiseOppstartAvslutningHjemreise(
+        VilkårReise(
             id = id,
             globalId = globalId,
             behandlingId = behandlingId,
@@ -74,11 +74,11 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
 
     fun VilkårROAH.mapTilVilkår(): Vilkår =
         when (this) {
-            is VilkårReiseOppstartAvslutningHjemreise -> mapTilVilkår()
+            is VilkårReise -> mapTilVilkår()
             is VilkårMidlertidigBosted -> mapTilVilkår()
         }
 
-    private fun VilkårReiseOppstartAvslutningHjemreise.mapTilVilkår() =
+    private fun VilkårReise.mapTilVilkår() =
         tilVilkår(
             type = this.typeReiseformål.tilVilkårType(),
             fakta =

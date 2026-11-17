@@ -15,6 +15,6 @@ data class AktivitetMedReiser(
     val tiltaksvariant: TypeAktivitet?,
     val fom: LocalDate,
     val tom: LocalDate,
-    val reiser: List<VilkårReiseOppstartAvslutningHjemreise>,
+    val reiser: List<VilkårReise>,
     val paraplyvilkår: List<VilkårMidlertidigBosted>,
 )

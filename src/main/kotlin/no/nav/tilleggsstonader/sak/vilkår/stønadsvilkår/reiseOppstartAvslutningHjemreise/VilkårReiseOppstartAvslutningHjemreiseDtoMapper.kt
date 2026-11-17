@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
@@ -34,7 +34,7 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
 
     fun VilkårROAH.tilDto(): VilkårROAHDto =
         when (this) {
-            is VilkårReiseOppstartAvslutningHjemreise -> this.tilDto()
+            is VilkårReise -> this.tilDto()
             is VilkårMidlertidigBosted -> this.tilDto()
         }
 
@@ -53,7 +53,7 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             slettetKommentar = this.slettetKommentar,
         )
 
-    fun VilkårReiseOppstartAvslutningHjemreise.tilDto() =
+    fun VilkårReise.tilDto() =
         VilkårReiseOppstartAvslutningHjemreiseDto(
             id = this.id,
             globalId = this.globalId,

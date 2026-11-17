@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeG
 import java.time.LocalDate
 
 /**
- * Et vilkår for reise oppstart, avslutning og hjemreise er enten en reise ([VilkårReiseOppstartAvslutningHjemreise])
+ * Et vilkår for reise oppstart, avslutning og hjemreise er enten en reise ([VilkårReise])
  * eller et paraplyvilkår for midlertidig bosted ([VilkårMidlertidigBosted]) som reiser kan høre til.
  */
 sealed interface VilkårROAH : Periode<LocalDate> {
@@ -49,7 +49,7 @@ data class VilkårMidlertidigBosted(
     }
 }
 
-data class VilkårReiseOppstartAvslutningHjemreise(
+data class VilkårReise(
     override val id: VilkårId = VilkårId.random(),
     override val globalId: VilkårGlobalId? = VilkårGlobalId.random(),
     override val behandlingId: BehandlingId,
@@ -65,13 +65,13 @@ data class VilkårReiseOppstartAvslutningHjemreise(
     override val slettetKommentar: String? = null,
     val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAH,
-    Mergeable<LocalDate, VilkårReiseOppstartAvslutningHjemreise> {
+    Mergeable<LocalDate, VilkårReise> {
     init {
         validatePeriode()
         validerFaktaErForventetType()
     }
 
-    override fun merge(other: VilkårReiseOppstartAvslutningHjemreise): VilkårReiseOppstartAvslutningHjemreise =
+    override fun merge(other: VilkårReise): VilkårReise =
         this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 
     private fun validerFaktaErForventetType() {

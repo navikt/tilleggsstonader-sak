@@ -28,7 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
@@ -52,7 +52,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         val vilkår = hentVilkårForBehandling(behandlingId)
         val reiserPerAktivitet =
-            vilkår.filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>().groupBy { it.aktivitetId }
+            vilkår.filterIsInstance<VilkårReise>().groupBy { it.aktivitetId }
         val paraplyvilkårPerAktivitet = vilkår.filterIsInstance<VilkårMidlertidigBosted>().groupBy { it.aktivitetId }
 
         return aktiviteter
@@ -133,7 +133,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
             )
         return when (nyttVilkår) {
             is LagreVilkårReiseOppstartAvslutningHjemreise ->
-                VilkårReiseOppstartAvslutningHjemreise(
+                VilkårReise(
                     behandlingId = behandlingId,
                     id = eksisterendeVilkår?.id ?: VilkårId.random(),
                     globalId = eksisterendeVilkår?.globalId ?: VilkårGlobalId.random(),
