@@ -31,11 +31,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårMidlertidigBostedDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -271,7 +271,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 .single()
 
         val nyttVilkår =
-            LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+            LagreVilkårROAHReiseDto(
                 fom = fom,
                 tom = null,
                 reiseId = dummyReiseId,
@@ -312,7 +312,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
             )
 
         assertThat(resultatSlettet.slettetPermanent).isTrue
-        assertThat((resultatSlettet.vilkår as VilkårReiseOppstartAvslutningHjemreiseDto).slettetKommentar).isNull()
+        assertThat((resultatSlettet.vilkår as VilkårROAHReiseDto).slettetKommentar).isNull()
 
         val hentedeVilkår = kall.vilkårDagligReise.hentVilkår(behandling.id)
         assertThat(hentedeVilkår).isEmpty()
@@ -398,7 +398,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         aktivitetId: VilkårperiodeGlobalId,
         parentVilkår: VilkårGlobalId? = null,
         fom: LocalDate = 1 januar 2026,
-    ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+    ) = LagreVilkårROAHReiseDto(
         fom = fom,
         tom = null,
         reiseId = ReiseId.random(),
@@ -435,8 +435,8 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     )
 
     private fun assertLagretVilkår(
-        lagreVilkårRequest: LagreVilkårReiseOppstartAvslutningHjemreiseDto,
-        resultat: VilkårReiseOppstartAvslutningHjemreiseDto,
+        lagreVilkårRequest: LagreVilkårROAHReiseDto,
+        resultat: VilkårROAHReiseDto,
         forventetTom: LocalDate? = lagreVilkårRequest.tom,
     ) {
         assertThat(resultat.fom).isEqualTo(lagreVilkårRequest.fom)
@@ -457,7 +457,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun offentligTransport(utgift: BigDecimal) =
-        FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+        FaktaROAHOffentligTransportDto(
             begrunnelse = "buss",
             nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
             utgifterOffentligTransport = utgift,

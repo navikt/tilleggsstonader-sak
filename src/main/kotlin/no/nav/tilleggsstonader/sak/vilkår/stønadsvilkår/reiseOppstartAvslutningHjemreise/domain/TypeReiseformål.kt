@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 
 /**
  * Hvilken type reise vilkåret gjelder for (oppstart, avslutning eller hjemreise). Lagres som eget fakta-felt,
- * satt direkte av saksbehandler/frontend. Brukes for å velge riktig flyt i [ReiseOppstartAvslutningHjemreiseRegel].
+ * satt direkte av saksbehandler/frontend. Brukes for å velge riktig flyt i [OppstartAvslutningRegel] og [HjemreiseRegel].
  **/
 enum class TypeReiseformål {
     OPPSTART,

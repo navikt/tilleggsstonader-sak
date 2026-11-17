@@ -44,7 +44,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Lagre
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -180,7 +180,7 @@ fun IntegrationTest.gjennomførVilkårSteg(
                 } else if (stønadstype.gjelderReiseOppstartAvslutningHjemreise()) {
                     kall.vilkårReiseOppstartAvslutningHjemreise.opprettVilkår(
                         behandlingId,
-                        it as LagreVilkårReiseOppstartAvslutningHjemreiseDto,
+                        it as LagreVilkårROAHReiseDto,
                     )
                 } else {
                     kall.vilkår.opprettVilkår(it as OpprettVilkårDto)

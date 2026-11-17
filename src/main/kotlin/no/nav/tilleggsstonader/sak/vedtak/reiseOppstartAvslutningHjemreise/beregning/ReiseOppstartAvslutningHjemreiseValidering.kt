@@ -7,11 +7,11 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning.Companion.mergeSammenhengende as mergeSammenhengendeReiseOppstartAvslutningHjemreise
 
 object ReiseOppstartAvslutningHjemreiseValidering {
-    fun List<VilkårReiseOppstartAvslutningHjemreise>.slåSammenPåfølgende(): List<Datoperiode> =
+    fun List<VilkårReise>.slåSammenPåfølgende(): List<Datoperiode> =
         this
             .map { Datoperiode(fom = it.fom, tom = it.tom) }
             .sorted()
@@ -21,7 +21,7 @@ object ReiseOppstartAvslutningHjemreiseValidering {
 
     fun validerUtgiftHeleVedtaksperioden(
         vedtaksperioder: List<Vedtaksperiode>,
-        utgifter: List<VilkårReiseOppstartAvslutningHjemreise>,
+        utgifter: List<VilkårReise>,
     ) {
         val vedtaksperioderUtenOppfylteUtgifter =
             vedtaksperioder.filter { vedtaksperiode ->
@@ -47,7 +47,7 @@ object ReiseOppstartAvslutningHjemreiseValidering {
     }
 
     fun validerUtgifterStrekkerSegUtenforVedtaksperiodene(
-        utgifter: List<VilkårReiseOppstartAvslutningHjemreise>,
+        utgifter: List<VilkårReise>,
         vedtaksperioder: List<VedtaksperiodeBeregning>,
     ) {
         val alleUtgifterErInnenforVedtaksperioder =
@@ -62,9 +62,9 @@ object ReiseOppstartAvslutningHjemreiseValidering {
         }
     }
 
-    fun List<VilkårReiseOppstartAvslutningHjemreise>.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(
+    fun List<VilkårReise>.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-    ): List<VilkårReiseOppstartAvslutningHjemreise> =
+    ): List<VilkårReise> =
         filter { vilkår ->
             vedtaksperioder.any { it.overlapper(vilkår) }
         }

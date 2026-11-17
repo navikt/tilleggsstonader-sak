@@ -91,9 +91,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
@@ -861,12 +861,12 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
     svar: Map<RegelId, SvarOgBegrunnelseDto> = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
-    fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
-        FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+    fakta: FaktaROAHDto =
+        FaktaROAHOffentligTransportDto(
             nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
             utgifterOffentligTransport = utgifterOffentligTransport,
         ),
-) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+) = LagreVilkårROAHReiseDto(
     fom = fom,
     tom = tom,
     reiseId = reiseId,

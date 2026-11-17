@@ -20,22 +20,22 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårReque
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårROAH
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårROAHMapper.mapTilVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårROAHMapper.mapTilVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAHReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ReiseOppstartAvslutningHjemreiseVilkårService(
+class ROAHVilkårService(
     private val vilkårRepository: VilkårRepository,
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
@@ -52,7 +52,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         val vilkår = hentVilkårForBehandling(behandlingId)
         val reiserPerAktivitet =
-            vilkår.filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>().groupBy { it.aktivitetId }
+            vilkår.filterIsInstance<VilkårReise>().groupBy { it.aktivitetId }
         val paraplyvilkårPerAktivitet = vilkår.filterIsInstance<VilkårMidlertidigBosted>().groupBy { it.aktivitetId }
 
         return aktiviteter
@@ -132,8 +132,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
                 svar = nyttVilkår.svar,
             )
         return when (nyttVilkår) {
-            is LagreVilkårReiseOppstartAvslutningHjemreise ->
-                VilkårReiseOppstartAvslutningHjemreise(
+            is LagreVilkårROAHReise ->
+                VilkårReise(
                     behandlingId = behandlingId,
                     id = eksisterendeVilkår?.id ?: VilkårId.random(),
                     globalId = eksisterendeVilkår?.globalId ?: VilkårGlobalId.random(),
@@ -216,10 +216,10 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     }
 
     private fun validerFeatureToggle() {
-        val kanBehandleReiseOppstartAvslutningHjemreise =
+        val kanBehandleROAH =
             unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)
 
-        feilHvis(!kanBehandleReiseOppstartAvslutningHjemreise) {
+        feilHvis(!kanBehandleROAH) {
             "TS-sak støtter foreløpig ikke behandling av saker som gjelder reise oppstart, avslutning eller hjemreise"
         }
     }

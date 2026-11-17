@@ -6,21 +6,21 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreisePrivatBilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHPrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHReiseDto
 
-object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
+object VilkårROAHDtoMapper {
     fun AktivitetMedReiser.tilDto() =
         AktivitetMedReiserDto(
             aktivitetId = this.aktivitetId,
@@ -34,7 +34,7 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
 
     fun VilkårROAH.tilDto(): VilkårROAHDto =
         when (this) {
-            is VilkårReiseOppstartAvslutningHjemreise -> this.tilDto()
+            is VilkårReise -> this.tilDto()
             is VilkårMidlertidigBosted -> this.tilDto()
         }
 
@@ -53,8 +53,8 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             slettetKommentar = this.slettetKommentar,
         )
 
-    fun VilkårReiseOppstartAvslutningHjemreise.tilDto() =
-        VilkårReiseOppstartAvslutningHjemreiseDto(
+    fun VilkårReise.tilDto() =
+        VilkårROAHReiseDto(
             id = this.id,
             globalId = this.globalId,
             fom = this.fom,
@@ -70,22 +70,22 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             parentVilkår = this.parentVilkår,
         )
 
-    private fun FaktaReiseOppstartAvslutningHjemreise.tilDto(): FaktaReiseOppstartAvslutningHjemreiseDto =
+    private fun FaktaROAH.tilDto(): FaktaROAHDto =
         when (this) {
             is FaktaOffentligTransport -> this.tilDto()
             is FaktaPrivatBil -> this.tilDto()
-            is FaktaUbestemtType -> FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
+            is FaktaUbestemtType -> FaktaROAHUbestemtDto
         }
 
     private fun FaktaOffentligTransport.tilDto() =
-        FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+        FaktaROAHOffentligTransportDto(
             nødvendigUtgift = nødvendigUtgift.tilDto(),
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
         )
 
     private fun FaktaPrivatBil.tilDto() =
-        FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
+        FaktaROAHPrivatBilDto(
             nødvendigUtgift = nødvendigUtgift.tilDto(),
             reiseavstand = this.reiseavstand,
             bompenger = this.bompenger,

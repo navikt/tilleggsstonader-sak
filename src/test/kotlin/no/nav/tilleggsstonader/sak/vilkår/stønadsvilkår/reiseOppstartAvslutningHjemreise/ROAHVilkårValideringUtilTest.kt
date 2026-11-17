@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAHReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThatCode
@@ -218,7 +218,7 @@ class ROAHVilkårValideringUtilTest {
             fom = dato,
             tom = dato,
             fakta =
-                FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+                FaktaROAHUbestemt(
                     reiseId = ReiseId.random(),
                     aktivitetId = aktivitetId,
                     typeReiseformål = TypeReiseformål.AVSLUTNING,
@@ -241,14 +241,14 @@ class ROAHVilkårValideringUtilTest {
     )
 
     private fun valider(
-        reise: LagreVilkårReiseOppstartAvslutningHjemreise,
+        reise: LagreVilkårROAHReise,
         paraply: Vilkår?,
     ) = ROAHVilkårValideringUtil.validerTilhørendeParaplyvilkår(reise, paraply, vilkårId = null)
 
     private fun reise(
         fom: LocalDate,
         tom: LocalDate,
-    ) = LagreVilkårReiseOppstartAvslutningHjemreise(
+    ) = LagreVilkårROAHReise(
         fom = fom,
         tom = tom,
         reiseId = ReiseId.random(),
@@ -267,6 +267,6 @@ class ROAHVilkårValideringUtilTest {
             type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
             fom = fom,
             tom = tom,
-            fakta = FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(aktivitetId, "Fra", "Til"),
+            fakta = FaktaROAHMidlertidigBosted(aktivitetId, "Fra", "Til"),
         )
 }

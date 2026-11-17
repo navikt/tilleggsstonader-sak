@@ -20,11 +20,11 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.domai
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårROAH
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårROAHMapper.mapTilVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -92,7 +92,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
     }
 
     private fun beregnOffentligTransport(
-        utgifter: List<VilkårReiseOppstartAvslutningHjemreise>,
+        utgifter: List<VilkårReise>,
         vedtaksperioder: List<Vedtaksperiode>,
     ): List<BeregningsresultatOffentligTransport> {
         val oppfylteOffentligTransport =
@@ -120,7 +120,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
     }
 
     private fun beregnPrivatBil(
-        utgifter: List<VilkårReiseOppstartAvslutningHjemreise>,
+        utgifter: List<VilkårReise>,
         vedtaksperioder: List<Vedtaksperiode>,
     ): List<BeregningsresultatPrivatBil> {
         val oppfyltePrivatBil =
@@ -163,17 +163,17 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
         return (kjøreutgift + ekstrakostnader).setScale(0, RoundingMode.HALF_UP)
     }
 
-    private fun List<VilkårROAH>.filtrerKunReisevilkår() = filterIsInstance<VilkårReiseOppstartAvslutningHjemreise>()
+    private fun List<VilkårROAH>.filtrerKunReisevilkår() = filterIsInstance<VilkårReise>()
 }
 
-private fun validerFinnesReise(vilkår: List<VilkårReiseOppstartAvslutningHjemreise>) {
+private fun validerFinnesReise(vilkår: List<VilkårReise>) {
     brukerfeilHvis(vilkår.isEmpty()) {
         "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
     }
 }
 
 fun validerUtgifter(
-    utgifter: List<VilkårReiseOppstartAvslutningHjemreise>,
+    utgifter: List<VilkårReise>,
     vedtakstype: TypeVedtak,
     vedtaksperioder: List<Vedtaksperiode>,
 ) {

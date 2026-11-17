@@ -18,8 +18,8 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.I
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -73,7 +73,7 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
         val reiseVilkår = aktivitetMedReiser.reiser.single()
         assertThat(reiseVilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(reiseVilkår.typeReiseformål).isEqualTo(TypeReiseformål.OPPSTART)
-        assertThat(reiseVilkår.fakta).isInstanceOf(FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto::class.java)
+        assertThat(reiseVilkår.fakta).isInstanceOf(FaktaROAHOffentligTransportDto::class.java)
         assertThat(reiseVilkår.aktivitetId).isEqualTo(aktivitet.globalId)
 
         val vedtak =
@@ -176,7 +176,7 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
     }
 
     private fun validerVilkår(
-        lagretVilkår: VilkårReiseOppstartAvslutningHjemreiseDto,
+        lagretVilkår: VilkårROAHReiseDto,
         forventetType: TypeReiseformål,
         forventetFom: LocalDate,
         forventetTom: LocalDate,

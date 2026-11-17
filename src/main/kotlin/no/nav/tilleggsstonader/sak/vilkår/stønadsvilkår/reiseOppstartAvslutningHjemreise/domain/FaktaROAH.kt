@@ -1,17 +1,17 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
-sealed interface FaktaReiseOppstartAvslutningHjemreise {
-    val type: TypeReiseOppstartAvslutningHjemreise
+sealed interface FaktaROAH {
+    val type: TypeFaktaROAH
 
     fun mapTilVilkårFakta(
         reiseId: ReiseId,
@@ -20,14 +20,14 @@ sealed interface FaktaReiseOppstartAvslutningHjemreise {
     ): VilkårFakta
 }
 
-data object FaktaUbestemtType : FaktaReiseOppstartAvslutningHjemreise {
-    override val type = TypeReiseOppstartAvslutningHjemreise.UBESTEMT
+data object FaktaUbestemtType : FaktaROAH {
+    override val type = TypeFaktaROAH.UBESTEMT
 
     override fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
         typeReiseformål: TypeReiseformål,
-    ) = FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+    ) = FaktaROAHUbestemt(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
         aktivitetId = aktivitetId,
@@ -38,8 +38,8 @@ data class FaktaOffentligTransport(
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
-) : FaktaReiseOppstartAvslutningHjemreise {
-    override val type = TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT
+) : FaktaROAH {
+    override val type = TypeFaktaROAH.OFFENTLIG_TRANSPORT
 
     init {
         validerIngenNegativeUtgifter()
@@ -49,7 +49,7 @@ data class FaktaOffentligTransport(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
         typeReiseformål: TypeReiseformål,
-    ) = FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+    ) = FaktaROAHOffentligTransport(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
         nødvendigUtgift = nødvendigUtgift,
@@ -73,8 +73,8 @@ data class FaktaPrivatBil(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String? = null,
-) : FaktaReiseOppstartAvslutningHjemreise {
-    override val type = TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL
+) : FaktaROAH {
+    override val type = TypeFaktaROAH.PRIVAT_BIL
 
     init {
         validerIngenNegativReiseavstand()
@@ -85,7 +85,7 @@ data class FaktaPrivatBil(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
         typeReiseformål: TypeReiseformål,
-    ) = FaktaReiseOppstartAvslutningHjemreisePrivatBil(
+    ) = FaktaROAHPrivatBil(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
         nødvendigUtgift = nødvendigUtgift,

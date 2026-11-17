@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
-class ReiseOppstartAvslutningHjemreiseVilkårServiceTest {
+class ROAHVilkårServiceTest {
     @Test
     fun `skal sette tom lik fom for oppstart når tom ikke er satt`() {
         val fom = 10 januar 2026
