@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -70,6 +71,9 @@ class VilkårController(
     ): SlettVilkårResponse {
         tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
+        feilHvis(!vilkårService.kanSlettesFraFellesSletteEndepunkt(request.behandlingId)) {
+            "Vilkår for denne stønadstypen kan ikke slettes her"
+        }
 
         return vilkårService.slettVilkår(request).tilDto()
     }

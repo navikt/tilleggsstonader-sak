@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
@@ -37,6 +38,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -317,6 +319,58 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     private val vilkårKall get() = kall.vilkårReiseOppstartAvslutningHjemreise
+
+    @Test
+    fun `skal ikke kunne slette paraplyvilkår som har reiser, men kan slette det etter at reisene er slettet`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        val reise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId))
+
+        vilkårKall.apiRespons
+            .slettVilkår(behandling.id, paraply.id, SlettVilkårRequestDto())
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Perioden hvor bruker bor borte har reiser knyttet til seg og kan ikke slettes. Slett reisene først.",
+            )
+        assertThat(vilkårRepository.findByIdOrThrow(paraply.id).status).isEqualTo(VilkårStatus.NY)
+
+        vilkårKall.slettVilkår(behandling.id, reise.id, SlettVilkårRequestDto())
+        val resultat = vilkårKall.slettVilkår(behandling.id, paraply.id, SlettVilkårRequestDto())
+
+        assertThat(resultat.slettetPermanent).isTrue
+    }
+
+    @Test
+    fun `skal ikke kunne slette ROAH-vilkår via det generelle vilkår-endepunktet`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        val reise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId))
+
+        listOf(paraply.id, reise.id).forEach { vilkårId ->
+            kall.vilkår.apiRespons
+                .slettVilkår(SlettVilkårRequest(id = vilkårId, behandlingId = behandling.id))
+                .expectProblemDetail(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Vilkår for denne stønadstypen kan ikke slettes her",
+                )
+            assertThat(vilkårRepository.findByIdOrThrow(vilkårId).status).isEqualTo(VilkårStatus.NY)
+        }
+    }
+
+    @Test
+    fun `skal ikke kunne slette aktivitet som har ROAH-vilkår`() {
+        val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
+        // Aktiviteter kan bare endres i steget for inngangsvilkår, mens ROAH-vilkår opprettes i vilkårsteget
+        testoppsettService.oppdater(testoppsettService.hentBehandling(behandling.id).copy(steg = StegType.INNGANGSVILKÅR))
+
+        kall.vilkårperiode.apiRespons
+            .slett(aktivitet.id, SlettVikårperiode(behandling.id))
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Aktiviteten har vilkår knyttet til seg og kan ikke slettes eller endres til ikke oppfylt",
+            )
+    }
 
     private fun opprettBehandlingMedAktivitet(ident: String): Pair<Behandling, VilkårperiodeDto> {
         val fom = 1 januar 2026
