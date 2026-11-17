@@ -246,9 +246,6 @@ class OppgaveService(
         behandlingId: BehandlingId?,
         stønadstype: Stønadstype,
     ): Behandlingstype? {
-        if (!unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER)) {
-            return null
-        }
         if (stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO) {
             return null
         }

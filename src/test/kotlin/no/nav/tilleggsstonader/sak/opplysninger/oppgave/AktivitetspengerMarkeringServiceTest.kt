@@ -82,16 +82,6 @@ class AktivitetspengerMarkeringServiceTest {
         }
 
         @Test
-        fun `skal avvise endring når markering ikke er aktivert`() {
-            every { unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER) } returns false
-
-            assertThatThrownBy { service.endreMarkering(OPPGAVE_ID, gjelderAktivitetspenger = true) }
-                .isInstanceOf(ApiFeil::class.java)
-                .hasMessageContaining("ikke aktivert")
-            verify(exactly = 0) { oppgaveService.oppdaterBehandlingstype(any(), any()) }
-        }
-
-        @Test
         fun `skal ikke kunne fjerne markering uten toggle`() {
             every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER) } returns false
 
