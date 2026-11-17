@@ -40,9 +40,9 @@ data class VilkårMidlertidigBosted(
     override val resultat: Vilkårsresultat,
     override val status: VilkårStatus?,
     override val delvilkårsett: List<Delvilkår>,
-    override val slettetKommentar: String? = null,
     val fraAdresse: String,
     val tilAdresse: String,
+    override val slettetKommentar: String? = null,
 ) : VilkårROAH {
     init {
         validatePeriode()

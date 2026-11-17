@@ -10,6 +10,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
+enum class TypeFaktaROAH {
+    OFFENTLIG_TRANSPORT,
+    PRIVAT_BIL,
+    UBESTEMT,
+}
+
 sealed interface FaktaROAH {
     val type: TypeFaktaROAH
 
