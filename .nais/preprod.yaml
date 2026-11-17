@@ -81,7 +81,7 @@ spec:
           - id: "dab3f549-f5f0-4a9c-9f5b-1f6a15ae8424" # 0000-GA-Tilleggsstonader-Beslutter
           - id: "a1b518e2-3947-478d-8929-e5d685c47cac" # 0000-GA-Strengt_Fortrolig_Adresse
           - id: "2e1dc582-f762-4510-a660-88bf68fb7128" # 0000-GA-Fortrolig_Adresse
-          - id: "dbe4ad45-320b-4e9a-aaa1-73cca4ee124d" # 0000-GA-Egne_ansatte
+          - id: "8df187e3-f6ab-4a5d-8830-61bf148e59fe" # 0000-GA-Egne_ansatte
           - id: "928636f4-fd0d-4149-978e-a6fb68bb19de" # 0000-GA-STDAPPS gir alle tilgang i preprod til prosessering
   accessPolicy:
     inbound:
