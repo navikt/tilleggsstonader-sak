@@ -11,18 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
-enum class TypeFaktaROAH {
-    OFFENTLIG_TRANSPORT,
-    PRIVAT_BIL,
-    MIDLERTIDIG_BOSTED,
-    UBESTEMT,
-}
-
-sealed interface FaktaROAH {
-    val type: TypeFaktaROAH
-}
-
-sealed interface FaktaReiseROAH : FaktaROAH {
+sealed interface FaktaReiseROAH {
     fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
@@ -31,8 +20,6 @@ sealed interface FaktaReiseROAH : FaktaROAH {
 }
 
 data object FaktaUbestemtType : FaktaReiseROAH {
-    override val type = TypeFaktaROAH.UBESTEMT
-
     override fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
@@ -49,8 +36,6 @@ data class FaktaOffentligTransport(
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
 ) : FaktaReiseROAH {
-    override val type = TypeFaktaROAH.OFFENTLIG_TRANSPORT
-
     init {
         validerIngenNegativeUtgifter()
     }
@@ -84,8 +69,6 @@ data class FaktaPrivatBil(
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String? = null,
 ) : FaktaReiseROAH {
-    override val type = TypeFaktaROAH.PRIVAT_BIL
-
     init {
         validerIngenNegativReiseavstand()
         validerIngenNegativeEkstrakostnader()
@@ -135,9 +118,7 @@ data class FaktaPrivatBil(
 data class FaktaMidlertidigBosted(
     val fraAdresse: String,
     val tilAdresse: String,
-) : FaktaROAH {
-    override val type = TypeFaktaROAH.MIDLERTIDIG_BOSTED
-
+) {
     init {
         brukerfeilHvis(fraAdresse.isBlank()) { "Fra adresse må fylles ut" }
         brukerfeilHvis(tilAdresse.isBlank()) { "Til adresse må fylles ut" }

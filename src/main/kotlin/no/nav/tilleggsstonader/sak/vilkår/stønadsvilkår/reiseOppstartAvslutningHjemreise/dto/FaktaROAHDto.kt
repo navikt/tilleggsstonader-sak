@@ -8,8 +8,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeFaktaROAH
 import java.math.BigDecimal
+
+enum class TypeFaktaROAH {
+    OFFENTLIG_TRANSPORT,
+    PRIVAT_BIL,
+    MIDLERTIDIG_BOSTED,
+    UBESTEMT,
+}
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
