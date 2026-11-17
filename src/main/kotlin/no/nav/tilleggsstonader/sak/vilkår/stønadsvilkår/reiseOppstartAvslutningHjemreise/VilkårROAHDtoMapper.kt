@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaROAH
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHPrivatBilDto
@@ -48,8 +50,7 @@ object VilkårROAHDtoMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
-            fraAdresse = this.fraAdresse,
-            tilAdresse = this.tilAdresse,
+            fakta = this.fakta.tilDto(),
             slettetKommentar = this.slettetKommentar,
         )
 
@@ -74,6 +75,7 @@ object VilkårROAHDtoMapper {
         when (this) {
             is FaktaOffentligTransport -> this.tilDto()
             is FaktaPrivatBil -> this.tilDto()
+            is FaktaMidlertidigBosted -> this.tilDto()
             is FaktaUbestemtType -> FaktaROAHUbestemtDto
         }
 
@@ -99,5 +101,11 @@ object VilkårROAHDtoMapper {
         NødvendigUtgiftDto(
             erUtgiftenNødvendig = this.erUtgiftenNødvendig,
             begrunnelse = this.begrunnelse,
+        )
+
+    private fun FaktaMidlertidigBosted.tilDto() =
+        FaktaMidlertidigBostedDto(
+            fraAdresse = this.fraAdresse,
+            tilAdresse = this.tilAdresse,
         )
 }

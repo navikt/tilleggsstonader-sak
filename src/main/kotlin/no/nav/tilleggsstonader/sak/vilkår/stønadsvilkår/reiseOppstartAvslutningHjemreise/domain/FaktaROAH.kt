@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
@@ -13,12 +14,15 @@ import java.math.BigDecimal
 enum class TypeFaktaROAH {
     OFFENTLIG_TRANSPORT,
     PRIVAT_BIL,
+    MIDLERTIDIG_BOSTED,
     UBESTEMT,
 }
 
 sealed interface FaktaROAH {
     val type: TypeFaktaROAH
+}
 
+sealed interface FaktaReiseROAH : FaktaROAH {
     fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
@@ -26,7 +30,7 @@ sealed interface FaktaROAH {
     ): VilkårFakta
 }
 
-data object FaktaUbestemtType : FaktaROAH {
+data object FaktaUbestemtType : FaktaReiseROAH {
     override val type = TypeFaktaROAH.UBESTEMT
 
     override fun mapTilVilkårFakta(
@@ -44,7 +48,7 @@ data class FaktaOffentligTransport(
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
-) : FaktaROAH {
+) : FaktaReiseROAH {
     override val type = TypeFaktaROAH.OFFENTLIG_TRANSPORT
 
     init {
@@ -79,7 +83,7 @@ data class FaktaPrivatBil(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String? = null,
-) : FaktaROAH {
+) : FaktaReiseROAH {
     override val type = TypeFaktaROAH.PRIVAT_BIL
 
     init {
@@ -126,4 +130,23 @@ data class FaktaPrivatBil(
             "Piggdekkavgift må være mer enn 0kr"
         }
     }
+}
+
+data class FaktaMidlertidigBosted(
+    val fraAdresse: String,
+    val tilAdresse: String,
+) : FaktaROAH {
+    override val type = TypeFaktaROAH.MIDLERTIDIG_BOSTED
+
+    init {
+        brukerfeilHvis(fraAdresse.isBlank()) { "Fra adresse må fylles ut" }
+        brukerfeilHvis(tilAdresse.isBlank()) { "Til adresse må fylles ut" }
+    }
+
+    fun mapTilVilkårFakta(aktivitetId: VilkårperiodeGlobalId) =
+        FaktaROAHMidlertidigBosted(
+            aktivitetId = aktivitetId,
+            fraAdresse = fraAdresse,
+            tilAdresse = tilAdresse,
+        )
 }

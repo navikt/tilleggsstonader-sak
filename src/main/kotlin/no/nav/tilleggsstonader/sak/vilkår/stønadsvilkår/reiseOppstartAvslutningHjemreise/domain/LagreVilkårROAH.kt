@@ -20,8 +20,7 @@ data class LagreVilkårMidlertidigBosted(
     override val tom: LocalDate,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val svar: Map<RegelId, SvarOgBegrunnelse>,
-    val fraAdresse: String,
-    val tilAdresse: String,
+    val fakta: FaktaMidlertidigBosted,
 ) : LagreVilkårROAH {
     override val vilkårType = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE
 }
@@ -33,7 +32,7 @@ data class LagreVilkårROAHReise(
     override val aktivitetId: VilkårperiodeGlobalId,
     val typeReiseformål: TypeReiseformål,
     override val svar: Map<RegelId, SvarOgBegrunnelse>,
-    val fakta: FaktaROAH,
+    val fakta: FaktaReiseROAH,
     val parentVilkår: VilkårGlobalId? = null,
 ) : LagreVilkårROAH {
     override val vilkårType get() = typeReiseformål.tilVilkårType()

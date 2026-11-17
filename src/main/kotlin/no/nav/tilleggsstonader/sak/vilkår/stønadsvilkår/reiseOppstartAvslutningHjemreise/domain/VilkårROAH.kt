@@ -40,8 +40,7 @@ data class VilkårMidlertidigBosted(
     override val resultat: Vilkårsresultat,
     override val status: VilkårStatus?,
     override val delvilkårsett: List<Delvilkår>,
-    val fraAdresse: String,
-    val tilAdresse: String,
+    val fakta: FaktaMidlertidigBosted,
     override val slettetKommentar: String? = null,
 ) : VilkårROAH {
     init {
@@ -61,7 +60,7 @@ data class VilkårReise(
     override val resultat: Vilkårsresultat,
     override val status: VilkårStatus?,
     override val delvilkårsett: List<Delvilkår>,
-    val fakta: FaktaROAH,
+    val fakta: FaktaReiseROAH,
     override val slettetKommentar: String? = null,
     val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAH,

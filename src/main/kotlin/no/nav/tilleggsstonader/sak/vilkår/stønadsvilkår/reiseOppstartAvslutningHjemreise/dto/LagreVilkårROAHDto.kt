@@ -32,7 +32,7 @@ data class LagreVilkårROAHReiseDto(
     val aktivitetId: VilkårperiodeGlobalId,
     val typeReiseformål: TypeReiseformål,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
-    val fakta: FaktaROAHDto,
+    val fakta: FaktaROAHReiseDto,
     val parentVilkår: VilkårGlobalId? = null,
 ) : LagreVilkårROAHDto {
     override fun tilDomene() =
@@ -62,16 +62,14 @@ data class LagreVilkårMidlertidigBostedDto(
     val tom: LocalDate,
     val aktivitetId: VilkårperiodeGlobalId,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
-    val fraAdresse: String,
-    val tilAdresse: String,
+    val fakta: FaktaMidlertidigBostedDto,
 ) : LagreVilkårROAHDto {
     override fun tilDomene() =
         LagreVilkårMidlertidigBosted(
             fom = fom,
             tom = tom,
             aktivitetId = aktivitetId,
+            fakta = fakta.mapTilFakta(),
             svar = svar.mapValues { it.value.tilDomene() },
-            fraAdresse = fraAdresse,
-            tilAdresse = tilAdresse,
         )
 }

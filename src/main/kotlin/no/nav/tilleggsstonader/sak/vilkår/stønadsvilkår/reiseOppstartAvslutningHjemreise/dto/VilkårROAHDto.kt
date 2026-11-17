@@ -45,7 +45,6 @@ data class VilkårMidlertidigBostedDto(
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<DelvilkårDto>,
-    val fraAdresse: String,
-    val tilAdresse: String,
+    val fakta: FaktaMidlertidigBostedDto,
     val slettetKommentar: String? = null,
 ) : VilkårROAHDto

@@ -160,8 +160,7 @@ class ROAHVilkårService(
                     status = utledStatus(eksisterendeVilkår),
                     delvilkårsett = delvilkårsett,
                     resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-                    fraAdresse = nyttVilkår.fraAdresse,
-                    tilAdresse = nyttVilkår.tilAdresse,
+                    fakta = nyttVilkår.fakta,
                 )
         }
     }

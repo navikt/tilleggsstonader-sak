@@ -60,4 +60,24 @@ class FaktaROAHTest {
 
         assertThat(feil.message).isEqualTo("erUtgiftenNødvendig må være JA eller NEI")
     }
+
+    @Test
+    fun `midlertidig bosted med adresser er gyldig`() {
+        val fakta = FaktaMidlertidigBosted(fraAdresse = "Fra", tilAdresse = "Til")
+
+        assertThat(fakta.fraAdresse).isEqualTo("Fra")
+        assertThat(fakta.tilAdresse).isEqualTo("Til")
+    }
+
+    @Test
+    fun `midlertidig bosted uten fra adresse avvises som brukerfeil`() {
+        assertThrows<ApiFeil> { FaktaMidlertidigBosted(fraAdresse = " ", tilAdresse = "Til") }
+            .also { assertThat(it.message).contains("Fra adresse må fylles ut") }
+    }
+
+    @Test
+    fun `midlertidig bosted uten til adresse avvises som brukerfeil`() {
+        assertThrows<ApiFeil> { FaktaMidlertidigBosted(fraAdresse = "Fra", tilAdresse = "") }
+            .also { assertThat(it.message).contains("Til adresse må fylles ut") }
+    }
 }

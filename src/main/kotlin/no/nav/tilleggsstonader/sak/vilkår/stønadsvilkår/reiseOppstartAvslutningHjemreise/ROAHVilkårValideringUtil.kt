@@ -35,7 +35,6 @@ object ROAHVilkårValideringUtil {
         vilkårIBehandling: List<Vilkår>,
     ) {
         VilkårAktivitetValidering.validerAktivitetOppfyltHeleVilkåret(aktivitet, nyttVilkår)
-        validerMidlertidigBosted(nyttVilkår)
         validerIkkeOverlappendeParaplyvilkår(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
         if (nyttVilkår is LagreVilkårROAHReise) {
             validerReiseMotParaply(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
@@ -105,13 +104,6 @@ object ROAHVilkårValideringUtil {
         feilHvis(erEksisterendeVilkårParaplyvilkår != erNyttVilkårParaplyvilkår) {
             "Kan ikke endre mellom reise og paraplyvilkår"
         }
-    }
-
-    /** Paraplyvilkåret for midlertidig bosted må ha begge adressene satt. Perioden er påkrevd av typen. */
-    internal fun validerMidlertidigBosted(nyttVilkår: LagreVilkårROAH) {
-        if (nyttVilkår !is LagreVilkårMidlertidigBosted) return
-        brukerfeilHvis(nyttVilkår.fraAdresse.isBlank()) { "Fra adresse må fylles ut" }
-        brukerfeilHvis(nyttVilkår.tilAdresse.isBlank()) { "Til adresse må fylles ut" }
     }
 
     /**
