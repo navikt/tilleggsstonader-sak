@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAHReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
@@ -22,7 +22,7 @@ data class LagreVilkårReiseOppstartAvslutningHjemreiseDto(
     val parentVilkår: VilkårGlobalId? = null,
 ) : LagreVilkårROAHDto {
     override fun tilDomene() =
-        LagreVilkårReiseOppstartAvslutningHjemreise(
+        LagreVilkårROAHReise(
             fom = fom,
             tom = utledTom(),
             reiseId = reiseId,

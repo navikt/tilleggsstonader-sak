@@ -26,7 +26,7 @@ data class LagreVilkårMidlertidigBosted(
     override val vilkårType = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE
 }
 
-data class LagreVilkårReiseOppstartAvslutningHjemreise(
+data class LagreVilkårROAHReise(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reiseId: ReiseId,

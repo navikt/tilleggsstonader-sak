@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
 
-object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
+object VilkårROAHDtoMapper {
     fun AktivitetMedReiser.tilDto() =
         AktivitetMedReiserDto(
             aktivitetId = this.aktivitetId,

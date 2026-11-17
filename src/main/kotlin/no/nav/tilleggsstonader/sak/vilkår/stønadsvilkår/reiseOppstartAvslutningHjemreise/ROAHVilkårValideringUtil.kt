@@ -8,10 +8,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårAktivitetValid
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårROAH
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårROAHMapper.mapTilVilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAHReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
 
 /** Validering av vilkår for reise oppstart, avslutning og hjemreise (ROAH). Uten oppslag, slik at den kan enhetstestes. */
@@ -37,7 +37,7 @@ object ROAHVilkårValideringUtil {
         VilkårAktivitetValidering.validerAktivitetOppfyltHeleVilkåret(aktivitet, nyttVilkår)
         validerMidlertidigBosted(nyttVilkår)
         validerIkkeOverlappendeParaplyvilkår(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
-        if (nyttVilkår is LagreVilkårReiseOppstartAvslutningHjemreise) {
+        if (nyttVilkår is LagreVilkårROAHReise) {
             validerReiseMotParaply(nyttVilkår, eksisterendeVilkår, vilkårIBehandling)
         }
         if (eksisterendeVilkår != null) {
@@ -68,7 +68,7 @@ object ROAHVilkårValideringUtil {
     }
 
     private fun validerReiseMotParaply(
-        nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
+        nyttVilkår: LagreVilkårROAHReise,
         eksisterendeVilkår: Vilkår?,
         vilkårIBehandling: List<Vilkår>,
     ) {
@@ -157,7 +157,7 @@ object ROAHVilkårValideringUtil {
      * [vilkårId] er null når vilkåret opprettes. Feilmeldingene inneholder ingen verdier fra vilkåret.
      */
     internal fun validerTilhørendeParaplyvilkår(
-        nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
+        nyttVilkår: LagreVilkårROAHReise,
         parentVilkår: Vilkår?,
         vilkårId: VilkårId?,
     ) {

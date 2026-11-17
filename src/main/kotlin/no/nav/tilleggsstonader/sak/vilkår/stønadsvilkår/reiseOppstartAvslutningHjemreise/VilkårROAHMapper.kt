@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.tilVilkårType
 
-object VilkårReiseOppstartAvslutningHjemreiseMapper {
+object VilkårROAHMapper {
     fun Vilkår.mapTilVilkårROAH(): VilkårROAH =
         when (val fakta = faktaROAHEllerFeil(this.fakta)) {
             is FaktaROAHReise -> mapTilReise(fakta)

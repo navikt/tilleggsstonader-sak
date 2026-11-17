@@ -9,14 +9,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.HjemreiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.MidlertidigBostedPeriodeRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.roah.OppstartAvslutningRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårROAHDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.RegelstrukturROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.tilReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.tilROAHDto
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(path = ["/api/vilkar/reise-oppstart-avslutning-hjemreise"])
 @ProtectedWithClaims(issuer = "azuread")
-class ReiseOppstartAvslutningHjemreiseVilkårController(
+class ROAHVilkårController(
     private val tilgangService: TilgangService,
-    private val reiseOppstartAvslutningHjemreiseVilkårService: ReiseOppstartAvslutningHjemreiseVilkårService,
+    private val roahVilkårService: ROAHVilkårService,
 ) {
     @GetMapping("regler")
     fun regler(): RegelstrukturROAHDto {
@@ -52,7 +52,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        return reiseOppstartAvslutningHjemreiseVilkårService.hentVilkårGruppertPåAktivitet(behandlingId).map {
+        return roahVilkårService.hentVilkårGruppertPåAktivitet(behandlingId).map {
             it.tilDto()
         }
     }
@@ -65,7 +65,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
 
-        return reiseOppstartAvslutningHjemreiseVilkårService
+        return roahVilkårService
             .opprettNyttVilkår(
                 nyttVilkår = lagreVilkårDto.tilDomene(),
                 behandlingId = behandlingId,
@@ -81,7 +81,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
-        return reiseOppstartAvslutningHjemreiseVilkårService
+        return roahVilkårService
             .oppdaterVilkår(
                 nyttVilkår = lagreVilkårDto.tilDomene(),
                 vilkårId = vilkårId,
@@ -98,11 +98,11 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
 
-        return reiseOppstartAvslutningHjemreiseVilkårService
+        return roahVilkårService
             .slettVilkår(
                 behandlingId = behandlingId,
                 vilkårId = vilkårId,
                 slettetKommentar = slettVilkårRequestDto.kommentar,
-            ).tilReiseOppstartAvslutningHjemreiseDto()
+            ).tilROAHDto()
     }
 }

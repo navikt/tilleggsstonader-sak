@@ -71,18 +71,17 @@ data class VilkårReise(
         validerFaktaErForventetType()
     }
 
-    override fun merge(other: VilkårReise): VilkårReise =
-        this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
+    override fun merge(other: VilkårReise): VilkårReise = this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 
     private fun validerFaktaErForventetType() {
         if (this.fakta.type === TypeReiseOppstartAvslutningHjemreise.UBESTEMT) return
 
         return require(
             this.fakta.type === TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT ||
-                    this.fakta.type === TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL,
+                this.fakta.type === TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL,
         ) {
             "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er " +
-                    "${TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT} eller ${TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL}"
+                "${TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT} eller ${TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL}"
         }
     }
 }

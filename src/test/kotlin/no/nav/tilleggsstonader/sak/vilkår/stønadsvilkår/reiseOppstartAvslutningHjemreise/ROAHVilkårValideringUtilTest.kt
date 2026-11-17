@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårROAHReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThatCode
@@ -241,14 +241,14 @@ class ROAHVilkårValideringUtilTest {
     )
 
     private fun valider(
-        reise: LagreVilkårReiseOppstartAvslutningHjemreise,
+        reise: LagreVilkårROAHReise,
         paraply: Vilkår?,
     ) = ROAHVilkårValideringUtil.validerTilhørendeParaplyvilkår(reise, paraply, vilkårId = null)
 
     private fun reise(
         fom: LocalDate,
         tom: LocalDate,
-    ) = LagreVilkårReiseOppstartAvslutningHjemreise(
+    ) = LagreVilkårROAHReise(
         fom = fom,
         tom = tom,
         reiseId = ReiseId.random(),
