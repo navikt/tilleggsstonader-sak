@@ -18,8 +18,8 @@ import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -72,7 +72,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fom = 1 januar 2025,
                     tom = 15 januar 2025,
                     fakta =
-                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                        FaktaROAHOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             nødvendigUtgift = nødvendigUtgift,
@@ -89,7 +89,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fom = 16 januar 2025,
                     tom = 31 januar 2025,
                     fakta =
-                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                        FaktaROAHOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.HJEMREISE,
                             nødvendigUtgift = nødvendigUtgift,
@@ -126,7 +126,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fom = 1 januar 2025,
                     tom = 31 januar 2025,
                     fakta =
-                        FaktaReiseOppstartAvslutningHjemreisePrivatBil(
+                        FaktaROAHPrivatBil(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.AVSLUTNING,
                             nødvendigUtgift = nødvendigUtgift,
@@ -164,7 +164,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fom = 1 januar 2025,
                     tom = 31 januar 2025,
                     fakta =
-                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                        FaktaROAHOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             nødvendigUtgift = nødvendigUtgift,
@@ -181,7 +181,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fom = 1 februar 2025,
                     tom = 28 februar 2025,
                     fakta =
-                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                        FaktaROAHOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             nødvendigUtgift = nødvendigUtgift,
@@ -214,7 +214,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fom = 1 januar 2025,
                     tom = 5 februar 2025,
                     fakta =
-                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                        FaktaROAHOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             nødvendigUtgift = nødvendigUtgift,

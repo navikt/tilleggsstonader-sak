@@ -61,7 +61,7 @@ data class VilkårReise(
     override val resultat: Vilkårsresultat,
     override val status: VilkårStatus?,
     override val delvilkårsett: List<Delvilkår>,
-    val fakta: FaktaReiseOppstartAvslutningHjemreise,
+    val fakta: FaktaROAH,
     override val slettetKommentar: String? = null,
     val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAH,
@@ -74,14 +74,14 @@ data class VilkårReise(
     override fun merge(other: VilkårReise): VilkårReise = this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 
     private fun validerFaktaErForventetType() {
-        if (this.fakta.type === TypeReiseOppstartAvslutningHjemreise.UBESTEMT) return
+        if (this.fakta.type === TypeFaktaROAH.UBESTEMT) return
 
         return require(
-            this.fakta.type === TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT ||
-                this.fakta.type === TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL,
+            this.fakta.type === TypeFaktaROAH.OFFENTLIG_TRANSPORT ||
+                this.fakta.type === TypeFaktaROAH.PRIVAT_BIL,
         ) {
             "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er " +
-                "${TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT} eller ${TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL}"
+                "${TypeFaktaROAH.OFFENTLIG_TRANSPORT} eller ${TypeFaktaROAH.PRIVAT_BIL}"
         }
     }
 }

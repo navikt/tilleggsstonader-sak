@@ -24,19 +24,19 @@ import java.time.LocalDate
     JsonSubTypes.Type(FaktaReiseTilSamlingDrosje::class, name = "REISE_TIL_SAMLING_DROSJE"),
     JsonSubTypes.Type(FaktaReiseTilSamlingUbestemt::class, name = "REISE_TIL_SAMLING_UBESTEMT"),
     JsonSubTypes.Type(
-        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport::class,
+        FaktaROAHOffentligTransport::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT",
     ),
     JsonSubTypes.Type(
-        FaktaReiseOppstartAvslutningHjemreisePrivatBil::class,
+        FaktaROAHPrivatBil::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL",
     ),
     JsonSubTypes.Type(
-        FaktaReiseOppstartAvslutningHjemreiseUbestemt::class,
+        FaktaROAHUbestemt::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT",
     ),
     JsonSubTypes.Type(
-        FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted::class,
+        FaktaROAHMidlertidigBosted::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_MIDLERTIDIG_BOSTED",
     ),
     JsonSubTypes.Type(FaktaFlyttebyrå::class, name = "FLYTTING_FLYTTEBYRÅ"),
@@ -129,27 +129,27 @@ data class FaktaReiseTilSamlingUbestemt(
     override val adresse: String?,
 ) : ReiseVilkårFakta
 
-sealed interface FaktaROAH :
+sealed interface ROAHVilkårFakta :
     VilkårFakta,
     KnyttetTilAktivitet {
     override val aktivitetId: VilkårperiodeGlobalId
 }
 
-sealed interface FaktaROAHReise : FaktaROAH {
+sealed interface ROAHReiseVilkårFakta : ROAHVilkårFakta {
     val reiseId: ReiseId
     val typeReiseformål: TypeReiseformål
 }
 
-data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+data class FaktaROAHOffentligTransport(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String?,
-) : FaktaROAHReise
+) : ROAHReiseVilkårFakta
 
-data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
+data class FaktaROAHPrivatBil(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
@@ -160,19 +160,19 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String?,
-) : FaktaROAHReise
+) : ROAHReiseVilkårFakta
 
-data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+data class FaktaROAHUbestemt(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
-) : FaktaROAHReise
+) : ROAHReiseVilkårFakta
 
-data class FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+data class FaktaROAHMidlertidigBosted(
     override val aktivitetId: VilkårperiodeGlobalId,
     val fraAdresse: String,
     val tilAdresse: String,
-) : FaktaROAH
+) : ROAHVilkårFakta
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,

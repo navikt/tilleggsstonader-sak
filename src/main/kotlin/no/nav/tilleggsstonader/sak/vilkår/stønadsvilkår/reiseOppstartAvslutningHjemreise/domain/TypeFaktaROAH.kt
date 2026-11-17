@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 /**
  * Hvordan søker reiser (transportmiddel). Speiler [no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling].
  */
-enum class TypeReiseOppstartAvslutningHjemreise {
+enum class TypeFaktaROAH {
     OFFENTLIG_TRANSPORT,
     PRIVAT_BIL,
     UBESTEMT,

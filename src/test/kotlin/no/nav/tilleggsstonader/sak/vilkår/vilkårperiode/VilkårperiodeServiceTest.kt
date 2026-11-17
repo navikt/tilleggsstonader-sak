@@ -25,8 +25,8 @@ import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -488,7 +488,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             lagROAHVilkår(
                 type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
                 fakta =
-                    FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+                    FaktaROAHUbestemt(
                         reiseId = ReiseId.random(),
                         aktivitetId = lagretAktivitet.globalId,
                         typeReiseformål = TypeReiseformål.OPPSTART,
@@ -504,7 +504,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             lagROAHVilkår(
                 type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
                 fakta =
-                    FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                    FaktaROAHMidlertidigBosted(
                         aktivitetId = lagretAktivitet.globalId,
                         fraAdresse = "Hjemveien 1",
                         tilAdresse = "Tiltaksveien 1",
@@ -522,7 +522,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
         ) = lagROAHVilkår(
             type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
             fakta =
-                FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                FaktaROAHMidlertidigBosted(
                     aktivitetId = lagretAktivitet.globalId,
                     fraAdresse = "Hjemveien 1",
                     tilAdresse = "Tiltaksveien 1",
@@ -577,7 +577,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             lagROAHVilkår(
                 type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
                 fakta =
-                    FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                    FaktaROAHMidlertidigBosted(
                         aktivitetId = lagretAktivitet.globalId,
                         fraAdresse = "Hjemveien 1",
                         tilAdresse = "Tiltaksveien 1",

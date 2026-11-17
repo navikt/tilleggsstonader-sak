@@ -33,7 +33,7 @@ data class LagreVilkårROAHReise(
     override val aktivitetId: VilkårperiodeGlobalId,
     val typeReiseformål: TypeReiseformål,
     override val svar: Map<RegelId, SvarOgBegrunnelse>,
-    val fakta: FaktaReiseOppstartAvslutningHjemreise,
+    val fakta: FaktaROAH,
     val parentVilkår: VilkårGlobalId? = null,
 ) : LagreVilkårROAH {
     override val vilkårType get() = typeReiseformål.tilVilkårType()

@@ -7,9 +7,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårMidlertidigBostedDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -46,14 +46,14 @@ class LagreVilkårROAHDtoTest {
     private fun reise(
         reiseformål: TypeReiseformål,
         tom: LocalDate? = if (reiseformål == TypeReiseformål.HJEMREISE) 1 mars 2026 else null,
-    ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+    ) = LagreVilkårROAHReiseDto(
         fom = 1 januar 2026,
         tom = tom,
         reiseId = ReiseId.random(),
         aktivitetId = VilkårperiodeGlobalId.random(),
         typeReiseformål = reiseformål,
         svar = emptyMap(),
-        fakta = FaktaReiseOppstartAvslutningHjemreiseUbestemtDto,
+        fakta = FaktaROAHUbestemtDto,
     )
 
     private fun paraply() =

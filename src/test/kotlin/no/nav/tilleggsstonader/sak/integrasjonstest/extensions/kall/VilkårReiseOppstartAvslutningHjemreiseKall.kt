@@ -6,12 +6,12 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.RegelstrukturROAHDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårMidlertidigBostedDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårROAHReiseDto
 
 class VilkårReiseOppstartAvslutningHjemreiseKall(
     private val testklient: Testklient,
@@ -21,15 +21,14 @@ class VilkårReiseOppstartAvslutningHjemreiseKall(
 
     fun opprettVilkår(
         behandlingId: BehandlingId,
-        dto: LagreVilkårReiseOppstartAvslutningHjemreiseDto,
-    ): VilkårReiseOppstartAvslutningHjemreiseDto =
-        apiRespons.opprettVilkår(behandlingId, dto).expectOkWithBody<VilkårReiseOppstartAvslutningHjemreiseDto>()
+        dto: LagreVilkårROAHReiseDto,
+    ): VilkårROAHReiseDto = apiRespons.opprettVilkår(behandlingId, dto).expectOkWithBody<VilkårROAHReiseDto>()
 
     fun oppdaterVilkår(
-        lagreVilkår: LagreVilkårReiseOppstartAvslutningHjemreiseDto,
+        lagreVilkår: LagreVilkårROAHReiseDto,
         vilkårId: VilkårId,
         behandlingId: BehandlingId,
-    ): VilkårReiseOppstartAvslutningHjemreiseDto = apiRespons.oppdaterVilkår(lagreVilkår, vilkårId, behandlingId).expectOkWithBody()
+    ): VilkårROAHReiseDto = apiRespons.oppdaterVilkår(lagreVilkår, vilkårId, behandlingId).expectOkWithBody()
 
     fun opprettParaplyvilkår(
         behandlingId: BehandlingId,

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeFaktaROAH
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -17,22 +17,22 @@ import java.math.BigDecimal
     visible = true,
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto::class, name = "OFFENTLIG_TRANSPORT"),
-    JsonSubTypes.Type(FaktaReiseOppstartAvslutningHjemreisePrivatBilDto::class, name = "PRIVAT_BIL"),
-    JsonSubTypes.Type(FaktaReiseOppstartAvslutningHjemreiseUbestemtDto::class, name = "UBESTEMT"),
+    JsonSubTypes.Type(FaktaROAHOffentligTransportDto::class, name = "OFFENTLIG_TRANSPORT"),
+    JsonSubTypes.Type(FaktaROAHPrivatBilDto::class, name = "PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaROAHUbestemtDto::class, name = "UBESTEMT"),
 )
-sealed interface FaktaReiseOppstartAvslutningHjemreiseDto {
-    val type: TypeReiseOppstartAvslutningHjemreise
+sealed interface FaktaROAHDto {
+    val type: TypeFaktaROAH
 
-    fun mapTilFakta(): FaktaReiseOppstartAvslutningHjemreise
+    fun mapTilFakta(): FaktaROAH
 }
 
-data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+data class FaktaROAHOffentligTransportDto(
     val nødvendigUtgift: NødvendigUtgiftDto,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
-) : FaktaReiseOppstartAvslutningHjemreiseDto {
-    override val type = TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT
+) : FaktaROAHDto {
+    override val type = TypeFaktaROAH.OFFENTLIG_TRANSPORT
 
     override fun mapTilFakta() =
         FaktaOffentligTransport(
@@ -42,7 +42,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
         )
 }
 
-data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
+data class FaktaROAHPrivatBilDto(
     val nødvendigUtgift: NødvendigUtgiftDto,
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal? = null,
@@ -50,8 +50,8 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String? = null,
-) : FaktaReiseOppstartAvslutningHjemreiseDto {
-    override val type = TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL
+) : FaktaROAHDto {
+    override val type = TypeFaktaROAH.PRIVAT_BIL
 
     override fun mapTilFakta() =
         FaktaPrivatBil(
@@ -65,8 +65,8 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
         )
 }
 
-data object FaktaReiseOppstartAvslutningHjemreiseUbestemtDto : FaktaReiseOppstartAvslutningHjemreiseDto {
-    override val type = TypeReiseOppstartAvslutningHjemreise.UBESTEMT
+data object FaktaROAHUbestemtDto : FaktaROAHDto {
+    override val type = TypeFaktaROAH.UBESTEMT
 
     override fun mapTilFakta() = FaktaUbestemtType
 }

@@ -11,14 +11,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
 
-data class LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+data class LagreVilkårROAHReiseDto(
     val fom: LocalDate,
     val tom: LocalDate?,
     val reiseId: ReiseId,
     val aktivitetId: VilkårperiodeGlobalId,
     val typeReiseformål: TypeReiseformål,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
-    val fakta: FaktaReiseOppstartAvslutningHjemreiseDto,
+    val fakta: FaktaROAHDto,
     val parentVilkår: VilkårGlobalId? = null,
 ) : LagreVilkårROAHDto {
     override fun tilDomene() =

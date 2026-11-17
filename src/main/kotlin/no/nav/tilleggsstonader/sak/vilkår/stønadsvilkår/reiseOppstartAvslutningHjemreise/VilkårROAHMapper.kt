@@ -3,19 +3,19 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAH
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ROAHReiseVilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ROAHVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
@@ -25,11 +25,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 object VilkårROAHMapper {
     fun Vilkår.mapTilVilkårROAH(): VilkårROAH =
         when (val fakta = faktaROAHEllerFeil(this.fakta)) {
-            is FaktaROAHReise -> mapTilReise(fakta)
-            is FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted -> mapTilMidlertidigBosted(fakta)
+            is ROAHReiseVilkårFakta -> mapTilReise(fakta)
+            is FaktaROAHMidlertidigBosted -> mapTilMidlertidigBosted(fakta)
         }
 
-    private fun Vilkår.mapTilReise(fakta: FaktaROAHReise) =
+    private fun Vilkår.mapTilReise(fakta: ROAHReiseVilkårFakta) =
         VilkårReise(
             id = id,
             globalId = globalId,
@@ -42,11 +42,11 @@ object VilkårROAHMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = fakta.mapTilFaktaReiseOppstartAvslutningHjemreise(),
+            fakta = fakta.mapTilFaktaROAH(),
             parentVilkår = this.parentVilkår,
         )
 
-    private fun Vilkår.mapTilMidlertidigBosted(fakta: FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted) =
+    private fun Vilkår.mapTilMidlertidigBosted(fakta: FaktaROAHMidlertidigBosted) =
         VilkårMidlertidigBosted(
             id = id,
             globalId = globalId,
@@ -61,14 +61,14 @@ object VilkårROAHMapper {
             tilAdresse = fakta.tilAdresse,
         )
 
-    private fun faktaROAHEllerFeil(fakta: VilkårFakta?): FaktaROAH =
+    private fun faktaROAHEllerFeil(fakta: VilkårFakta?): ROAHVilkårFakta =
         when (fakta) {
             null -> feil("Fakta skal aldri være null for reise oppstart, avslutning og hjemreise")
-            is FaktaROAH -> fakta
+            is ROAHVilkårFakta -> fakta
             else ->
                 feil(
                     "Ugyldig fakta for reise oppstart, avslutning og hjemreise. " +
-                        "Forventet FaktaROAH, fikk ${fakta::class.qualifiedName}",
+                        "Forventet ROAHVilkårFakta, fikk ${fakta::class.qualifiedName}",
                 )
         }
 
@@ -94,7 +94,7 @@ object VilkårROAHMapper {
         tilVilkår(
             type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
             fakta =
-                FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted(
+                FaktaROAHMidlertidigBosted(
                     aktivitetId = this.aktivitetId,
                     fraAdresse = this.fraAdresse,
                     tilAdresse = this.tilAdresse,
@@ -123,21 +123,21 @@ object VilkårROAHMapper {
         parentVilkår = parentVilkår,
     )
 
-    private fun FaktaROAHReise.mapTilFaktaReiseOppstartAvslutningHjemreise(): FaktaReiseOppstartAvslutningHjemreise =
+    private fun ROAHReiseVilkårFakta.mapTilFaktaROAH(): FaktaROAH =
         when (this) {
-            is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport -> this.mapTilFakta()
-            is FaktaReiseOppstartAvslutningHjemreisePrivatBil -> this.mapTilFakta()
-            is FaktaReiseOppstartAvslutningHjemreiseUbestemt -> this.mapTilFakta()
+            is FaktaROAHOffentligTransport -> this.mapTilFakta()
+            is FaktaROAHPrivatBil -> this.mapTilFakta()
+            is FaktaROAHUbestemt -> this.mapTilFakta()
         }
 
-    private fun FaktaReiseOppstartAvslutningHjemreiseOffentligTransport.mapTilFakta() =
+    private fun FaktaROAHOffentligTransport.mapTilFakta() =
         FaktaOffentligTransport(
             nødvendigUtgift = this.nødvendigUtgift,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
         )
 
-    private fun FaktaReiseOppstartAvslutningHjemreisePrivatBil.mapTilFakta() =
+    private fun FaktaROAHPrivatBil.mapTilFakta() =
         FaktaPrivatBil(
             nødvendigUtgift = this.nødvendigUtgift,
             reiseavstand = this.reiseavstand,
@@ -148,5 +148,5 @@ object VilkårROAHMapper {
             begrunnelse = this.begrunnelse,
         )
 
-    private fun FaktaReiseOppstartAvslutningHjemreiseUbestemt.mapTilFakta() = FaktaUbestemtType
+    private fun FaktaROAHUbestemt.mapTilFakta() = FaktaUbestemtType
 }

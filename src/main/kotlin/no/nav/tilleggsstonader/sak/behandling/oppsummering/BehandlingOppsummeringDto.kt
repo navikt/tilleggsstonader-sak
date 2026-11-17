@@ -12,10 +12,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
@@ -122,13 +122,13 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
                 is FaktaReiseTilSamlingPrivatBil -> TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
                 is FaktaReiseTilSamlingDrosje -> TypeVilkårFakta.REISE_TIL_SAMLING_DROSJE
                 is FaktaReiseTilSamlingUbestemt -> TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
-                is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport ->
+                is FaktaROAHOffentligTransport ->
                     TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT
-                is FaktaReiseOppstartAvslutningHjemreisePrivatBil ->
+                is FaktaROAHPrivatBil ->
                     TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL
-                is FaktaReiseOppstartAvslutningHjemreiseUbestemt ->
+                is FaktaROAHUbestemt ->
                     TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT
-                is FaktaReiseOppstartAvslutningHjemreiseMidlertidigBosted ->
+                is FaktaROAHMidlertidigBosted ->
                     TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_MIDLERTIDIG_BOSTED
                 null -> null
             },

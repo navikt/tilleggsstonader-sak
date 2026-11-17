@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(LagreVilkårReiseOppstartAvslutningHjemreiseDto::class, name = "REISEVILKÅR"),
+    JsonSubTypes.Type(LagreVilkårROAHReiseDto::class, name = "REISEVILKÅR"),
     JsonSubTypes.Type(LagreVilkårMidlertidigBostedDto::class, name = "PARAPLYVILKÅR"),
 )
 sealed interface LagreVilkårROAHDto : LagreVilkår {

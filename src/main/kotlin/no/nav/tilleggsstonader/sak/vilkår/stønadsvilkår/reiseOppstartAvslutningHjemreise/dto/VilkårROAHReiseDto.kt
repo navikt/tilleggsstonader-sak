@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
 
-data class VilkårReiseOppstartAvslutningHjemreiseDto(
+data class VilkårROAHReiseDto(
     val id: VilkårId,
     val globalId: VilkårGlobalId?,
     val fom: LocalDate,
@@ -21,7 +21,7 @@ data class VilkårReiseOppstartAvslutningHjemreiseDto(
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<DelvilkårDto>,
-    val fakta: FaktaReiseOppstartAvslutningHjemreiseDto,
+    val fakta: FaktaROAHDto,
     val slettetKommentar: String? = null,
     val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAHDto
