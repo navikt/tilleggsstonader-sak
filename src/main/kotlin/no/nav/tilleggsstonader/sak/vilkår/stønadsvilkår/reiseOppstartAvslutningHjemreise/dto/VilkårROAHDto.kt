@@ -31,7 +31,7 @@ data class VilkårROAHReiseDto(
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<DelvilkårDto>,
-    val fakta: FaktaROAHDto,
+    val fakta: FaktaROAHReiseDto,
     val slettetKommentar: String? = null,
     val parentVilkår: VilkårGlobalId? = null,
 ) : VilkårROAHDto

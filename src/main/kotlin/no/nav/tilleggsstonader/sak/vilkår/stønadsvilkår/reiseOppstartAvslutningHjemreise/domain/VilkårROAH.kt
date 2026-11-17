@@ -67,20 +67,7 @@ data class VilkårReise(
     Mergeable<LocalDate, VilkårReise> {
     init {
         validatePeriode()
-        validerFaktaErForventetType()
     }
 
     override fun merge(other: VilkårReise): VilkårReise = this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
-
-    private fun validerFaktaErForventetType() {
-        if (this.fakta.type === TypeFaktaROAH.UBESTEMT) return
-
-        return require(
-            this.fakta.type === TypeFaktaROAH.OFFENTLIG_TRANSPORT ||
-                this.fakta.type === TypeFaktaROAH.PRIVAT_BIL,
-        ) {
-            "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er " +
-                "${TypeFaktaROAH.OFFENTLIG_TRANSPORT} eller ${TypeFaktaROAH.PRIVAT_BIL}"
-        }
-    }
 }
