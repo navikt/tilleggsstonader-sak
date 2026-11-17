@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
@@ -36,7 +38,7 @@ class ForeslåVedtaksperiodeService(
             GrunnlagForVedtaksperiode.MÅLGRUPPE_AKTIVITET_OG_VILKÅR ->
                 ForeslåVedtaksperiode.finnVedtaksperiode(
                     vilkårperioder = vilkårperioder,
-                    vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                    vilkår = hentVilkårUtenParaplyvilkår(saksbehandling.id),
                     forrigeVedtaksperioder = forrigeVedtaksperioder,
                     tidligsteEndring = tidligsteEndring,
                 )
@@ -44,7 +46,7 @@ class ForeslåVedtaksperiodeService(
             GrunnlagForVedtaksperiode.MÅLGRUPPE_OG_VILKÅR ->
                 ForeslåVedtaksperiode.finnVedtaksperiodeUtenAktivitet(
                     vilkårperioder = vilkårperioder,
-                    vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                    vilkår = hentVilkårUtenParaplyvilkår(saksbehandling.id),
                     forrigeVedtaksperioder = forrigeVedtaksperioder,
                     tidligsteEndring = tidligsteEndring,
                 )
@@ -57,4 +59,8 @@ class ForeslåVedtaksperiodeService(
                 )
         }
     }
+
+    /** Paraplyvilkår (midlertidig bosted) gir ikke rett i seg selv. Det er reisene under som gir grunnlag for vedtaksperioder. */
+    private fun hentVilkårUtenParaplyvilkår(behandlingId: BehandlingId): List<Vilkår> =
+        vilkårService.hentVilkår(behandlingId).filterNot { it.type == VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE }
 }
