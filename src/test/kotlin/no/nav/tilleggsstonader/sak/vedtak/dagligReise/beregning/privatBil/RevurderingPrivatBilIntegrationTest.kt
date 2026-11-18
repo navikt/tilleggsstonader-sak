@@ -49,7 +49,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Slett
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.groups.Tuple
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,11 +63,6 @@ class RevurderingPrivatBilIntegrationTest(
 ) : CleanDatabaseIntegrationTest() {
     val fom = 1 januar 2026
     val tom = 31 desember 2026
-
-    @BeforeEach
-    fun setUp() {
-        every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
-    }
 
     @Nested
     inner class LeggeTilOgSlette {

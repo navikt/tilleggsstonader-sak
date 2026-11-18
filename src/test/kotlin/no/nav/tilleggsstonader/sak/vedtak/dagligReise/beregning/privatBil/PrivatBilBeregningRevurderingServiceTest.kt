@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
-import io.mockk.mockk
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -20,8 +18,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class PrivatBilBeregningRevurderingServiceTest {
-    private val unleashService = mockk<UnleashService>()
-    private val service = PrivatBilBeregningRevurderingService(unleashService)
+    private val service = PrivatBilBeregningRevurderingService()
 
     private val reiseId = ReiseId.random()
 

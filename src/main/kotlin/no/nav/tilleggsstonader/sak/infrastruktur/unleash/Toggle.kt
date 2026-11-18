@@ -26,8 +26,6 @@ enum class Toggle(
         "sak.soknad-routing.reise-oppstart-avslutning-hjemreise",
     ),
 
-    KAN_OPPHØRE_PRIVAT_BIL("sak.opphore-privat-bil"),
-
     KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE("sak.reise-oppstart-avslutning-hjemreise"),
     KAN_BEHANDLE_FLYTTING("sak.flytting"),
 

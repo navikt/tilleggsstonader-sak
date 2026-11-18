@@ -50,7 +50,6 @@ class DagligReiseVilkårServiceTest {
             vilkårRepository = vilkårRepository,
             behandlingService = behandlingService,
             vilkårService = vilkårService,
-            unleashService = unleashService,
             vilkårperiodeService = vilkårperiodeService,
         )
 
