@@ -60,7 +60,7 @@ class ForeslåVedtaksperiodeService(
         }
     }
 
-    /** Paraplyvilkår (midlertidig bosted) gir ikke rett i seg selv. Det er reisene under som gir grunnlag for vedtaksperioder. */
+    /** Paraplyvilkår (midlertidig bosted for ROAH) gir ikke rett i seg selv. Det er reisene under som gir grunnlag for vedtaksperioder. */
     private fun hentVilkårUtenParaplyvilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårService.hentVilkår(behandlingId).filterNot { it.type == VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE }
 }
