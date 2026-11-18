@@ -16,19 +16,7 @@ class PosteringStønadstypeMapperTest {
     fun `alle TypeAndel med bestilte klassekoder skal ha en definert klassekode`() {
         val typeAndelerMedKlassekode = PosteringStønadstypeMapper.klassekodeTilTypeAndel.values.toSet()
         val forventedeTypeAndeler =
-            TypeAndel.entries.filterNot {
-                it == TypeAndel.UGYLDIG ||
-                    it in
-                    setOf(
-                        TypeAndel.TILSYN_BARN_AKTIVITETSPENGER,
-                        TypeAndel.LÆREMIDLER_AKTIVITETSPENGER,
-                        TypeAndel.BOUTGIFTER_AKTIVITETSPENGER,
-                        TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
-                        TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
-                        TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
-                        TypeAndel.FLYTTING_AKTIVITETSPENGER,
-                    )
-            }
+            TypeAndel.entries.filterNot { it == TypeAndel.UGYLDIG }
 
         assertThat(typeAndelerMedKlassekode).containsExactlyInAnyOrderElementsOf(forventedeTypeAndeler)
     }
