@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
@@ -64,9 +63,6 @@ class OpprettRevurderingService(
             }
         }
 
-        val fagsak = fagsakService.hentFagsak(opprettRevurdering.fagsakId)
-        validerIngenKjørelistePåVent(opprettRevurdering.fagsakId, fagsak.stønadstype)
-
         val behandling = opprettBehandlingService.opprettBehandling(lagOpprettBehandlingRequest(opprettRevurdering))
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
@@ -84,18 +80,6 @@ class OpprettRevurderingService(
         )
 
         return OpprettRevurderingResultat.Opprettet(behandling.id)
-    }
-
-    private fun validerIngenKjørelistePåVent(
-        fagsakId: FagsakId,
-        stønadstype: Stønadstype,
-    ) {
-        if (!stønadstype.gjelderDagligReise()) {
-            return
-        }
-        brukerfeilHvis(behandlingService.harÅpenKjørelisteBehandling(fagsakId)) {
-            "Det finnes en åpen kjørelistebehandling. Behandle denne før du oppretter en ny behandling."
-        }
     }
 
     private fun lagOpprettBehandlingRequest(opprettRevurdering: OpprettRevurdering): OpprettBehandling =

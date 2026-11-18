@@ -68,15 +68,13 @@ class OpprettRevurderingServiceTest {
             )
         every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
-        assertThatThrownBy {
-            service.opprettRevurdering(
-                opprettRevurdering(
-                    fagsakId = fagsakId,
-                ),
-            )
-        }.hasMessageContaining("Det finnes en åpen kjørelistebehandling")
+        service.opprettRevurdering(
+            opprettRevurdering(
+                fagsakId = fagsakId,
+            ),
+        )
 
-        verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
+        verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
     }
 
     @Test
