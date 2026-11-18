@@ -197,18 +197,6 @@ internal class OppgaveServiceTest {
         }
 
         @Test
-        fun `skal ikke slå opp ung-sak eller sette behandlingstype når toggle er av`() {
-            unleashService.mockIsEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER, false)
-            val slot = slot<OpprettOppgaveRequest>()
-            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
-
-            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
-
-            assertThat(slot.captured.behandlingstype).isNull()
-            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) }
-        }
-
-        @Test
         fun `skal bruke tolerant oppslag mot ung-sak når oppgaven har behandling`() {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot, gjelderAktivitetspenger = true)

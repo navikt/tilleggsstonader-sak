@@ -28,9 +28,6 @@ class AktivitetspengerMarkeringService(
         gjelderAktivitetspenger: Boolean,
     ): OppgaveMedMetadata {
         tilgangService.validerHarSaksbehandlerrolle()
-        brukerfeilHvis(!unleashService.isEnabled(Toggle.SKAL_MARKERE_AKTIVITETSPENGER_OPPGAVER)) {
-            "Markering av aktivitetspenger er ikke aktivert"
-        }
         brukerfeilHvis(!gjelderAktivitetspenger && !unleashService.isEnabled(Toggle.KAN_BEHANDLE_AKTIVITETSPENGER)) {
             "Du har ikke tilgang til å fjerne markering for aktivitetspenger"
         }
