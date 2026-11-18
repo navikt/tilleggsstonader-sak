@@ -24,8 +24,6 @@ enum class Toggle(
 
     BRUK_NYTT_FAGOMRADE_FOR_UTBETALING("sak.bruk-nytt-fagomrade-for-utbetaling"),
 
-    SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
-
     SØKNAD_ROUTING_FLYTTING("sak.soknad-routing.flytting"),
 
     SØKNAD_ROUTING_ROAH(
