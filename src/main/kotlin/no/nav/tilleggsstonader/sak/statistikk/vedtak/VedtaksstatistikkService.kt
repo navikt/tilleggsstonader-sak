@@ -1,11 +1,9 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
@@ -32,7 +30,6 @@ class VedtaksstatistikkService(
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
-    private val unleashService: UnleashService,
 ) {
     fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId) {
         val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
@@ -57,8 +54,7 @@ class VedtaksstatistikkService(
             tilkjentYtelseService.hentForBehandlingEllerNull(behandlingId)?.andelerTilkjentYtelse
                 ?: emptySet()
         val barn = barnRepository.findByBehandlingId(behandlingId)
-        val knyttAndelTilVedtaksperiode = unleashService.isEnabled(Toggle.KNYTT_ANDEL_TIL_VEDTAKSPERIODE)
-        val vedtaksperioderJsonWrapper = VedtaksperioderDvh.fraDomene(vedtak, barn, behandlingId, knyttAndelTilVedtaksperiode)
+        val vedtaksperioderJsonWrapper = VedtaksperioderDvh.fraDomene(vedtak, barn, behandlingId)
 
         return VedtaksstatistikkV2(
             fagsakId = behandling.fagsakId,
@@ -79,7 +75,6 @@ class VedtaksstatistikkService(
                     andelTilkjentYtelse,
                     vedtak,
                     vedtaksperioderJsonWrapper.vedtaksperioder,
-                    knyttAndelTilVedtaksperiode,
                 ),
             årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
             årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
