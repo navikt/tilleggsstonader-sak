@@ -14,27 +14,27 @@ import java.time.LocalDateTime
  * Aggregert behandling og fagsak
  */
 data class Saksbehandling(
-    val id: BehandlingId,
+    override val id: BehandlingId,
     val eksternId: Long,
-    val forrigeIverksatteBehandlingId: BehandlingId? = null,
-    val type: BehandlingType,
+    override val forrigeIverksatteBehandlingId: BehandlingId? = null,
+    override val type: BehandlingType,
     @Column("behandling_metode")
-    val behandlingMetode: BehandlingMetode,
-    val status: BehandlingStatus,
-    val steg: StegType,
-    val kategori: BehandlingKategori,
+    override val behandlingMetode: BehandlingMetode,
+    override val status: BehandlingStatus,
+    override val steg: StegType,
+    override val kategori: BehandlingKategori,
     @Column("arsak")
-    val årsak: BehandlingÅrsak,
+    override val årsak: BehandlingÅrsak,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    val årsakMetadata: ÅrsakMetadata? = null,
-    val kravMottatt: LocalDate? = null,
-    val resultat: BehandlingResultat,
-    val vedtakstidspunkt: LocalDateTime?,
+    override val årsakMetadata: ÅrsakMetadata? = null,
+    override val kravMottatt: LocalDate? = null,
+    override val resultat: BehandlingResultat,
+    override val vedtakstidspunkt: LocalDateTime?,
     @Column("henlagt_arsak")
-    val henlagtÅrsak: HenlagtÅrsak? = null,
-    val henlagtBegrunnelse: String? = null,
+    override val henlagtÅrsak: HenlagtÅrsak? = null,
+    override val henlagtBegrunnelse: String? = null,
     val ident: String,
-    val fagsakId: FagsakId,
+    override val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,
     val eksternFagsakId: Long,
     @Column("stonadstype")
@@ -43,16 +43,11 @@ data class Saksbehandling(
     val opprettetTid: LocalDateTime,
     val endretAv: String,
     val endretTid: LocalDateTime,
-) {
+) : ErBehandling {
     val skalSendeBrev: Boolean = !skalIkkeSendeBrev
     val skalIkkeSendeBrev get() = erÅrsakUtenBrev || erSatsendring
     val erÅrsakUtenBrev
         get() = årsak == BehandlingÅrsak.KORRIGERING_UTEN_BREV || årsak == BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
-    val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     val harStatusOpprettet get() = status == BehandlingStatus.OPPRETTET
-
-    fun erFerdigstilt(): Boolean = status == BehandlingStatus.FERDIGSTILT
-
-    fun erKjørelisteBehandling(): Boolean = type == BehandlingType.KJØRELISTE
 }
