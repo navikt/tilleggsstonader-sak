@@ -68,7 +68,6 @@ class RevurderingPrivatBilIntegrationTest(
     @BeforeEach
     fun setUp() {
         every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
     }
 
     @Nested

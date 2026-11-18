@@ -52,7 +52,6 @@ class ReduserAntallDagerIKjørelistestegIntegrationTest(
     @BeforeEach
     fun setUp() {
         every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
     }
 
     @Test

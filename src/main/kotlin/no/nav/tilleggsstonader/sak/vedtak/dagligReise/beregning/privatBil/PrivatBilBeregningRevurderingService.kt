@@ -44,10 +44,6 @@ class PrivatBilBeregningRevurderingService(
         nyttRammevedtak: RammevedtakPrivatBil?,
         beregningsplan: Beregningsplan,
     ): RammevedtakPrivatBil? {
-        brukerfeilHvis(!unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL)) {
-            "Muligheten for å revurdere daglige reiser med privat bil er skrudd av."
-        }
-
         val forrigeRammerByReiseId = forrigeRammevedtak.reiser.associateBy { it.reiseId }
         val nyeRammerByReiseId = nyttRammevedtak?.reiser?.associateBy { it.reiseId }
 
