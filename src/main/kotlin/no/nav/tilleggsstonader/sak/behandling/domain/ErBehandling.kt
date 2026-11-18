@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-interface ErBehandling {
+sealed interface ErBehandling {
     val id: BehandlingId
     val fagsakId: FagsakId
     val forrigeIverksatteBehandlingId: BehandlingId?
