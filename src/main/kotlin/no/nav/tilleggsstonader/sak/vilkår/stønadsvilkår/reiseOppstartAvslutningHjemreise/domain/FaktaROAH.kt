@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
@@ -10,9 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
-sealed interface FaktaROAH {
-    val type: TypeFaktaROAH
-
+sealed interface FaktaReiseROAH {
     fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
@@ -20,9 +19,7 @@ sealed interface FaktaROAH {
     ): VilkårFakta
 }
 
-data object FaktaUbestemtType : FaktaROAH {
-    override val type = TypeFaktaROAH.UBESTEMT
-
+data object FaktaUbestemtType : FaktaReiseROAH {
     override fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
@@ -38,9 +35,7 @@ data class FaktaOffentligTransport(
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
-) : FaktaROAH {
-    override val type = TypeFaktaROAH.OFFENTLIG_TRANSPORT
-
+) : FaktaReiseROAH {
     init {
         validerIngenNegativeUtgifter()
     }
@@ -73,9 +68,7 @@ data class FaktaPrivatBil(
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
     val begrunnelse: String? = null,
-) : FaktaROAH {
-    override val type = TypeFaktaROAH.PRIVAT_BIL
-
+) : FaktaReiseROAH {
     init {
         validerIngenNegativReiseavstand()
         validerIngenNegativeEkstrakostnader()
@@ -120,4 +113,21 @@ data class FaktaPrivatBil(
             "Piggdekkavgift må være mer enn 0kr"
         }
     }
+}
+
+data class FaktaMidlertidigBosted(
+    val fraAdresse: String,
+    val tilAdresse: String,
+) {
+    init {
+        brukerfeilHvis(fraAdresse.isBlank()) { "Fra adresse må fylles ut" }
+        brukerfeilHvis(tilAdresse.isBlank()) { "Til adresse må fylles ut" }
+    }
+
+    fun mapTilVilkårFakta(aktivitetId: VilkårperiodeGlobalId) =
+        FaktaROAHMidlertidigBosted(
+            aktivitetId = aktivitetId,
+            fraAdresse = fraAdresse,
+            tilAdresse = tilAdresse,
+        )
 }

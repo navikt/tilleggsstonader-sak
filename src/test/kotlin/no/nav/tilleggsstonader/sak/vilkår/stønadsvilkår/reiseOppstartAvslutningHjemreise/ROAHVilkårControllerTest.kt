@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaROAHOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
@@ -61,8 +62,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         assertThat(paraply.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(paraply.status).isEqualTo(VilkårStatus.NY)
-        assertThat(paraply.fraAdresse).isEqualTo("Adresse 1")
-        assertThat(paraply.tilAdresse).isEqualTo("Adresse 2")
+        assertThat(paraply.fakta).isEqualTo(FaktaMidlertidigBostedDto(fraAdresse = "Adresse 1", tilAdresse = "Adresse 2"))
 
         val oppdatert =
             vilkårKall.oppdaterParaplyvilkår(
@@ -72,8 +72,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
             )
 
         assertThat(oppdatert.id).isEqualTo(paraply.id)
-        assertThat(oppdatert.fraAdresse).isEqualTo("Adresse 3")
-        assertThat(oppdatert.tilAdresse).isEqualTo("Adresse 2")
+        assertThat(oppdatert.fakta).isEqualTo(FaktaMidlertidigBostedDto(fraAdresse = "Adresse 3", tilAdresse = "Adresse 2"))
     }
 
     @Test
@@ -430,8 +429,11 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         tom = tom,
         aktivitetId = aktivitetId,
         svar = svar,
-        fraAdresse = fraAdresse,
-        tilAdresse = "Adresse 2",
+        fakta =
+            FaktaMidlertidigBostedDto(
+                fraAdresse = fraAdresse,
+                tilAdresse = "Adresse 2",
+            ),
     )
 
     private fun assertLagretVilkår(

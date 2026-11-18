@@ -13,9 +13,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaROAH
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
@@ -42,7 +43,7 @@ object VilkårROAHMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = fakta.mapTilFaktaROAH(),
+            fakta = fakta.mapTilFaktaReiseROAH(),
             parentVilkår = this.parentVilkår,
         )
 
@@ -57,8 +58,7 @@ object VilkårROAHMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fraAdresse = fakta.fraAdresse,
-            tilAdresse = fakta.tilAdresse,
+            fakta = fakta.mapTilFaktaMidlertidigBosted(),
         )
 
     private fun faktaROAHEllerFeil(fakta: VilkårFakta?): ROAHVilkårFakta =
@@ -94,10 +94,8 @@ object VilkårROAHMapper {
         tilVilkår(
             type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
             fakta =
-                FaktaROAHMidlertidigBosted(
+                this.fakta.mapTilVilkårFakta(
                     aktivitetId = this.aktivitetId,
-                    fraAdresse = this.fraAdresse,
-                    tilAdresse = this.tilAdresse,
                 ),
             parentVilkår = null,
         )
@@ -123,7 +121,7 @@ object VilkårROAHMapper {
         parentVilkår = parentVilkår,
     )
 
-    private fun ROAHReiseVilkårFakta.mapTilFaktaROAH(): FaktaROAH =
+    private fun ROAHReiseVilkårFakta.mapTilFaktaReiseROAH(): FaktaReiseROAH =
         when (this) {
             is FaktaROAHOffentligTransport -> this.mapTilFakta()
             is FaktaROAHPrivatBil -> this.mapTilFakta()
@@ -146,6 +144,12 @@ object VilkårROAHMapper {
             parkering = this.parkering,
             piggdekkavgift = this.piggdekkavgift,
             begrunnelse = this.begrunnelse,
+        )
+
+    private fun FaktaROAHMidlertidigBosted.mapTilFaktaMidlertidigBosted() =
+        FaktaMidlertidigBosted(
+            fraAdresse = this.fraAdresse,
+            tilAdresse = this.tilAdresse,
         )
 
     private fun FaktaROAHUbestemt.mapTilFakta() = FaktaUbestemtType
