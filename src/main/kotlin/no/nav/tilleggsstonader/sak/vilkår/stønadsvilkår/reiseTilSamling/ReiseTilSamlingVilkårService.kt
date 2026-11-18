@@ -2,16 +2,13 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårAktivitetValidering
@@ -41,7 +38,6 @@ class ReiseTilSamlingVilkårService(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val unleashService: UnleashService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårReiseTilSamling> =
         vilkårRepository
@@ -57,7 +53,6 @@ class ReiseTilSamlingVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerSamlingIkkeStrekkerSegOverNyttår(nyttVilkår)
-        validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandling)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
@@ -75,7 +70,6 @@ class ReiseTilSamlingVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerSamlingIkkeStrekkerSegOverNyttår(nyttVilkår)
-        validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandling)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårReiseTilSamling()
@@ -149,14 +143,6 @@ class ReiseTilSamlingVilkårService(
     private fun validerSamlingIkkeStrekkerSegOverNyttår(nyttVilkår: LagreVilkårReiseTilSamling) {
         brukerfeilHvis(nyttVilkår.fom.year != nyttVilkår.tom.year) {
             "Samlingen kan ikke registreres over nyttår."
-        }
-    }
-
-    private fun validerFeatureToggle() {
-        val kanBehandleReiseTilSamling = unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)
-
-        feilHvis(!kanBehandleReiseTilSamling) {
-            "TS-sak støtter foreløpig ikke behandling av saker som gjelder reise til samling"
         }
     }
 

@@ -28,8 +28,6 @@ enum class Toggle(
 
     KAN_OPPHØRE_PRIVAT_BIL("sak.opphore-privat-bil"),
 
-    KAN_BEHANDLE_REISE_TIL_SAMLING("sak.reise-til-samling"),
-
     KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE("sak.reise-oppstart-avslutning-hjemreise"),
     KAN_BEHANDLE_FLYTTING("sak.flytting"),
 
