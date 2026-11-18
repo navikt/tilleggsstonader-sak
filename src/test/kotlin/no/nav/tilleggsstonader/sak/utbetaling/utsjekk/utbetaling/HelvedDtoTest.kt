@@ -23,7 +23,7 @@ class HelvedDtoTest {
         val idService = mockk<FagsakUtbetalingIdService>()
         val utbetalingsvalgService = mockk<FagsakUtbetalingsvalgService>()
         val mapper = UtbetalingV3Mapper(idService, utbetalingsvalgService, mockk())
-        every { utbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(any(), any()) } returns true
+        every { utbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(any()) } returns true
 
         val forventetMapping =
             mapOf(

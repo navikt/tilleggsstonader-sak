@@ -1,40 +1,28 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.fagomrade.FagsakUtbetalingsvalgService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class UtbetalingPassAvBarnIntegrationTest : IntegrationTest() {
+class UtbetalingNyttFagområdeIntegrationTest : IntegrationTest() {
     @Autowired
     lateinit var fagsakUtbetalingsvalgService: FagsakUtbetalingsvalgService
 
-    @Test
-    fun `iverksetting for pass av barn skal bruke gammelt fagområde når toggle er av`() {
-        every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns false
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.BARNETILSYN,
-        ) {
-            defaultPassAvBarnTestdata()
-        }
-
-        val iverksettingDto = hentIverksettingDtoer(1).single()
-
-        assertThat(iverksettingDto.utbetalinger).hasSize(1)
-        assertThat(iverksettingDto.utbetalinger.single().brukFagområdeTillst).isTrue
-    }
+    @Autowired lateinit var fagsakRepository: FagsakRepository
 
     @Test
-    fun `iverksetting for pass av barn skal bruke nytt fagområde når toggle er på`() {
-        every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns true
+    fun `iverksetting for pass av barn skal bruke nytt fagområde`() {
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
         ) {
@@ -48,19 +36,23 @@ class UtbetalingPassAvBarnIntegrationTest : IntegrationTest() {
 
     @Test
     fun `fagsak med historikk på gammelt fagområde skal fortsette med gammelt fagområde`() {
-        every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns false
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
-            ) {
-                defaultPassAvBarnTestdata()
-            }
+                tilSteg = StegType.INNGANGSVILKÅR,
+            ) {}
 
-        every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns true
+        // Simulerer at allerede er satt at den skal betales på gammelt fagområde, eks gammel behandling
+        val fagsak = fagsakRepository.findByIdOrThrow(førstegangsbehandlingContext.fagsakId)
+        fagsakRepository.update(fagsak.copy(utbetalPåNyttFagområde = false))
+
+        gjennomførBehandlingsløp(førstegangsbehandlingContext.behandlingId, førstegangsbehandlingContext.ident) {
+            defaultPassAvBarnTestdata()
+        }
+
         val utbetalPåNyttFagområde =
             fagsakUtbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(
                 fagsakId = førstegangsbehandlingContext.fagsakId,
-                stønadstype = Stønadstype.BARNETILSYN,
             )
         assertThat(utbetalPåNyttFagområde).isFalse
     }
