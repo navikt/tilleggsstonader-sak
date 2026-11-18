@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
@@ -345,7 +344,6 @@ class AvklartKjørelisteServiceTest {
             )
         every { kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId) } returns innsendtKjøreliste
         every { behandlingService.hentBehandling(behandlingId) } returns behandling
-        every { unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK) } returns false
 
         val vedtakData =
             InnvilgelseDagligReise(
