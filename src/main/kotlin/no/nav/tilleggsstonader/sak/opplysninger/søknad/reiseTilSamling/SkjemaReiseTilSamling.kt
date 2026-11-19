@@ -47,7 +47,7 @@ data class Samling(
 )
 
 data class Avreiseadresse(
-    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val skalReiseFraFolkeregistrertAdresse: JaNei?,
     val adresseDetSkalReisesFra: Adresse?,
 )
 

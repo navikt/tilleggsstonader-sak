@@ -193,7 +193,7 @@ data class FaktaFlyttetilbud(
 )
 
 data class FaktaAvreiseadresse(
-    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val skalReiseFraFolkeregistrertAdresse: JaNei?,
     val adresseDetSkalReisesFra: ReiseAdresse?,
 )
 

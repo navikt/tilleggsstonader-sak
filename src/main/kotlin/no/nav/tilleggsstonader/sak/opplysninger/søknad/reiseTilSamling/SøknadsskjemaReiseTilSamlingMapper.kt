@@ -83,7 +83,7 @@ object SøknadsskjemaReiseTilSamlingMapper {
             },
         avreiseadresse =
             Avreiseadresse(
-                skalReiseFraFolkeregistrertAdresse = skjema.avreiseadresse.skalReiseFraFolkeregistrertAdresse.verdi,
+                skalReiseFraFolkeregistrertAdresse = skjema.avreiseadresse.skalReiseFraFolkeregistrertAdresse?.verdi,
                 adresseDetSkalReisesFra =
                     skjema.avreiseadresse.adresseDetSkalReisesFra?.let {
                         Adresse(
