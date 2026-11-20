@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -49,6 +51,9 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
 
+    @Autowired
+    lateinit var vedtakRepository: VedtakRepository
+
     @BeforeEach
     fun setUp() {
         BrukerContextUtil.mockBrukerContext()
@@ -63,7 +68,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Nested
     inner class OpprettBehandling {
         @Test
-        fun `skal ikke opprette revurdering når det finnes en åpen kjørelistebehandling`() {
+        fun `skal opprette revurdering når det finnes en åpen kjørelistebehandling`() {
             val ferdigBehandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(
@@ -73,6 +78,8 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                     opprettGrunnlagsdata = false,
                 )
+            vedtakRepository.insert(DagligReiseTestUtil.innvilgelse(behandlingId = ferdigBehandling.id))
+
             testoppsettService.lagre(
                 behandling(
                     fagsak =
@@ -84,9 +91,12 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                 opprettGrunnlagsdata = false,
             )
 
-            assertThatThrownBy {
-                service.opprettRevurdering(opprettRevurdering(fagsakId = ferdigBehandling.fagsakId))
-            }.hasMessageContaining("Det finnes en åpen kjørelistebehandling")
+            val nyBehandlingId =
+                service.opprettRevurdering(opprettRevurdering(fagsakId = ferdigBehandling.fagsakId)).assertOpprettet()
+
+            val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
+            assertThat(nyBehandling.fagsakId).isEqualTo(ferdigBehandling.fagsakId)
+            assertThat(nyBehandling.type).isEqualTo(BehandlingType.REVURDERING)
         }
 
         @Test

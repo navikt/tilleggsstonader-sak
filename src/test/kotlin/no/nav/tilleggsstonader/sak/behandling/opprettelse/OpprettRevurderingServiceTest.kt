@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class OpprettRevurderingServiceTest {
@@ -68,15 +67,13 @@ class OpprettRevurderingServiceTest {
             )
         every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
-        assertThatThrownBy {
-            service.opprettRevurdering(
-                opprettRevurdering(
-                    fagsakId = fagsakId,
-                ),
-            )
-        }.hasMessageContaining("Det finnes en åpen kjørelistebehandling")
+        service.opprettRevurdering(
+            opprettRevurdering(
+                fagsakId = fagsakId,
+            ),
+        )
 
-        verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
+        verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
     }
 
     @Test
