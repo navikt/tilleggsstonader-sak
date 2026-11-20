@@ -177,8 +177,8 @@ class BehandleMottattKjørelisteService(
         avklarteUker: List<AvklartKjørtUke>,
     ): Boolean {
         val behandling =
-            behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(kjøreliste.fagsakId)
-                ?: return false
+            behandlingService.finnSisteIverksatteBehandling(kjøreliste.fagsakId)
+                ?: error("Forventer at fagsak ${kjøreliste.fagsakId} har en siste iverksatte behandling")
 
         val rammeForReise =
             avklartKjørelisteService.henteReiseFraVedtak(
