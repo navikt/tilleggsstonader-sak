@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -15,7 +14,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.dummyAktivitetId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -48,7 +46,6 @@ class ReiseTilSamlingVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
     val vilkårService = mockk<VilkårService>()
     val behandlingService = mockk<BehandlingService>()
-    val unleashService = mockk<UnleashService>()
     val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
 
     val reiseTilSamlingVilkårService =
@@ -57,7 +54,6 @@ class ReiseTilSamlingVilkårServiceTest {
             behandlingService = behandlingService,
             vilkårService = vilkårService,
             vilkårperiodeService = vilkårperiodeService,
-            unleashService = unleashService,
         )
 
     val svarOffentligTransport = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransport()
@@ -158,27 +154,10 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
-    fun `skal feile hvis feature toggle for reise til samling ikke er skrudd på`() {
-        val behandling =
-            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns false
-
-        assertThatExceptionOfType(Feil::class.java)
-            .isThrownBy {
-                reiseTilSamlingVilkårService.opprettNyttVilkår(
-                    nyttVilkår = nyttVilkår,
-                    behandlingId = behandling.id,
-                )
-            }.withMessage("TS-sak støtter foreløpig ikke behandling av saker som gjelder reise til samling")
-    }
-
-    @Test
     fun `skal validere aktivitet for offentlig transport ved opprettelse for TSR`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
@@ -212,7 +191,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
 
         val vilkår =
             nyttVilkår.copy(
@@ -241,7 +219,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val vilkår =
@@ -272,7 +249,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val vilkår =
@@ -303,7 +279,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
         every { vilkårperiodeService.hentAktivitet(any(), any()) } returns null
 
         val vilkår =
@@ -336,7 +311,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
 
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
         every { aktivitet.resultat } returns ResultatVilkårperiode.IKKE_OPPFYLT
@@ -372,7 +346,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
 
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
         every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
@@ -411,7 +384,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val aktivitetId = dummyAktivitetId
@@ -449,7 +421,6 @@ class ReiseTilSamlingVilkårServiceTest {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val vilkår =
@@ -528,7 +499,6 @@ class ReiseTilSamlingVilkårServiceTest {
                 .mapTilVilkår()
                 .copy(globalId = globalId)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING) } returns true
         every { vilkårRepository.findById(eksisterende.id) } returns Optional.of(eksisterende)
         every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
 

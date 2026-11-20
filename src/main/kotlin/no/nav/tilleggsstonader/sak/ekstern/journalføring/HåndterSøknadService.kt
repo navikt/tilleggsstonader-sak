@@ -99,15 +99,10 @@ class HåndterSøknadService(
                 )
 
             Skjematype.SØKNAD_REISE_TIL_SAMLING ->
-                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING) || !filtrerStønadstyperSomIkkeErAktivert) {
-                    ValgbareStønadstyperForJournalpost(
-                        defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
-                        valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
-                    )
-                } else {
-                    // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
-                    valgbareStønadstyperForIkkeStøttetSkjematype()
-                }
+                ValgbareStønadstyperForJournalpost(
+                    defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
+                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
+                )
 
             Skjematype.SØKNAD_FLYTTING ->
                 if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) || !filtrerStønadstyperSomIkkeErAktivert) {
@@ -153,9 +148,6 @@ class HåndterSøknadService(
     private fun finnTilgjengeligeStønadstyper(): List<Stønadstype> {
         val utilgjengeligeStønadstyper = mutableSetOf<Stønadstype>()
 
-        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)) {
-            utilgjengeligeStønadstyper.addAll(Stønadstype.entries.filter { it.gjelderReiseTilSamling() })
-        }
         if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING)) {
             utilgjengeligeStønadstyper.addAll(Stønadstype.entries.filter { it.gjelderFlytting() })
         }
@@ -316,11 +308,9 @@ class HåndterSøknadService(
             Stønadstype.BOUTGIFTER,
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.DAGLIG_REISE_TSR,
-            -> true
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSR,
-            ->
-                unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)
+            -> true
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             ->

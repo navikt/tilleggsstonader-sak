@@ -1,10 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
-import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
@@ -14,17 +11,11 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class PrivatBilBeregningRevurderingService(
-    private val unleashService: UnleashService,
-) {
+class PrivatBilBeregningRevurderingService {
     fun kuttEksisterendeRammevedtakForOpphør(
         forrigeRammevedtak: RammevedtakPrivatBil,
         opphørsdato: LocalDate?,
     ): RammevedtakPrivatBil? {
-        brukerfeilHvis(!unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL)) {
-            "Muligheten for å opphøre daglige reiser med privat bil er skrudd av."
-        }
-
         feilHvis(opphørsdato == null) {
             "Opphørsdato må være satt for å kunne opphøre"
         }
@@ -44,10 +35,6 @@ class PrivatBilBeregningRevurderingService(
         nyttRammevedtak: RammevedtakPrivatBil?,
         beregningsplan: Beregningsplan,
     ): RammevedtakPrivatBil? {
-        brukerfeilHvis(!unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL)) {
-            "Muligheten for å revurdere daglige reiser med privat bil er skrudd av."
-        }
-
         val forrigeRammerByReiseId = forrigeRammevedtak.reiser.associateBy { it.reiseId }
         val nyeRammerByReiseId = nyttRammevedtak?.reiser?.associateBy { it.reiseId }
 
@@ -128,30 +115,7 @@ class PrivatBilBeregningRevurderingService(
         return if (reiseErFørBeregnFra) {
             forrigeRammeForReise
         } else {
-            validerReisedagerIkkeRedusert(forrigeRammeForReise, nyRammeForReise)
             nyRammeForReise
-        }
-    }
-
-    /**
-     * Vi støtter ikke å redusere antall reisedager per uke i en revurdering, da reduksjon kan komme i konflikt med
-     * dager som allerede er kjørt og utbetalt. Økning av reisedager er tillatt.
-     */
-    private fun validerReisedagerIkkeRedusert(
-        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil,
-        nyRammeForReise: RammevedtakForReiseMedPrivatBil,
-    ) {
-        if (!unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL)) {
-            val reisedagerErRedusert =
-                nyRammeForReise.grunnlag.delperioder.any { nyDelperiode ->
-                    forrigeRammeForReise.grunnlag.delperioder
-                        .filter { it.overlapper(nyDelperiode) }
-                        .any { nyDelperiode.reisedagerPerUke < it.reisedagerPerUke }
-                }
-
-            brukerfeilHvis(reisedagerErRedusert) {
-                "Det er ikke støttet å redusere antall reisedager per uke i en revurdering, da dette kan komme i konflikt med dager som allerede er kjørt og utbetalt."
-            }
         }
     }
 }

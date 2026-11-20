@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
@@ -18,9 +16,6 @@ import org.junit.jupiter.api.Test
 class GjennopprettAvklarteDagerServiceIntegrationTest : IntegrationTest() {
     @Test
     fun `skal gjenopprette kjøreliste etter opphør selv om det er mellomliggende behandlinger`() {
-        every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
-
         val fom = 2 februar 2026
         val tom = 20 mars 2026
         val opphørsdato = 9 mars 2026 // mandag - start av uke 10
@@ -76,9 +71,6 @@ class GjennopprettAvklarteDagerServiceIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal gjenopprette slettet enkeltdag i eksisterende uke når rammevedtaket utvides igjen`() {
-        every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
-
         val fom = 2 februar 2026
         val tom = 20 mars 2026
         val opphørsdato = 11 mars 2026

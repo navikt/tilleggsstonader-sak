@@ -68,7 +68,6 @@ class UtbetalingV3Mapper(
         val utbetalPåNyttFagområde =
             fagsakUtbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(
                 fagsakId = behandling.fagsakId,
-                stønadstype = behandling.stønadstype,
             )
         return andelerTilkjentYtelse
             .filterNot { it.erNullandel() }

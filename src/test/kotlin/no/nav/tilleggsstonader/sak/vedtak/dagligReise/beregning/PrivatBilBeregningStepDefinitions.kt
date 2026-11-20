@@ -10,7 +10,6 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
@@ -53,7 +52,6 @@ class PrivatBilBeregningStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
-    val unleashServiceMock = mockk<UnleashService>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val dagligReiseVilkårService =
@@ -61,7 +59,6 @@ class PrivatBilBeregningStepDefinitions {
             vilkårRepository = vilkårRepositoryFake,
             vilkårService = vilkårServiceMock,
             behandlingService = behandlingServiceMock,
-            unleashService = unleashServiceMock,
             vilkårperiodeService = vilkårperiodeService,
         )
 
@@ -73,7 +70,7 @@ class PrivatBilBeregningStepDefinitions {
             satsPrivatBilProvider = satsPrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
-            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(unleashServiceMock),
+            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(),
         )
 
     var reiserUtenDelperioder: Map<Int, LagreVilkårDagligReise> = emptyMap()
@@ -96,8 +93,6 @@ class PrivatBilBeregningStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.VILKÅR,
             )
-
-        every { unleashServiceMock.isEnabled(any()) } returns true
 
         reiserUtenDelperioder =
             dataTable
@@ -132,8 +127,6 @@ class PrivatBilBeregningStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.VILKÅR,
             )
-
-        every { unleashServiceMock.isEnabled(any()) } returns true
 
         delperioderForReisenummer = mapDelperioder(dataTable)
     }

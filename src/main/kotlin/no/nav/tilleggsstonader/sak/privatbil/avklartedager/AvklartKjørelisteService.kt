@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
@@ -69,15 +68,12 @@ class AvklartKjørelisteService(
         val eksisterendeUke = hentAvklartUke(ukeId)
         val oppdaterteDager = oppdaterAvklarteDager(eksisterendeUke.dager, request)
 
-        val rammevedtak = henteReiseFraVedtak(behandlingId, eksisterendeUke.reiseId)
         val innsendteKjørelisteDager = kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId).data.reisedager
 
         validerOppdatertAvklartKjørtUke(
             oppdaterteDager = oppdaterteDager.filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET },
             ukeSomSkalOppdateres = eksisterendeUke.uke,
-            rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
-            tillatOverskridelseRammevedtak = unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK),
         )
 
         val nyAvklartKjørtUkeStatus = beregnNyStatus(behandlingId, eksisterendeUke, oppdaterteDager)

@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
@@ -50,11 +49,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Slett
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.groups.Tuple
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -66,12 +63,6 @@ class RevurderingPrivatBilIntegrationTest(
 ) : CleanDatabaseIntegrationTest() {
     val fom = 1 januar 2026
     val tom = 31 desember 2026
-
-    @BeforeEach
-    fun setUp() {
-        every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
-    }
 
     @Nested
     inner class LeggeTilOgSlette {
@@ -303,33 +294,7 @@ class RevurderingPrivatBilIntegrationTest(
         }
 
         @Test
-        fun `reduksjon av reisedager per uke under antallet allerede kjørte dager kaster feil`() {
-            val fomReise1 = 5 januar 2026
-            val tomReise1 = 11 januar 2026
-
-            val førstegangsbehandlingContext =
-                innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1, reisedagerPerUke = 5)
-
-            val revurderingId =
-                opprettRevurderingOgGjennomførBehandlingsløp(
-                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                    tilSteg = StegType.BEREGNE_YTELSE,
-                ) {
-                    vilkår {
-                        endrePrivatBilFaktaDelperioder { it.copy(reisedagerPerUke = 2) }
-                    }
-                }
-
-            gjennomførBeregningStegKall(revurderingId, Stønadstype.DAGLIG_REISE_TSO)
-                .expectProblemDetail(
-                    HttpStatus.BAD_REQUEST,
-                    "Det er ikke støttet å redusere antall reisedager per uke i en revurdering",
-                )
-        }
-
-        @Test
-        fun `kan redusere reisedager når feature-toggle er på`() {
-            every { unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL) } returns true
+        fun `kan redusere antall reisedager i rammevedtak`() {
             val fomReise1 = 5 januar 2026
             val tomReise1 = 11 januar 2026
 

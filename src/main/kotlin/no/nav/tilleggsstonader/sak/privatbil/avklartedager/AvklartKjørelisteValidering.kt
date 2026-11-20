@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
@@ -22,43 +21,15 @@ fun validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(
 fun validerOppdatertAvklartKjørtUke(
     oppdaterteDager: List<AvklartKjørtDag>,
     ukeSomSkalOppdateres: UkeIÅr,
-    rammevedtak: RammevedtakForReiseMedPrivatBil,
     innsendteKjørelisteDager: List<KjørelisteDag>,
-    tillatOverskridelseRammevedtak: Boolean = false,
 ) {
     validerInnsendteDagerErInnenforUken(ukeSomSkalOppdateres, oppdaterteDager)
-    validerAntallDagerGodkjentInnenforRammevedtak(
-        oppdaterteDager = oppdaterteDager,
-        rammevedtak = rammevedtak,
-        tillatOverskridelseRammevedtak = tillatOverskridelseRammevedtak,
-    )
 
     oppdaterteDager.forEach { oppdatertDag ->
         oppdatertDag.validerGyldigeVerdier()
 
         val innsendtKjørelisteDag = innsendteKjørelisteDager.find { it.dato == oppdatertDag.dato }
         oppdatertDag.validerBegrunnelse(innsendtKjørelisteDag)
-    }
-}
-
-private fun validerAntallDagerGodkjentInnenforRammevedtak(
-    oppdaterteDager: List<AvklartKjørtDag>,
-    rammevedtak: RammevedtakForReiseMedPrivatBil,
-    tillatOverskridelseRammevedtak: Boolean,
-) {
-    if (tillatOverskridelseRammevedtak) return
-
-    val antallDagerSomDekkes = oppdaterteDager.count { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
-    val tilhørendeDelperiode =
-        rammevedtak.finnDelperiodeForPeriode(
-            Datoperiode(
-                oppdaterteDager.minOf { it.dato },
-                oppdaterteDager.maxOf { it.dato },
-            ),
-        )
-
-    brukerfeilHvis(antallDagerSomDekkes > tilhørendeDelperiode.reisedagerPerUke) {
-        "Antall godkjente reisedager kan ikke være høyere enn antall dager godkjent i rammevedtak"
     }
 }
 

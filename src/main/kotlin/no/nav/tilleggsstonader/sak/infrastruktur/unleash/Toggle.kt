@@ -20,28 +20,14 @@ enum class Toggle(
 
     KAN_AUTOMATISK_BEHANDLE_KJØRELISTE("sak.automatisk-behandling-kjoreliste"),
 
-    KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK("sak.kan-overskride-antall-dager-i-rammevedtak"),
-
-    BRUK_NYTT_FAGOMRADE_FOR_UTBETALING("sak.bruk-nytt-fagomrade-for-utbetaling"),
-
-    SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
-
     SØKNAD_ROUTING_FLYTTING("sak.soknad-routing.flytting"),
 
     SØKNAD_ROUTING_ROAH(
         "sak.soknad-routing.reise-oppstart-avslutning-hjemreise",
     ),
 
-    KAN_OPPHØRE_PRIVAT_BIL("sak.opphore-privat-bil"),
-    KAN_REVURDERE_PRIVAT_BIL("sak.revurdere-privat-bil"),
-    KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL("sak.redusere-reisedager-revurdering-privat-bil"),
-
-    KAN_BEHANDLE_REISE_TIL_SAMLING("sak.reise-til-samling"),
-
     KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE("sak.reise-oppstart-avslutning-hjemreise"),
     KAN_BEHANDLE_FLYTTING("sak.flytting"),
-
-    KNYTT_ANDEL_TIL_VEDTAKSPERIODE("sak.knytt-andel-til-vedtaksperiode-dvh"),
 
     KAN_BRUKE_MÅLGRUPPE_UNGDOMSPROGRAMMET("sak.frontend.kan-bruke-malgruppe-ungdomsprogrammet"),
     KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER("sak.frontend.kan-bruke-malgruppe-aktivitetspenger"),

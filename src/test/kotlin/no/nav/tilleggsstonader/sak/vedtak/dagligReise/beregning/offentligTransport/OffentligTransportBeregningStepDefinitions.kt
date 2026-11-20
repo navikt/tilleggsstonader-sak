@@ -61,7 +61,6 @@ class OffentligTransportBeregningStepDefinitions {
             vilkårRepository = vilkårRepositoryFake,
             vilkårService = vilkårServiceMock,
             behandlingService = behandlingServiceMock,
-            unleashService = unleashServiceMock,
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
 

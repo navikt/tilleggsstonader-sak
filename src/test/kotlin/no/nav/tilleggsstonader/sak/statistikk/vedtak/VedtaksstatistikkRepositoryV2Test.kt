@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AndelstypeDvh
@@ -33,6 +34,7 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
 
     final val id: BehandlingId = BehandlingId.fromString("3bc11bf2-1421-4d2b-978d-c33a36870ce2")
     final val fagsakId: FagsakId = FagsakId.fromString("76e6ea78-5abb-414b-85df-9387cc7db1f7")
+    final val vedtaksperiodeId: VedtaksperiodeId = vedtaksperiodeId()
 
     @Test
     fun `kan skrive vedtaksstatistikk til tabell og verifiserer at ingen breaking changes finnes`() {
@@ -79,7 +81,7 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
             vedtaksperioder =
                 listOf(
                     VedtaksperioderDvh(
-                        id = vedtaksperiodeId(),
+                        id = vedtaksperiodeId,
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 2),
                         aktivitet = AktivitetTypeDvh.TILTAK,
@@ -102,6 +104,7 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
                         beløp = 1,
                         makssats = 100,
                         beløpErBegrensetAvMakssats = true,
+                        vedtaksperiodeIder = listOf(vedtaksperiodeId),
                     ),
                 ),
         )

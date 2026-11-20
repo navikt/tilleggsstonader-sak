@@ -72,7 +72,7 @@ internal class SimuleringServiceTest {
                 reiseId = thirdArg(),
             )
         }
-        every { fagsakUtbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(any(), any()) } returns true
+        every { fagsakUtbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(any()) } returns true
         every { fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(any()) } returns
             listOf(
                 FagsakUtbetalingId(
