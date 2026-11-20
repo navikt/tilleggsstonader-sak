@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.11.16-215520-53c47ec",
-  "source_sha": "53c47ecce625aa125daef8710870685263f6bb98",
+  "version": "2026.11.19-222543-3363873",
+  "source_sha": "33638739d8fc743b3e397d32e6b04781f1c55a83",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -244,6 +244,10 @@
     {
       "path": ".github/skills/ktor-scaffold/",
       "hash": "68b1ffff9f769c0a"
+    },
+    {
+      "path": ".github/skills/mcp-server-authoring/",
+      "hash": "d5bd23612defb37c"
     },
     {
       "path": ".github/skills/nais/",
