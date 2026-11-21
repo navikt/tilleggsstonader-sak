@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.statistikk.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
@@ -18,6 +20,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -170,14 +173,16 @@ class BehandlingsstatistikkMappingTest {
     }
 
     @Test
-    fun `mapping med strengt fortrolig adresse`() {
+    fun `mapping med strengt fortrolig adresse når oppgave tildelt vikafossen`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
+        val beslutterId = "Beslutteren"
 
         val henvendelseTidspunkt = LocalDateTime.now()
         val hendelseTidspunkt = LocalDateTime.now()
         val tekniskTid = LocalDateTime.now()
+        val sisteOppgaveForBehandling = eksternOppgave(tildeltEnhetsnr = Enhet.VIKAFOSSEN.enhetsnr)
 
         val saksbehandling =
             saksbehandling(
@@ -198,6 +203,8 @@ class BehandlingsstatistikkMappingTest {
                 hendelseTidspunkt = hendelseTidspunkt,
                 tekniskTid = tekniskTid,
                 søkerHarStrengtFortroligAdresse = true,
+                sisteOppgaveForBehandling = sisteOppgaveForBehandling,
+                beslutterId = beslutterId,
             )
 
         val expected =
@@ -218,9 +225,9 @@ class BehandlingsstatistikkMappingTest {
                 behandlingStatus = "MOTTATT",
                 behandlingMetode = "MANUELL",
                 kravMottatt = null,
-                opprettetAv = "-5",
-                saksbehandler = "-5",
-                ansvarligEnhet = "-5",
+                opprettetAv = "VL",
+                saksbehandler = saksbehandlerId,
+                ansvarligEnhet = Enhet.VIKAFOSSEN.enhetsnr,
                 behandlingResultat = null,
                 resultatBegrunnelse = null,
                 avsender = "Nav Tilleggstønader",
@@ -230,8 +237,86 @@ class BehandlingsstatistikkMappingTest {
                 utbetaltTid = null,
                 forventetOppstartTid = null,
                 papirSøknad = null,
-                ansvarligBeslutter = null,
-                totrinnsbehandling = false,
+                ansvarligBeslutter = beslutterId,
+                totrinnsbehandling = true,
+                vilkårsprøving = emptyList(),
+                venteAarsak = null,
+                behandlingBegrunnelse = null,
+                revurderingOpplysningskilde = null,
+                revurderingÅrsak = null,
+                behandlingÅrsak = "SØKNAD",
+            )
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `mapping med strengt fortrolig adresse når oppgave IKKE tildelt vikafossen`() {
+        val behandlingId = BehandlingId(UUID.randomUUID())
+        val aktørId = "9876543210127"
+        val saksbehandlerId = "7873486250023"
+        val beslutterId = "Beslutteren"
+
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
+        val sisteOppgaveForBehandling = eksternOppgave(tildeltEnhetsnr = Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE.enhetsnr)
+
+        val saksbehandling =
+            saksbehandling(
+                behandlingId = behandlingId,
+                status = BehandlingStatus.OPPRETTET,
+                ident = aktørId,
+                eksternId = 33L,
+                eksternFagId = 99L,
+                kategori = BehandlingKategori.NASJONAL,
+            )
+
+        val actual =
+            map(
+                hendelse = Hendelse.MOTTATT,
+                saksbehandling = saksbehandling,
+                saksbehandlerId = saksbehandlerId,
+                henvendelseTidspunkt = henvendelseTidspunkt,
+                hendelseTidspunkt = hendelseTidspunkt,
+                tekniskTid = tekniskTid,
+                søkerHarStrengtFortroligAdresse = true,
+                sisteOppgaveForBehandling = sisteOppgaveForBehandling,
+                beslutterId = beslutterId,
+            )
+
+        val expected =
+            BehandlingDVH(
+                behandlingId = "33",
+                behandlingUuid = behandlingId.id.toString(),
+                saksnummer = "99",
+                sakId = "99",
+                aktorId = aktørId,
+                mottattTid = henvendelseTidspunkt,
+                registrertTid = henvendelseTidspunkt,
+                ferdigBehandletTid = null,
+                endretTid = henvendelseTidspunkt,
+                tekniskTid = tekniskTid,
+                sakYtelse = SakYtelseDvh.TILLEGG_BARNETILSYN,
+                sakUtland = "Nasjonal",
+                behandlingType = "FØRSTEGANGSBEHANDLING",
+                behandlingStatus = "MOTTATT",
+                behandlingMetode = "MANUELL",
+                kravMottatt = null,
+                opprettetAv = "VL",
+                saksbehandler = "SKJERMET",
+                ansvarligEnhet = "SKJERMET",
+                behandlingResultat = null,
+                resultatBegrunnelse = null,
+                avsender = "Nav Tilleggstønader",
+                versjon = Applikasjonsversjon.versjon,
+                relatertBehandlingId = null,
+                vedtakTid = null,
+                utbetaltTid = null,
+                forventetOppstartTid = null,
+                papirSøknad = null,
+                ansvarligBeslutter = "SKJERMET",
+                totrinnsbehandling = true,
                 vilkårsprøving = emptyList(),
                 venteAarsak = null,
                 behandlingBegrunnelse = null,
@@ -514,6 +599,8 @@ class BehandlingsstatistikkMappingTest {
         hendelseTidspunkt: LocalDateTime,
         tekniskTid: LocalDateTime,
         søkerHarStrengtFortroligAdresse: Boolean = false,
+        sisteOppgaveForBehandling: Oppgave? = null,
+        beslutterId: String? = null,
     ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
         saksbehandling = saksbehandling,
         henvendelseTidspunkt = henvendelseTidspunkt,
@@ -521,8 +608,8 @@ class BehandlingsstatistikkMappingTest {
         hendelseTidspunkt = hendelseTidspunkt,
         søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
         saksbehandlerId = saksbehandlerId,
-        sisteOppgaveForBehandling = null,
-        beslutterId = null,
+        sisteOppgaveForBehandling = sisteOppgaveForBehandling,
+        beslutterId = beslutterId,
         tekniskTid = tekniskTid,
         relatertBehandlingId = null,
     )
