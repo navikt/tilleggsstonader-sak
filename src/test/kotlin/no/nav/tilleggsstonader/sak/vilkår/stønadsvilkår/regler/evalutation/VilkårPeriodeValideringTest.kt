@@ -111,6 +111,15 @@ class VilkårPeriodeValideringTest {
     }
 
     @Test
+    fun `skal ikke kaste feil hvis 2 reiser for oppstart og avslutning eller hjemreise overlapper`() {
+        listOf(VilkårType.ROAH_OPPSTART_AVSLUTNING, VilkårType.ROAH_HJEMREISE).forEach { type ->
+            val vilkår = vilkår(behandlingId = behandlingId, type = type, fom = fom, tom = tom, utgift = 1)
+
+            validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår))
+        }
+    }
+
+    @Test
     fun `skal ikke kaste feil hvis 2 perioder for løpende utgifter overlapper, men en er slettet`() {
         val vilkår =
             vilkår(
