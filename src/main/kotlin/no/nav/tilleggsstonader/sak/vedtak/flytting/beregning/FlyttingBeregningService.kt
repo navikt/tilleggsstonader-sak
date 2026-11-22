@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -95,9 +96,8 @@ class FlyttingBeregningService(
         vilkår: VilkårFlytting,
         vedtaksperioder: List<Vedtaksperiode>,
     ): Vedtaksperiode =
-        vedtaksperioder.single {
-            it.inneholder(vilkår.flyttedato)
-        }
+        vedtaksperioder.singleOrNull { it.inneholder(vilkår.flyttedato) }
+            ?: brukerfeil("Det er ikke lagt inn noen oppfylte utgiftsperioder")
 
     private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
