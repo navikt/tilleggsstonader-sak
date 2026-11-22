@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.11.19-222543-3363873",
-  "source_sha": "33638739d8fc743b3e397d32e6b04781f1c55a83",
+  "version": "2026.11.22-003914-4367eed",
+  "source_sha": "4367eed5851934ae958123e4710cc79c2e7b76db",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -130,8 +130,8 @@
     },
     {
       "path": ".github/instructions/norwegian-text.instructions.md",
-      "hash": "25ee167a83661c64",
-      "revision": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183"
+      "hash": "9c7edf11317102f4",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/instructions/output-style.instructions.md",
@@ -175,8 +175,8 @@
     },
     {
       "path": ".github/prompts/spring-boot-endpoint.prompt.md",
-      "hash": "3804da163fe6fb78",
-      "revision": "83fb61c2b2973b845655224d72a950d1347cfaeb"
+      "hash": "67606488a1368fdb",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/ai-news-research/",
@@ -190,8 +190,8 @@
     },
     {
       "path": ".github/skills/api-design/",
-      "hash": "cc11f76f432c6df8",
-      "revision": "83fb61c2b2973b845655224d72a950d1347cfaeb"
+      "hash": "7dfca5f96b5ce231",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/appsec-advisory/",
@@ -234,8 +234,8 @@
     },
     {
       "path": ".github/skills/klarsprak/",
-      "hash": "618a0dbf98be8b11",
-      "revision": "d787cdbc897e5fa5e6992861826c230dfc45b096"
+      "hash": "0c29527df9da7db7",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/kotlin-app-config/",
@@ -247,7 +247,8 @@
     },
     {
       "path": ".github/skills/mcp-server-authoring/",
-      "hash": "d5bd23612defb37c"
+      "hash": "61d25f59d6eee5cc",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/nais/",
@@ -276,8 +277,8 @@
     },
     {
       "path": ".github/skills/nav-plan/",
-      "hash": "acf7f52bf9dd29b0",
-      "revision": "83fb61c2b2973b845655224d72a950d1347cfaeb"
+      "hash": "e91cf87f8ef2d7ff",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/nav-troubleshoot/",
@@ -291,8 +292,8 @@
     },
     {
       "path": ".github/skills/observability-setup/",
-      "hash": "9962327c056eda64",
-      "revision": "83fb61c2b2973b845655224d72a950d1347cfaeb"
+      "hash": "c5caa371c68a4982",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/playwright-testing/",
@@ -322,8 +323,8 @@
     },
     {
       "path": ".github/skills/security-owasp/",
-      "hash": "c020e45389dad61d",
-      "revision": "53c47ecce625aa125daef8710870685263f6bb98"
+      "hash": "a504870d7b15c9d1",
+      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
     },
     {
       "path": ".github/skills/security-review/",
