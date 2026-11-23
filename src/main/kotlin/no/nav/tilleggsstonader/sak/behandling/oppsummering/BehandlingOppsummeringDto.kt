@@ -20,10 +20,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilS
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ROAHReiseVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -101,6 +104,9 @@ data class OppsummertVilkår(
     val resultat: Vilkårsresultat,
     val utgift: Int?,
     val typeFakta: TypeVilkårFakta?,
+    val globalId: VilkårGlobalId?,
+    val parentVilkår: VilkårGlobalId?,
+    val typeReiseformål: TypeReiseformål?,
 )
 
 fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
@@ -110,6 +116,9 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
+        globalId = this.globalId,
+        parentVilkår = this.parentVilkår,
+        typeReiseformål = (this.fakta as? ROAHReiseVilkårFakta)?.typeReiseformål,
         typeFakta =
             when (this.fakta) {
                 is FaktaFlyttebyrå -> TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ

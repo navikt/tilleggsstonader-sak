@@ -14,10 +14,15 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.opphørVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -82,6 +87,57 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].barnId).isEqualTo(barn1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(1)
+        }
+
+        @Test
+        fun `skal beholde reiser separat med reiseformål og paraplyvilkår`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+            val parentVilkår = VilkårGlobalId.random()
+            val typeReiseformål = TypeReiseformål.entries.first()
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 15),
+                    ).copy(
+                        globalId = VilkårGlobalId.random(),
+                        parentVilkår = parentVilkår,
+                        fakta =
+                            FaktaROAHUbestemt(
+                                reiseId = ReiseId.random(),
+                                aktivitetId = VilkårperiodeGlobalId.random(),
+                                typeReiseformål = typeReiseformål,
+                            ),
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                        fom = LocalDate.of(2025, 1, 16),
+                        tom = LocalDate.of(2025, 1, 31),
+                    ).copy(
+                        globalId = VilkårGlobalId.random(),
+                        parentVilkår = parentVilkår,
+                        fakta =
+                            FaktaROAHUbestemt(
+                                reiseId = ReiseId.random(),
+                                aktivitetId = VilkårperiodeGlobalId.random(),
+                                typeReiseformål = typeReiseformål,
+                            ),
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            val oppsummerteReiser = oppsummering.vilkår.single().vilkår
+
+            assertThat(oppsummerteReiser).hasSize(2)
+            assertThat(oppsummerteReiser.map { it.fom }).containsExactly(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 16))
+            assertThat(oppsummerteReiser.map { it.parentVilkår }).containsOnly(parentVilkår)
+            assertThat(oppsummerteReiser.map { it.typeReiseformål }).containsOnly(typeReiseformål)
+            assertThat(oppsummerteReiser.map { it.globalId }).doesNotContainNull()
         }
     }
 
