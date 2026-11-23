@@ -28,6 +28,14 @@ object FlyttingRegelTestUtil {
             ),
         )
 
+    fun oppfylteSvarFlyttingTsrDto(flyttemåte: SvarId) =
+        mapOf(
+            RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+            RegelId.MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID to SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+            RegelId.SØKER_FØR_FLYTTING_ER_GJENNOMFØRT to SvarOgBegrunnelseDto(SvarId.JA),
+            RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(flyttemåte),
+        )
+
     private fun oppfylteSvarFlyttingDto(flyttemåte: SvarId) =
         mapOf(
             RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),

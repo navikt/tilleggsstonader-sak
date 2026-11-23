@@ -20,6 +20,8 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyt
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegelTestUtil.oppfylteSvarFlyttingTsrDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -51,11 +53,16 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id) {
             målgruppe {
                 opprett {
-                    målgruppeDagpenger(fom, tom)
+                    målgruppeArbeidssøker(fom, tom)
                 }
             }
             vilkår {
-                flyttingEgenKjøring(flyttedato = fom, avstandEnVei = 100, bompenger = 100)
+                flyttingEgenKjøring(
+                    flyttedato = fom,
+                    avstandEnVei = 100,
+                    bompenger = 100,
+                    svar = oppfylteSvarFlyttingTsrDto(SvarId.FLYTTER_SELV),
+                )
             }
             vedtak {
                 avslag()
@@ -97,7 +104,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         ) {
             målgruppe {
                 opprett {
-                    målgruppeDagpenger(fom, tom)
+                    målgruppeArbeidssøker(fom, tom)
                 }
             }
             vilkår {
@@ -106,6 +113,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                     avstandEnVei = 100,
                     bompenger = 100,
                     erUtgifterDokumentert = dokumentert,
+                    svar = oppfylteSvarFlyttingTsrDto(SvarId.FLYTTER_SELV),
                 )
             }
         }
@@ -154,7 +162,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         ) {
             målgruppe {
                 opprett {
-                    målgruppeDagpenger(fom, tom)
+                    målgruppeArbeidssøker(fom, tom)
                 }
             }
             vilkår {
@@ -162,6 +170,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
                     erUtgifterDokumentert = true,
+                    svar = oppfylteSvarFlyttingTsrDto(SvarId.FLYTTEBYRÅ),
                 )
             }
         }
@@ -210,7 +219,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         ) {
             målgruppe {
                 opprett {
-                    målgruppeDagpenger(fom, tom)
+                    målgruppeArbeidssøker(fom, tom)
                 }
             }
             vilkår {
@@ -218,6 +227,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                     flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
                     erUtgifterDokumentert = false,
+                    svar = oppfylteSvarFlyttingTsrDto(SvarId.FLYTTEBYRÅ),
                 )
             }
         }

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingTsrRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterEnBoligRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterToBoligerRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
@@ -25,7 +26,15 @@ class Vilkårsregler private constructor(
 }
 
 private val alleVilkårsregler: List<Vilkårsregel> =
-    Stønadstype.entries.map { vilkårsreglerForStønad(it) }.flatten()
+    Stønadstype.entries
+        .map { vilkårsreglerForStønad(it) }
+        .flatten()
+        .distinctBy { it::class }
+        .also { regler ->
+            // Oppslag skjer på vilkårType, så to ulike regelsett med samme vilkårType vil overskrive hverandre
+            val duplikater = regler.groupBy { it.vilkårType }.filterValues { it.size > 1 }.keys
+            require(duplikater.isEmpty()) { "Flere vilkårsregler har samme vilkårType: $duplikater" }
+        }
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
@@ -47,9 +56,8 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         Stønadstype.REISE_TIL_SAMLING_TSO,
         Stønadstype.REISE_TIL_SAMLING_TSR,
         -> listOf(ReiseTilSamlingRegel())
-        Stønadstype.FLYTTING_TSO,
-        Stønadstype.FLYTTING_TSR,
-        -> listOf(FlyttingRegel())
+        Stønadstype.FLYTTING_TSO -> listOf(FlyttingRegel())
+        Stønadstype.FLYTTING_TSR -> listOf(FlyttingTsrRegel())
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         -> listOf(OppstartAvslutningRegel(), HjemreiseRegel(), MidlertidigBostedPeriodeRegel())

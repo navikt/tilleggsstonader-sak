@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
@@ -14,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.VilkårF
 
 object VilkårFlyttingMapper {
     fun Vilkår.mapTilVilkårFlytting(): VilkårFlytting {
-        if (type != VilkårType.FLYTTING) feil("Ugyldig vilkårstype for flytting")
+        if (type !in vilkårTyperFlytting) feil("Ugyldig vilkårstype for flytting")
         val flyttefakta = fakta as? FlyttingVilkårFakta ?: feil("Fakta mangler for flytting")
         feilHvis(fom != tom) {
             "Forventer at fom og tom er lik for flytting"
@@ -23,6 +22,7 @@ object VilkårFlyttingMapper {
             id = id,
             globalId = globalId,
             behandlingId = behandlingId,
+            vilkårType = type,
             flyttedato = fom ?: feil("Forventer at fom er satt for flytting"),
             resultat = resultat,
             status = status,
@@ -41,7 +41,7 @@ object VilkårFlyttingMapper {
             behandlingId = behandlingId,
             resultat = resultat,
             status = status,
-            type = VilkårType.FLYTTING,
+            type = vilkårType,
             fom = flyttedato,
             tom = flyttedato,
             erFremtidigUtgift = false,

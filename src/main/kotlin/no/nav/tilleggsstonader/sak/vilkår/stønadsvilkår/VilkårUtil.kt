@@ -82,6 +82,7 @@ object VilkårUtil {
                 VilkårType.ROAH_HJEMREISE -> false
                 VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE -> false
                 VilkårType.FLYTTING -> false
+                VilkårType.FLYTTING_TSR -> false
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false
             }

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -13,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.VilkårF
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.tilVilkårFlyttingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -31,7 +32,9 @@ class FlyttingVilkårController(
     private val flyttingVilkårService: FlyttingVilkårService,
 ) {
     @GetMapping("regler")
-    fun regler(): RegelstrukturDto = FlyttingRegel().tilRegelstruktur()
+    fun regler(
+        @RequestParam("stonadstype") stønadstype: Stønadstype,
+    ): RegelstrukturDto = flyttingRegel(stønadstype).tilRegelstruktur()
 
     @GetMapping("{behandlingId}")
     fun hentVilkår(

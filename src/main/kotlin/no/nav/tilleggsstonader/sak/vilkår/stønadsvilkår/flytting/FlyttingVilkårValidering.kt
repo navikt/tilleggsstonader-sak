@@ -7,12 +7,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
 import java.math.BigDecimal
 
 object FlyttingVilkårValidering {
-    private val flyttingRegel = FlyttingRegel()
-
     fun validerOppgitteFakta(fakta: FlyttingVilkårFakta) {
         brukerfeilHvis(fakta.adresse.isBlank()) { "Flytteadressen kan ikke være tom" }
         when (fakta) {

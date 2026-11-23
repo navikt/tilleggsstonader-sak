@@ -139,6 +139,20 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
+    fun målgruppeArbeidssøker(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.ARBEIDSSØKER,
+            )
+        }
+    }
+
     fun målgruppeOvergangsstønad(
         fom: LocalDate,
         tom: LocalDate,

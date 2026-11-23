@@ -369,7 +369,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     @Test
     fun `skal hente alle regler som tilhører flytting`() {
-        val resultat = kall.vilkårFlytting.regler()
+        val resultat = kall.vilkårFlytting.regler(Stønadstype.FLYTTING_TSO)
 
         FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/FLYTTING.json", resultat)
     }

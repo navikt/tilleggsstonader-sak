@@ -6,8 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 object YtelserUtil {
     fun finnRelevanteYtelsesTyper(type: Stønadstype): List<TypeYtelsePeriode> =
         when (type) {
-            Stønadstype.FLYTTING_TSR ->
-                finnRelevanteYtelsesTyper(Stønadstype.FLYTTING_TSO) + TypeYtelsePeriode.ARBEIDSSØKER
+            Stønadstype.FLYTTING_TSR -> listOf(TypeYtelsePeriode.ARBEIDSSØKER)
 
             Stønadstype.BARNETILSYN,
             Stønadstype.LÆREMIDLER,

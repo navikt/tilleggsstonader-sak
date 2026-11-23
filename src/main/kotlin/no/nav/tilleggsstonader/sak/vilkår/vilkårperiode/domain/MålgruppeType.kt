@@ -174,11 +174,6 @@ enum class MålgruppeType(
                 this in
                     listOf(
                         INGEN_MÅLGRUPPE,
-                        TILTAKSPENGER,
-                        UNGDOMSPROGRAMMET,
-                        KVALIFISERINGSSTØNAD,
-                        DAGPENGER,
-                        INNSATT_I_FENGSEL,
                         ARBEIDSSØKER,
                     )
         }

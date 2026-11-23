@@ -194,28 +194,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = "INGEN_MÅLGRUPPE_FLYTTING_TSO",
     ),
     JsonSubTypes.Type(
-        DagpengerFlyttingTsr::class,
-        name = "DAGPENGER_FLYTTING_TSR",
-    ),
-    JsonSubTypes.Type(
         ArbeidssøkerFlyttingTsr::class,
         name = "ARBEIDSSØKER_FLYTTING_TSR",
-    ),
-    JsonSubTypes.Type(
-        TiltakspengerFlyttingTsr::class,
-        name = "TILTAKSPENGER_FLYTTING_TSR",
-    ),
-    JsonSubTypes.Type(
-        UngdomsprogrammetFlyttingTsr::class,
-        name = "UNGDOMSPROGRAMMET_FLYTTING_TSR",
-    ),
-    JsonSubTypes.Type(
-        KvalifiseringsstønadFlyttingTsr::class,
-        name = "KVALIFISERINGSSTØNAD_FLYTTING_TSR",
-    ),
-    JsonSubTypes.Type(
-        InnsattIFengselFlyttingTsr::class,
-        name = "INNSATT_I_FENGSEL_FLYTTING_TSR",
     ),
     JsonSubTypes.Type(
         IngenMålgruppeFlyttingTsr::class,

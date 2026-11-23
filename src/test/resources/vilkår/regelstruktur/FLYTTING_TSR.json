@@ -1,0 +1,62 @@
+{
+  "HAR_UTGIFTER_TIL_FLYTTING": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [ "SØKER_FØR_FLYTTING_ER_GJENNOMFØRT", "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID", "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "SØKER_FØR_FLYTTING_ER_GJENNOMFØRT",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "HVORDAN_SKAL_BRUKER_FLYTTE": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "FLYTTEBYRÅ",
+      "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
+    }, {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "FLYTTER_SELV",
+      "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
+    } ]
+  },
+  "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+    } ]
+  },
+  "SØKER_FØR_FLYTTING_ER_GJENNOMFØRT": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID", "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+    } ]
+  }
+}

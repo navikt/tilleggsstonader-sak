@@ -8,13 +8,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.vilkårTyperFlytting
 import java.time.LocalDate
 
 data class VilkårFlytting(
     val id: VilkårId = VilkårId.random(),
     val globalId: VilkårGlobalId? = VilkårGlobalId.random(),
     val behandlingId: BehandlingId,
+    val vilkårType: VilkårType,
     val flyttedato: LocalDate,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
@@ -23,6 +26,10 @@ data class VilkårFlytting(
     val slettetKommentar: String? = null,
     val opphavsvilkår: Opphavsvilkår? = null,
 ) : Periode<LocalDate> {
+    init {
+        require(vilkårType in vilkårTyperFlytting) { "Ugyldig vilkårstype=$vilkårType for flytting" }
+    }
+
     override val fom = flyttedato
     override val tom = flyttedato
 }
