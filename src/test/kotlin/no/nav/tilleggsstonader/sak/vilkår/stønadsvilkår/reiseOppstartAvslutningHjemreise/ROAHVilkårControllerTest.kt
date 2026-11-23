@@ -80,17 +80,10 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
         val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
 
-        val reiseUtenReferanse = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId))
-        val reiseMedReferanse =
-            vilkårKall.oppdaterVilkår(
-                lagreVilkår = reise(aktivitet.globalId, paraply.globalId),
-                vilkårId = reiseUtenReferanse.id,
-                behandlingId = behandling.id,
-            )
+        val reise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId))
 
-        assertThat(reiseUtenReferanse.parentVilkår).isNull()
-        assertThat(reiseMedReferanse.parentVilkår).isEqualTo(paraply.globalId)
-        assertThat(reiseMedReferanse.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+        assertThat(reise.parentVilkår).isEqualTo(paraply.globalId)
+        assertThat(reise.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
 
         val hentet = vilkårKall.hentVilkår(behandling.id).single()
         assertThat(hentet.reiser.single().parentVilkår).isEqualTo(paraply.globalId)
@@ -127,8 +120,8 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         val (annenBehandling, annenAktivitet) = opprettBehandlingMedAktivitet("12345678911")
         val api = vilkårKall.apiRespons
 
-        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
-        val vanligReise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId))
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId, tom = 31 januar 2026))
+        val vanligReise = vilkårKall.opprettVilkår(behandling.id, reise(aktivitet.globalId, paraply.globalId))
         val paraplyIAnnenBehandling =
             vilkårKall.opprettParaplyvilkår(annenBehandling.id, paraplyvilkår(annenAktivitet.globalId))
 
@@ -149,8 +142,13 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
             .oppdaterVilkår(reise(aktivitet.globalId, vanligReise.globalId), vanligReise.id, behandling.id)
             .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Et vilkår kan ikke referere til seg selv")
         // Reise kan ikke overskrive et paraplyvilkår
+        val annenParaply =
+            vilkårKall.opprettParaplyvilkår(
+                behandling.id,
+                paraplyvilkår(aktivitet.globalId, fom = 1 februar 2026, tom = 28 februar 2026),
+            )
         api
-            .oppdaterVilkår(reise(aktivitet.globalId), paraply.id, behandling.id)
+            .oppdaterVilkår(reise(aktivitet.globalId, annenParaply.globalId, fom = 1 februar 2026), paraply.id, behandling.id)
             .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Kan ikke endre mellom reise og paraplyvilkår")
     }
 
@@ -218,10 +216,11 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal ikke kunne overskrive vilkår av en annen type`() {
         val (behandling, aktivitet) = opprettBehandlingMedAktivitet(ident)
+        val paraply = vilkårKall.opprettParaplyvilkår(behandling.id, paraplyvilkår(aktivitet.globalId))
         val dagligReise = vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.DAGLIG_REISE))
 
         vilkårKall.apiRespons
-            .oppdaterVilkår(reise(aktivitet.globalId), dagligReise.id, behandling.id)
+            .oppdaterVilkår(reise(aktivitet.globalId, paraply.globalId), dagligReise.id, behandling.id)
             .expectProblemDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Vilkåret er ikke et vilkår for reise oppstart, avslutning og hjemreise",
@@ -269,6 +268,12 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 .vilkårperioder.aktiviteter
                 .single()
 
+        val paraply =
+            kall.vilkårReiseOppstartAvslutningHjemreise.opprettParaplyvilkår(
+                behandling.id,
+                paraplyvilkår(aktivitet.globalId, tom = tom),
+            )
+
         val nyttVilkår =
             LagreVilkårROAHReiseDto(
                 fom = fom,
@@ -278,6 +283,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 typeReiseformål = TypeReiseformål.OPPSTART,
                 svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
                 fakta = offentligTransport(BigDecimal.valueOf(100)),
+                parentVilkår = paraply.globalId!!,
             )
 
         val opprettetVilkår = kall.vilkårReiseOppstartAvslutningHjemreise.opprettVilkår(behandling.id, nyttVilkår)
@@ -313,8 +319,8 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         assertThat(resultatSlettet.slettetPermanent).isTrue
         assertThat((resultatSlettet.vilkår as VilkårROAHReiseDto).slettetKommentar).isNull()
 
-        val hentedeVilkår = kall.vilkårDagligReise.hentVilkår(behandling.id)
-        assertThat(hentedeVilkår).isEmpty()
+        val hentedeVilkår = kall.vilkårReiseOppstartAvslutningHjemreise.hentVilkår(behandling.id)
+        assertThat(hentedeVilkår.flatMap { it.reiser }).isEmpty()
     }
 
     private val vilkårKall get() = kall.vilkårReiseOppstartAvslutningHjemreise
@@ -405,7 +411,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         typeReiseformål = TypeReiseformål.OPPSTART,
         svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
         fakta = offentligTransport(BigDecimal.valueOf(100)),
-        parentVilkår = parentVilkår,
+        parentVilkår = parentVilkår ?: VilkårGlobalId.random(),
     )
 
     private fun resultatTilReise(

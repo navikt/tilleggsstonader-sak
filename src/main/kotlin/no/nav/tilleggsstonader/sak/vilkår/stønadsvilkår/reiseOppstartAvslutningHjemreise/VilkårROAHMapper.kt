@@ -44,7 +44,7 @@ object VilkårROAHMapper {
             status = this.status,
             delvilkårsett = this.delvilkårsett,
             fakta = fakta.mapTilFaktaReiseROAH(),
-            parentVilkår = this.parentVilkår,
+            parentVilkår = this.parentVilkår ?: error("Reisevilkår $id mangler parentVilkår"),
         )
 
     private fun Vilkår.mapTilMidlertidigBosted(fakta: FaktaROAHMidlertidigBosted) =

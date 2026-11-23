@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -67,6 +68,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 vilkår(
                     behandlingId = behandling.id,
                     type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    parentVilkår = VilkårGlobalId.random(),
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
@@ -84,6 +86,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 vilkår(
                     behandlingId = behandling.id,
                     type = VilkårType.ROAH_HJEMREISE,
+                    parentVilkår = VilkårGlobalId.random(),
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 16 januar 2025,
@@ -121,6 +124,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 vilkår(
                     behandlingId = behandling.id,
                     type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    parentVilkår = VilkårGlobalId.random(),
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
@@ -159,6 +163,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 vilkår(
                     behandlingId = behandling.id,
                     type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    parentVilkår = VilkårGlobalId.random(),
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
@@ -176,6 +181,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 vilkår(
                     behandlingId = behandling.id,
                     type = VilkårType.ROAH_HJEMREISE,
+                    parentVilkår = VilkårGlobalId.random(),
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 februar 2025,
@@ -209,6 +215,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                 vilkår(
                     behandlingId = behandling.id,
                     type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    parentVilkår = VilkårGlobalId.random(),
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,

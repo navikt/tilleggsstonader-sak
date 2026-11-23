@@ -33,7 +33,7 @@ data class LagreVilkårROAHReiseDto(
     val typeReiseformål: TypeReiseformål,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaROAHReiseDto,
-    val parentVilkår: VilkårGlobalId? = null,
+    val parentVilkår: VilkårGlobalId,
 ) : LagreVilkårROAHDto {
     override fun tilDomene() =
         LagreVilkårROAHReise(

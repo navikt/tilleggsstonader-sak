@@ -42,11 +42,16 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.OpphørReiseTilSam
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ROAHTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaMidlertidigBostedDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårMidlertidigBostedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårROAHReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.servlet.client.RestTestClient
@@ -163,14 +168,19 @@ fun IntegrationTest.gjennomførVilkårSteg(
             ?.let { _ -> barnRepository.findByBehandlingId(behandlingId).map { it.id } }
             ?: emptyList()
 
+    val aktiviteterForVilkår =
+        kall.vilkårperiode
+            .hentForBehandling(behandlingId)
+            .vilkårperioder.aktiviteter
+    // Reiser i ROAH krever et paraplyvilkår. Testdata får ett paraplyvilkår per aktivitet som dekker hele aktivitetsperioden.
+    val paraplyPerAktivitet =
+        mutableMapOf<VilkårperiodeGlobalId, VilkårGlobalId>()
+
     testdata.vilkår.opprettScope
         .build(
             behandlingId,
             barnIder,
-            aktiviteter =
-                kall.vilkårperiode
-                    .hentForBehandling(behandlingId)
-                    .vilkårperioder.aktiviteter,
+            aktiviteter = aktiviteterForVilkår,
         ).forEach {
             if (stønadstype.gjelderDagligReise()) {
                 kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreVilkårDagligReiseDto)
@@ -178,9 +188,25 @@ fun IntegrationTest.gjennomførVilkårSteg(
                 if (stønadstype.gjelderReiseTilSamling()) {
                     kall.vilkårReiseTilSamling.opprettVilkår(behandlingId, it as LagreVilkårReiseTilSamlingDto)
                 } else if (stønadstype.gjelderReiseOppstartAvslutningHjemreise()) {
+                    val reise = it as LagreVilkårROAHReiseDto
+                    val paraplyId =
+                        paraplyPerAktivitet.getOrPut(reise.aktivitetId) {
+                            val aktivitet = aktiviteterForVilkår.single { a -> a.globalId == reise.aktivitetId }
+                            kall.vilkårReiseOppstartAvslutningHjemreise
+                                .opprettParaplyvilkår(
+                                    behandlingId,
+                                    LagreVilkårMidlertidigBostedDto(
+                                        fom = aktivitet.fom,
+                                        tom = aktivitet.tom,
+                                        aktivitetId = aktivitet.globalId,
+                                        svar = ROAHTestUtil.oppfylteSvarMidlertidigBostedDto(),
+                                        fakta = FaktaMidlertidigBostedDto(fraAdresse = "Adresse 1", tilAdresse = "Adresse 2"),
+                                    ),
+                                ).globalId!!
+                        }
                     kall.vilkårReiseOppstartAvslutningHjemreise.opprettVilkår(
                         behandlingId,
-                        it as LagreVilkårROAHReiseDto,
+                        reise.copy(parentVilkår = paraplyId),
                     )
                 } else {
                     kall.vilkår.opprettVilkår(it as OpprettVilkårDto)

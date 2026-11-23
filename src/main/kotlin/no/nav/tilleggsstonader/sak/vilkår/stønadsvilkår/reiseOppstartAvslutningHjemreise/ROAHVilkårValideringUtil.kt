@@ -71,7 +71,7 @@ object ROAHVilkårValideringUtil {
         eksisterendeVilkår: Vilkår?,
         vilkårIBehandling: List<Vilkår>,
     ) {
-        val parentGlobalId = nyttVilkår.parentVilkår ?: return
+        val parentGlobalId = nyttVilkår.parentVilkår
         val parentVilkår = vilkårIBehandling.singleOrNull { it.globalId == parentGlobalId }
         validerTilhørendeParaplyvilkår(nyttVilkår, parentVilkår, eksisterendeVilkår?.id)
     }

@@ -62,7 +62,7 @@ data class VilkårReise(
     override val delvilkårsett: List<Delvilkår>,
     val fakta: FaktaReiseROAH,
     override val slettetKommentar: String? = null,
-    val parentVilkår: VilkårGlobalId? = null,
+    val parentVilkår: VilkårGlobalId,
 ) : VilkårROAH,
     Mergeable<LocalDate, VilkårReise> {
     init {

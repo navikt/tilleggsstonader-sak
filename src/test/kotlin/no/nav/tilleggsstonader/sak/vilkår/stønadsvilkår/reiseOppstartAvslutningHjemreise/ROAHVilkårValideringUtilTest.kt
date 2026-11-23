@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -196,6 +197,7 @@ class ROAHVilkårValideringUtilTest {
     private fun reiseVilkår(dato: LocalDate): Vilkår =
         vilkår(
             type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+            parentVilkår = VilkårGlobalId.random(),
             fom = dato,
             tom = dato,
             fakta =
@@ -240,6 +242,7 @@ class ROAHVilkårValideringUtilTest {
         typeReiseformål = TypeReiseformål.AVSLUTNING,
         svar = emptyMap(),
         fakta = FaktaUbestemtType,
+        parentVilkår = VilkårGlobalId.random(),
     )
 
     private fun paraply(
