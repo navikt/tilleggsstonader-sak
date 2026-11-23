@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
@@ -153,21 +155,24 @@ class BehandlingsstatistikkService(
             tekniskTid = tekniskTid,
             behandlingStatus = hendelse.name,
             opprettetAv =
-                maskerVerdiHvisStrengtFortrolig(
-                    erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                    verdi = saksbehandling.opprettetAv,
-                ),
+                saksbehandling.opprettetAv.takeIf { it == SikkerhetContext.SYSTEM_FORKORTELSE }
+                    ?: maskerVerdiHvisStrengtFortrolig(
+                        erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                        verdi = saksbehandling.opprettetAv,
+                    ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
             mottattTid = henvendelseTidspunkt,
             kravMottatt = saksbehandling.kravMottatt,
             saksbehandler =
-                maskerVerdiHvisStrengtFortrolig(
+                maskerVerdiHvisStrengtFortroligOgBehandlesIkkeAvVikafossen(
                     erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                    behandlendeEnhet = sisteOppgaveForBehandling?.tildeltEnhetsnr,
                     verdi = saksbehandlerId,
                 ),
             ansvarligEnhet =
-                maskerVerdiHvisStrengtFortrolig(
+                maskerVerdiHvisStrengtFortroligOgBehandlesIkkeAvVikafossen(
                     erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                    behandlendeEnhet = sisteOppgaveForBehandling?.tildeltEnhetsnr,
                     verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
                 ),
             behandlingMetode = saksbehandling.behandlingMetode.name,
@@ -177,7 +182,7 @@ class BehandlingsstatistikkService(
             sakYtelse = SakYtelseDvh.fraStønadstype(saksbehandling.stønadstype),
             behandlingResultat = if (Hendelse.FERDIG == hendelse) saksbehandling.resultat.name else null,
             resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
-            ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse),
+            ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse, sisteOppgaveForBehandling),
             vedtakTid = if (Hendelse.VEDTATT == hendelse) hendelseTidspunkt else null,
             ferdigBehandletTid = if (Hendelse.FERDIG == hendelse) hendelseTidspunkt else null,
             totrinnsbehandling = beslutterId != null,
@@ -195,9 +200,11 @@ class BehandlingsstatistikkService(
         private fun finnAnsvarligBeslutter(
             beslutterId: String?,
             søkerHarStrengtFortroligAdresse: Boolean,
+            sisteOppgaveForBehandling: Oppgave?,
         ) = if (!beslutterId.isNullOrEmpty()) {
-            maskerVerdiHvisStrengtFortrolig(
+            maskerVerdiHvisStrengtFortroligOgBehandlesIkkeAvVikafossen(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                behandlendeEnhet = sisteOppgaveForBehandling?.tildeltEnhetsnr,
                 verdi = beslutterId,
             )
         } else {
@@ -207,7 +214,13 @@ class BehandlingsstatistikkService(
         private fun maskerVerdiHvisStrengtFortrolig(
             erStrengtFortrolig: Boolean,
             verdi: String,
-        ) = if (erStrengtFortrolig) "-5" else verdi // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig
+        ) = if (erStrengtFortrolig) "SKJERMET" else verdi
+
+        private fun maskerVerdiHvisStrengtFortroligOgBehandlesIkkeAvVikafossen(
+            erStrengtFortrolig: Boolean,
+            behandlendeEnhet: String?,
+            verdi: String,
+        ) = if (erStrengtFortrolig && behandlendeEnhet != Enhet.VIKAFOSSEN.enhetsnr) "SKJERMET" else verdi
 
         private fun mapTilStreng(kategori: BehandlingKategori?) =
             when (kategori) {
