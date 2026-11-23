@@ -234,10 +234,6 @@ class VilkårperiodeService(
             )
         }
 
-        if (oppdatert.fom != eksisterendeVilkårperiode.fom || oppdatert.tom != eksisterendeVilkårperiode.tom) {
-            validerPeriodeInneholderTilknyttedeVilkår(oppdatert)
-        }
-
         return vilkårperiodeRepository.update(oppdatert)
     }
 
@@ -344,17 +340,6 @@ class VilkårperiodeService(
     ) {
         brukerfeilHvis(hentAktiveVilkårKnyttetTilAktivitet(behandlingId, globalId).isNotEmpty()) {
             "Aktiviteten har vilkår knyttet til seg og kan ikke slettes eller endres til ikke oppfylt"
-        }
-    }
-
-    private fun validerPeriodeInneholderTilknyttedeVilkår(oppdatert: Vilkårperiode) {
-        // Vilkår implementerer ikke Periode (fom og tom er nullable), så vi lager en Datoperiode for å kunne bruke inneholder()
-        val vilkårUtenforPerioden =
-            hentAktiveVilkårKnyttetTilAktivitet(oppdatert.behandlingId, oppdatert.globalId)
-                .filter { it.fom != null && it.tom != null && !oppdatert.inneholder(Datoperiode(it.fom, it.tom)) }
-
-        brukerfeilHvis(vilkårUtenforPerioden.isNotEmpty()) {
-            "Perioden kan ikke gjøres kortere enn vilkårene som er knyttet til aktiviteten"
         }
     }
 }

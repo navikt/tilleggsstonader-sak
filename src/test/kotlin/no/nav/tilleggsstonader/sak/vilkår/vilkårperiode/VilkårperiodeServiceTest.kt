@@ -533,19 +533,6 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
         )
 
         @Test
-        fun `skal ikke kunne forkorte aktivitetens periode til kortere enn tilknyttede vilkår`() {
-            lagParaplyvilkår()
-
-            val forkortetFom = lagretAktivitet.tilOppdatering().copy(fom = lagretAktivitet.fom.plusDays(1))
-            val forkortetTom = lagretAktivitet.tilOppdatering().copy(tom = lagretAktivitet.tom.minusDays(1))
-
-            listOf(forkortetFom, forkortetTom).forEach {
-                assertThatThrownBy { vilkårperiodeService.oppdaterVilkårperiode(lagretAktivitet.id, it) }
-                    .hasMessageContaining("Perioden kan ikke gjøres kortere enn vilkårene")
-            }
-        }
-
-        @Test
         fun `skal kunne forlenge aktivitetens periode og forkorte den så lenge vilkårene er innenfor`() {
             lagParaplyvilkår(fom = lagretAktivitet.fom.plusDays(1), tom = lagretAktivitet.tom.minusDays(1))
 
