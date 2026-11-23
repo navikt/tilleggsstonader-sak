@@ -412,10 +412,11 @@ fun vilkår(
     erFremtidigUtgift: Boolean = false,
     fakta: VilkårFakta? = null,
     slettetKommentar: String? = null,
+    parentVilkår: VilkårGlobalId? = null,
 ): Vilkår =
     Vilkår(
         globalId = VilkårGlobalId.random(),
-        parentVilkår = null,
+        parentVilkår = parentVilkår,
         behandlingId = behandlingId,
         resultat = resultat,
         status = status,
@@ -866,6 +867,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
             nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
             utgifterOffentligTransport = utgifterOffentligTransport,
         ),
+    parentVilkår: VilkårGlobalId = VilkårGlobalId.random(),
 ) = LagreVilkårROAHReiseDto(
     fom = fom,
     tom = tom,
@@ -874,6 +876,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     typeReiseformål = typeReiseformål,
     svar = svar,
     fakta = fakta,
+    parentVilkår = parentVilkår,
 )
 
 fun lagreDagligReisePrivatBilDto(

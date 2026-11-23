@@ -33,7 +33,7 @@ data class VilkårROAHReiseDto(
     val delvilkårsett: List<DelvilkårDto>,
     val fakta: FaktaROAHReiseDto,
     val slettetKommentar: String? = null,
-    val parentVilkår: VilkårGlobalId? = null,
+    val parentVilkår: VilkårGlobalId,
 ) : VilkårROAHDto
 
 data class VilkårMidlertidigBostedDto(
