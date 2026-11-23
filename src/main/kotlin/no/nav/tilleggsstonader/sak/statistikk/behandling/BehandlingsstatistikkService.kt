@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
@@ -154,7 +155,7 @@ class BehandlingsstatistikkService(
             tekniskTid = tekniskTid,
             behandlingStatus = hendelse.name,
             opprettetAv =
-                saksbehandling.opprettetAv.takeIf { it == "VL" }
+                saksbehandling.opprettetAv.takeIf { it == SikkerhetContext.SYSTEM_FORKORTELSE }
                     ?: maskerVerdiHvisStrengtFortrolig(
                         erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                         verdi = saksbehandling.opprettetAv,
