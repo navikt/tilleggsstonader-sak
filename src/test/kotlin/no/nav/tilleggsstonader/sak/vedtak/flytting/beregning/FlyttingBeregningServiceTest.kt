@@ -4,7 +4,9 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
+import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -326,6 +328,51 @@ class FlyttingBeregningServiceTest {
                     annet = BigDecimal.ZERO,
                 ),
             )
+    }
+
+    @Test
+    fun `kaster brukerfeil når ingen vedtaksperiode inneholder flyttedato`() {
+        every {
+            flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id)
+        } returns
+            listOf(
+                vilkår(
+                    flyttedato = 1 januar 2025,
+                    fakta =
+                        FaktaFlytteSelv(
+                            dokumenterteUtgifter =
+                                DokumenterteUtgifter(
+                                    SvarJaNei.JA,
+                                    "Kvittering fra flyttebyrå",
+                                ),
+                            avstandEnVei = 1,
+                            henger = null,
+                            leiebil = null,
+                            bompenger = null,
+                            ferge = null,
+                            parkering = null,
+                            annet = null,
+                            adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
+                        ),
+                ),
+            )
+        val vedtaksperioder =
+            listOf(
+                vedtaksperiode(fom = 1 januar 2024, tom = 31 januar 2024),
+            )
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                beregningService.beregn(
+                    behandling = behandling,
+                    vedtaksperioder = vedtaksperioder,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                )
+            }
+
+        assertThat(feil.message)
+            .contains("Det er ikke lagt inn noen oppfylte utgiftsperioder")
     }
 
     @Test
