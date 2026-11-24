@@ -6,10 +6,13 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -18,6 +21,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -26,6 +30,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgiftService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -35,14 +41,18 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.BoutgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
@@ -62,12 +72,14 @@ internal class VilkårServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårRepository = mockk<VilkårRepository>()
     private val barnService = mockk<BarnService>()
+    private val unleashService = mockk<UnleashService>(relaxed = true)
 
     private val vilkårService =
         VilkårService(
             behandlingService = behandlingService,
             vilkårRepository = vilkårRepository,
             barnService = barnService,
+            unleashService = unleashService,
         )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
@@ -104,6 +116,161 @@ internal class VilkårServiceTest {
     @AfterEach
     internal fun tearDown() {
         BrukerContextUtil.clearBrukerContext()
+    }
+
+    @Nested
+    inner class BoutgifterEnBolig {
+        @BeforeEach
+        fun setUpBoutgifter() {
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns
+                saksbehandling(fagsak.copy(stønadstype = Stønadstype.BOUTGIFTER), behandling)
+            every { unleashService.isEnabled(Toggle.BOUTGIFTER_EN_BOLIG_MERUTGIFTER_FAKTA) } returns true
+            every { vilkårRepository.insert(any()) } answers { firstArg() }
+            every { vilkårRepository.update(any()) } answers { firstArg() }
+        }
+
+        @Test
+        fun `beregner og lagrer merutgift sammen med fakta`() {
+            val resultat = vilkårService.opprettNyttVilkår(opprett())
+
+            assertThat(resultat.utgift).isEqualTo(1000)
+            assertThat(resultat.fakta).isEqualTo(FaktaLøpendeUtgifterEnBolig(5000, 6000))
+            assertThat(resultat.tilDto().boutgifterEnBolig).isEqualTo(BoutgifterEnBoligDto(5000, 6000))
+        }
+
+        @Test
+        fun `tillater eksplisitt null kroner og største heltall`() {
+            val resultat =
+                vilkårService.opprettNyttVilkår(
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(0, Int.MAX_VALUE)),
+                )
+
+            assertThat(resultat.utgift).isEqualTo(Int.MAX_VALUE)
+            assertThat(resultat.fakta).isEqualTo(FaktaLøpendeUtgifterEnBolig(0, Int.MAX_VALUE))
+        }
+
+        @Test
+        fun `krever og lagrer begge beløp også ved ikke oppfylt`() {
+            val forespørsel =
+                opprett().copy(
+                    delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
+                )
+            val resultat = vilkårService.opprettNyttVilkår(forespørsel)
+
+            assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+            assertThat(resultat.utgift).isEqualTo(1000)
+            assertThat(resultat.fakta).isEqualTo(FaktaLøpendeUtgifterEnBolig(5000, 6000))
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(forespørsel.copy(boutgifterEnBolig = null))
+            }.isInstanceOf(ApiFeil::class.java)
+
+            val oppfylt =
+                vilkårService.opprettNyttVilkår(
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, 7000)),
+                )
+            every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(resultat, oppfylt)
+            val beregningsutgifter = BoutgifterUtgiftService(vilkårService).hentUtgifterTilBeregning(behandlingId)
+            assertThat(beregningsutgifter.values.flatten().map { it.utgift }).containsExactly(2000)
+        }
+
+        @Test
+        fun `avviser manglende fakta ugyldige beløp fremtidig utgift og overstyrt merutgift`() {
+            val ugyldige =
+                listOf(
+                    opprett().copy(boutgifterEnBolig = null),
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(-1, 6000)),
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, -1)),
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, 5000)),
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(6000, 5000)),
+                    opprett().copy(utgift = 6000),
+                    opprett().copy(erFremtidigUtgift = true, delvilkårsett = emptyList()),
+                    opprett().copy(vilkårType = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER),
+                )
+
+            ugyldige.forEach { forespørsel ->
+                assertThatThrownBy { vilkårService.opprettNyttVilkår(forespørsel) }
+                    .isInstanceOf(ApiFeil::class.java)
+            }
+            verify(exactly = 0) { vilkårRepository.insert(any()) }
+        }
+
+        @Test
+        fun `toggle av tillater gammel registrering men avviser nye fakta`() {
+            every { unleashService.isEnabled(Toggle.BOUTGIFTER_EN_BOLIG_MERUTGIFTER_FAKTA) } returns false
+
+            val resultat =
+                vilkårService.opprettNyttVilkår(
+                    opprett().copy(boutgifterEnBolig = null, utgift = 6000),
+                )
+
+            assertThat(resultat.utgift).isEqualTo(6000)
+            assertThat(resultat.fakta).isNull()
+            assertThatThrownBy { vilkårService.opprettNyttVilkår(opprett()) }
+                .isInstanceOf(Feil::class.java)
+        }
+
+        @Test
+        fun `faktavariant kan endres etter at toggle slås av men kan ikke miste fakta`() {
+            val eksisterende = vilkårService.opprettNyttVilkår(opprett())
+            every { vilkårRepository.findByIdOrNull(eksisterende.id) } returns eksisterende
+            every { unleashService.isEnabled(Toggle.BOUTGIFTER_EN_BOLIG_MERUTGIFTER_FAKTA) } returns false
+
+            val oppdatering = svar(eksisterende).copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, 7000))
+            val resultat = vilkårService.oppdaterVilkår(oppdatering)
+
+            assertThat(resultat.utgift).isEqualTo(2000)
+            assertThat(resultat.fakta).isEqualTo(FaktaLøpendeUtgifterEnBolig(5000, 7000))
+            assertThatThrownBy { vilkårService.oppdaterVilkår(oppdatering.copy(boutgifterEnBolig = null)) }
+                .isInstanceOf(ApiFeil::class.java)
+        }
+
+        @Test
+        fun `gamle vilkår beholder direkte beløpsregistrering når toggle er på`() {
+            val eksisterende =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                    delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBolig(),
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                )
+            every { vilkårRepository.findByIdOrNull(eksisterende.id) } returns eksisterende
+            val oppdatering = svar(eksisterende).copy(boutgifterEnBolig = null, utgift = 6000)
+
+            val resultat = vilkårService.oppdaterVilkår(oppdatering)
+
+            assertThat(resultat.utgift).isEqualTo(6000)
+            assertThat(resultat.fakta).isNull()
+            assertThatThrownBy {
+                vilkårService.oppdaterVilkår(oppdatering.copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, 6000)))
+            }.isInstanceOf(Feil::class.java)
+        }
+
+        private fun opprett() =
+            OpprettVilkårDto(
+                vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                behandlingId = behandlingId,
+                delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
+                fom = 1 januar 2026,
+                tom = 31 januar 2026,
+                utgift = null,
+                erFremtidigUtgift = false,
+                offentligTransport = null,
+                boutgifterEnBolig = BoutgifterEnBoligDto(5000, 6000),
+            )
+
+        private fun svar(vilkår: Vilkår) =
+            SvarPåVilkårDto(
+                id = vilkår.id,
+                behandlingId = behandlingId,
+                delvilkårsett = vilkår.delvilkårsett.map { it.tilDto() },
+                fom = vilkår.fom,
+                tom = vilkår.tom,
+                utgift = null,
+                erFremtidigUtgift = false,
+                offentligTransport = null,
+                boutgifterEnBolig = BoutgifterEnBoligDto(5000, 6000),
+            )
     }
 
     @Disabled

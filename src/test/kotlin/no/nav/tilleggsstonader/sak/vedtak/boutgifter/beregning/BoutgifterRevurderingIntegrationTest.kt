@@ -89,6 +89,7 @@ class BoutgifterRevurderingIntegrationTest(
                                 utgift = 7_400,
                                 erFremtidigUtgift = erFremtidigUtgift,
                                 offentligTransport = null,
+                                boutgifterEnBolig = boutgifterEnBolig,
                             )
                         }
                     }

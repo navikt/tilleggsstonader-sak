@@ -106,6 +106,7 @@ class BoutgifterOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
                                 utgift = utgift,
                                 erFremtidigUtgift = erFremtidigUtgift,
                                 offentligTransport = null,
+                                boutgifterEnBolig = boutgifterEnBolig,
                             )
                         }
                     }

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -15,7 +16,9 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.opprettVilkårsvurderinger
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -25,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -67,6 +71,39 @@ internal class VilkårServiceIntegrasjonsTest : CleanDatabaseIntegrationTest() {
             barnRepository.insertAll(barnFørsteBehandling)
 
             barnIdMap = barnService.gjenbrukBarn(førstegangsbehandling.id, revurdering.id)
+        }
+
+        @Test
+        fun `videreføring bevarer både gamle boutgifter og boutgifter med fakta`() {
+            val opprinnelige =
+                listOf(null, FaktaLøpendeUtgifterEnBolig(5000, 6000)).map { fakta ->
+                    vilkårRepository.insert(
+                        vilkår(
+                            behandlingId = førstegangsbehandling.id,
+                            type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                            delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBolig(),
+                            fom = 1 januar 2026,
+                            tom = 31 januar 2026,
+                            utgift = 1000,
+                            fakta = fakta,
+                        ),
+                    )
+                }
+
+            vilkårService.kopierVilkårsettTilNyBehandling(
+                forrigeIverksatteBehandlingId = førstegangsbehandling.id,
+                nyBehandling = revurdering,
+                barnIdMap = emptyMap(),
+            )
+
+            val kopierte = vilkårRepository.findByBehandlingId(revurdering.id)
+            assertThat(kopierte).hasSize(2)
+            opprinnelige.forEach { opprinnelig ->
+                val kopi = kopierte.single { it.fakta == opprinnelig.fakta }
+                assertThat(kopi.utgift).isEqualTo(opprinnelig.utgift)
+                assertThat(kopi.delvilkårsett).isEqualTo(opprinnelig.delvilkårsett)
+                assertThat(kopi.status).isEqualTo(VilkårStatus.UENDRET)
+            }
         }
 
         @Test

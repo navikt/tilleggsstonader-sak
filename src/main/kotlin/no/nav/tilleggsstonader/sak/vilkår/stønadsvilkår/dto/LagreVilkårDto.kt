@@ -14,6 +14,7 @@ sealed interface LagreVilkårDto {
     val utgift: Int?
     val erFremtidigUtgift: Boolean?
     val offentligTransport: OffentligTransportDto?
+    val boutgifterEnBolig: BoutgifterEnBoligDto?
 }
 
 data class SvarPåVilkårDto(
@@ -25,6 +26,7 @@ data class SvarPåVilkårDto(
     override val utgift: Int?,
     override val erFremtidigUtgift: Boolean?,
     override val offentligTransport: OffentligTransportDto?,
+    override val boutgifterEnBolig: BoutgifterEnBoligDto? = null,
 ) : LagreVilkårDto
 
 data class OpprettVilkårDto(
@@ -37,6 +39,7 @@ data class OpprettVilkårDto(
     override val utgift: Int?,
     override val erFremtidigUtgift: Boolean?,
     override val offentligTransport: OffentligTransportDto?,
+    override val boutgifterEnBolig: BoutgifterEnBoligDto? = null,
 ) : LagreVilkårDto,
     LagreVilkår
 

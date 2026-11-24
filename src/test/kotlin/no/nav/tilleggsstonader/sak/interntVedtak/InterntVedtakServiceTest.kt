@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -16,6 +17,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaLøpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -431,6 +434,26 @@ class InterntVedtakServiceTest {
                     avslagBegrunnelse = dummyAvslåttVedtak.data.begrunnelse,
                 ),
             )
+        }
+
+        @Test
+        fun `fakta om løpende utgifter for en bolig skal mappes`() {
+            val fakta = FaktaLøpendeUtgifterEnBolig(utgiftHjemsted = 1000, utgiftAktivitetssted = 1500)
+            val vilkår =
+                InterntVedtakTestdata.Boutgifter.vilkår.first().copy(
+                    type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                    utgift = 500,
+                    fakta = fakta,
+                )
+            every { vilkårService.hentVilkår(behandlingId) } returns listOf(vilkår)
+
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val mappetFakta = interntVedtak.vilkår.single().fakta as VilkårFaktaLøpendeUtgifterEnBoligInterntVedtak
+
+            assertThat(mappetFakta.utgiftHjemsted).isEqualTo(1000)
+            assertThat(mappetFakta.utgiftAktivitetssted).isEqualTo(1500)
         }
 
         @Test

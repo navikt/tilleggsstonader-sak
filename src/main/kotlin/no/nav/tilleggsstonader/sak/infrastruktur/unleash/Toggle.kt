@@ -28,6 +28,7 @@ enum class Toggle(
 
     KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE("sak.reise-oppstart-avslutning-hjemreise"),
     KAN_BEHANDLE_FLYTTING("sak.flytting"),
+    BOUTGIFTER_EN_BOLIG_MERUTGIFTER_FAKTA("sak.boutgifter-en-bolig-merutgifter-fakta"),
 
     KAN_BRUKE_MÅLGRUPPE_UNGDOMSPROGRAMMET("sak.frontend.kan-bruke-malgruppe-ungdomsprogrammet"),
     KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER("sak.frontend.kan-bruke-malgruppe-aktivitetspenger"),

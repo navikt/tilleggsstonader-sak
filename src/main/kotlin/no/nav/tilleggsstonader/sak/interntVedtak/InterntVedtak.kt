@@ -258,6 +258,13 @@ data class VilkårFaktaFlyttingUbestemtInterntVedtak(
     override val type = TypeVilkårFakta.FLYTTING_UBESTEMT
 }
 
+data class VilkårFaktaLøpendeUtgifterEnBoligInterntVedtak(
+    val utgiftHjemsted: Int,
+    val utgiftAktivitetssted: Int,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.LØPENDE_UTGIFTER_EN_BOLIG
+}
+
 data class VurderingInterntVedtak(
     val regel: String,
     val svar: String?,
