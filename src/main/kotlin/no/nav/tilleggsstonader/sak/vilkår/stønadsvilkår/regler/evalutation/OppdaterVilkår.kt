@@ -50,6 +50,15 @@ object OppdaterVilkår {
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
 
+        val bolig = oppdatering.boutgifterEnBolig
+        if (
+            vilkår.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG &&
+            bolig != null &&
+            bolig.utgiftAktivitetssted <= bolig.utgiftHjemsted
+        ) {
+            return vilkårsresultat.copy(vilkår = Vilkårsresultat.IKKE_OPPFYLT)
+        }
+
         return vilkårsresultat
     }
 

@@ -63,6 +63,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -134,6 +136,7 @@ internal class VilkårServiceTest {
             val resultat = vilkårService.opprettNyttVilkår(opprett())
 
             assertThat(resultat.utgift).isEqualTo(1000)
+            assertThat(resultat.resultat).isEqualTo(OPPFYLT)
             assertThat(resultat.fakta).isEqualTo(FaktaLøpendeUtgifterEnBolig(5000, 6000))
             assertThat(resultat.tilDto().boutgifterEnBolig).isEqualTo(BoutgifterEnBoligDto(5000, 6000))
         }
@@ -173,6 +176,43 @@ internal class VilkårServiceTest {
             assertThat(beregningsutgifter.values.flatten().map { it.utgift }).containsExactly(2000)
         }
 
+        @ParameterizedTest
+        @CsvSource("5000, 5000", "6000, 5000", "0, 0", "2147483647, 0")
+        fun `like eller lavere utgifter gir ikke oppfylt med null kroner`(
+            utgiftHjemsted: Int,
+            utgiftAktivitetssted: Int,
+        ) {
+            val fakta = BoutgifterEnBoligDto(utgiftHjemsted, utgiftAktivitetssted)
+            val resultat =
+                vilkårService.opprettNyttVilkår(
+                    opprett().copy(boutgifterEnBolig = fakta, utgift = 0),
+                )
+
+            assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+            assertThat(resultat.utgift).isZero()
+            assertThat(resultat.fakta).isEqualTo(FaktaLøpendeUtgifterEnBolig(utgiftHjemsted, utgiftAktivitetssted))
+            every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(resultat)
+            assertThat(vilkårService.hentOppfylteBoutgiftVilkår(behandlingId)).isEmpty()
+        }
+
+        @Test
+        fun `krever fullstendig vurdering også uten merutgift`() {
+            val delvilkår =
+                oppfylteDelvilkårLøpendeUtgifterEnBolig().map { delvilkår ->
+                    delvilkår.tilDto().copy(vurderinger = delvilkår.vurderinger.map { it.tilDto().copy(svar = null) })
+                }
+
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(
+                    opprett().copy(
+                        boutgifterEnBolig = BoutgifterEnBoligDto(5000, 5000),
+                        delvilkårsett = delvilkår,
+                    ),
+                )
+            }.isInstanceOf(Feil::class.java)
+            verify(exactly = 0) { vilkårRepository.insert(any()) }
+        }
+
         @Test
         fun `avviser manglende fakta ugyldige beløp fremtidig utgift og overstyrt merutgift`() {
             val ugyldige =
@@ -180,8 +220,8 @@ internal class VilkårServiceTest {
                     opprett().copy(boutgifterEnBolig = null),
                     opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(-1, 6000)),
                     opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, -1)),
-                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, 5000)),
-                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(6000, 5000)),
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(5000, 5000), utgift = 1000),
+                    opprett().copy(boutgifterEnBolig = BoutgifterEnBoligDto(6000, 5000), utgift = -1000),
                     opprett().copy(utgift = 6000),
                     opprett().copy(erFremtidigUtgift = true, delvilkårsett = emptyList()),
                     opprett().copy(vilkårType = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER),
