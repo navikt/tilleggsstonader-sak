@@ -16,6 +16,7 @@ class FaktaROAHTest {
     fun `skal mappe nødvendig utgift for offentlig transport`() {
         val fakta =
             FaktaROAHOffentligTransportDto(
+                typeReiseformål = TypeReiseformål.OPPSTART,
                 nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                 utgifterOffentligTransport = 40.toBigDecimal(),
             ).mapTilFakta()
@@ -27,6 +28,7 @@ class FaktaROAHTest {
     fun `skal mappe nødvendig utgift for privat bil`() {
         val fakta =
             FaktaROAHPrivatBilDto(
+                typeReiseformål = TypeReiseformål.OPPSTART,
                 nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = "Ikke nødvendig"),
                 reiseavstand = 40.toBigDecimal(),
                 begrunnelse = null,
@@ -40,6 +42,7 @@ class FaktaROAHTest {
         val feil =
             assertThrows<ApiFeil> {
                 FaktaROAHOffentligTransportDto(
+                    typeReiseformål = TypeReiseformål.OPPSTART,
                     nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = " "),
                     utgifterOffentligTransport = 40.toBigDecimal(),
                 ).mapTilFakta()
@@ -53,6 +56,7 @@ class FaktaROAHTest {
         val feil =
             assertThrows<Feil> {
                 FaktaROAHPrivatBilDto(
+                    typeReiseformål = TypeReiseformål.OPPSTART,
                     nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.GAMMEL_MANGLER_DATA, begrunnelse = null),
                     reiseavstand = BigDecimal.TEN,
                 ).mapTilFakta()

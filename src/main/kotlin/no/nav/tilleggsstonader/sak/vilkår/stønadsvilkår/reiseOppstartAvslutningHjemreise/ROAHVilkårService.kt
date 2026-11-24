@@ -141,7 +141,6 @@ class ROAHVilkårService(
                     tom = nyttVilkår.tom,
                     aktivitetId = nyttVilkår.aktivitetId,
                     reiseId = nyttVilkår.reiseId,
-                    typeReiseformål = nyttVilkår.typeReiseformål,
                     status = utledStatus(eksisterendeVilkår),
                     delvilkårsett = delvilkårsett,
                     resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),

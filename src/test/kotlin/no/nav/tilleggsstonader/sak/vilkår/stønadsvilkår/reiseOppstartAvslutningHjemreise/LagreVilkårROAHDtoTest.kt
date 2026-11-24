@@ -53,9 +53,8 @@ class LagreVilkårROAHDtoTest {
         tom = tom,
         reiseId = ReiseId.random(),
         aktivitetId = VilkårperiodeGlobalId.random(),
-        typeReiseformål = reiseformål,
         svar = emptyMap(),
-        fakta = FaktaROAHUbestemtDto,
+        fakta = FaktaROAHUbestemtDto(typeReiseformål = reiseformål),
         parentVilkår = VilkårGlobalId.random(),
     )
 

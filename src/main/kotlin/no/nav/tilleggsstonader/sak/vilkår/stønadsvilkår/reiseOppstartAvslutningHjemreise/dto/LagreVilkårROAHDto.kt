@@ -30,7 +30,6 @@ data class LagreVilkårROAHReiseDto(
     val tom: LocalDate?,
     val reiseId: ReiseId,
     val aktivitetId: VilkårperiodeGlobalId,
-    val typeReiseformål: TypeReiseformål,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaROAHReiseDto,
     val parentVilkår: VilkårGlobalId,
@@ -41,14 +40,13 @@ data class LagreVilkårROAHReiseDto(
             tom = utledTom(),
             reiseId = reiseId,
             aktivitetId = aktivitetId,
-            typeReiseformål = typeReiseformål,
             svar = svar.mapValues { it.value.tilDomene() },
             fakta = fakta.mapTilFakta(),
             parentVilkår = parentVilkår,
         )
 
     private fun utledTom(): LocalDate =
-        when (typeReiseformål) {
+        when (val typeReiseformål = fakta.typeReiseformål) {
             TypeReiseformål.HJEMREISE -> tom ?: brukerfeil("tom må settes for hjemreise")
             TypeReiseformål.OPPSTART, TypeReiseformål.AVSLUTNING -> {
                 brukerfeilHvis(tom != null && tom != fom) { "Tom kan ikke settes til noe annet enn lik fom for $typeReiseformål" }

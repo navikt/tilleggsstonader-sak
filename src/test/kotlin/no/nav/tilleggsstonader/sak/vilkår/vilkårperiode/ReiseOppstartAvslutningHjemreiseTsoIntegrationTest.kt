@@ -72,7 +72,7 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
 
         val reiseVilkår = aktivitetMedReiser.reiser.single()
         assertThat(reiseVilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(reiseVilkår.typeReiseformål).isEqualTo(TypeReiseformål.OPPSTART)
+        assertThat(reiseVilkår.fakta.typeReiseformål).isEqualTo(TypeReiseformål.OPPSTART)
         assertThat(reiseVilkår.fakta).isInstanceOf(FaktaROAHOffentligTransportDto::class.java)
         assertThat(reiseVilkår.aktivitetId).isEqualTo(aktivitet.globalId)
 
@@ -183,6 +183,6 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
     ) {
         assertThat(lagretVilkår.fom).isEqualTo(forventetFom)
         assertThat(lagretVilkår.tom).isEqualTo(forventetTom)
-        assertThat(lagretVilkår.typeReiseformål).isEqualTo(forventetType)
+        assertThat(lagretVilkår.fakta.typeReiseformål).isEqualTo(forventetType)
     }
 }

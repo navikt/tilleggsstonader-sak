@@ -239,9 +239,8 @@ class ROAHVilkårValideringUtilTest {
         tom = tom,
         reiseId = ReiseId.random(),
         aktivitetId = aktivitetId,
-        typeReiseformål = TypeReiseformål.AVSLUTNING,
         svar = emptyMap(),
-        fakta = FaktaUbestemtType,
+        fakta = FaktaUbestemtType(typeReiseformål = TypeReiseformål.AVSLUTNING),
         parentVilkår = VilkårGlobalId.random(),
     )
 
