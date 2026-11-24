@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -49,18 +50,21 @@ class FlyttingBeregningService(
         )
 
         val oppfylteVilkår = flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id)
+        val relevanteVilkår =
+            oppfylteVilkår
+                .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
 
         val resultater =
             when (omfang) {
                 Beregningsomfang.ALLE_PERIODER -> {
-                    oppfylteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
+                    if (oppfylteVilkår.isNotEmpty() && relevanteVilkår.isEmpty()) {
+                        brukerfeil("Det er ikke lagt inn noen oppfylte utgiftsperioder")
+                    }
+                    relevanteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
                 }
-
                 Beregningsomfang.FRA_DATO -> {
                     val nyeBeregningsresultat =
-                        oppfylteVilkår
-                            .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
-                            .map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
+                        relevanteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
                     val forrigeBeregningsresultat = hentForrigeIverksatteVedtak(behandling).beregningsresultat.resultater
                     val beregnFraDato = beregningsplan.beregnFra() ?: feil("Forventer beregn-fra dato")
                     slåSammenNyeOgGamleBeregningsresultatFraDato(forrigeBeregningsresultat, nyeBeregningsresultat, beregnFraDato)
@@ -94,10 +98,7 @@ class FlyttingBeregningService(
     private fun finnTilhørendeVedtaksperiode(
         vilkår: VilkårFlytting,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): Vedtaksperiode =
-        vedtaksperioder.single {
-            it.inneholder(vilkår.flyttedato)
-        }
+    ): Vedtaksperiode = vedtaksperioder.single { it.inneholder(vilkår.flyttedato) }
 
     private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
