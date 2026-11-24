@@ -21,6 +21,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlytt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.flyttingRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.vilkårTypeFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.vilkårTyperFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering

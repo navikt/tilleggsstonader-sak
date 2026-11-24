@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.tilVilkårFlyttingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.flyttingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.LagreVilkårFlyttingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.SlettVilkårFlyttingRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.SlettVilkårFlyttingResultatDto

@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
@@ -10,7 +12,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalI
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.vilkårTyperFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingTsrRegel
 import java.time.LocalDate
 
 data class VilkårFlytting(
@@ -33,3 +37,19 @@ data class VilkårFlytting(
     override val fom = flyttedato
     override val tom = flyttedato
 }
+
+val vilkårTyperFlytting = setOf(VilkårType.FLYTTING, VilkårType.FLYTTING_TSR)
+
+fun vilkårTypeFlytting(stønadstype: Stønadstype): VilkårType =
+    when (stønadstype) {
+        Stønadstype.FLYTTING_TSO -> VilkårType.FLYTTING
+        Stønadstype.FLYTTING_TSR -> VilkårType.FLYTTING_TSR
+        else -> feil("Stønadstype=$stønadstype har ikke flyttevilkår")
+    }
+
+fun flyttingRegel(stønadstype: Stønadstype): Vilkårsregel =
+    when (stønadstype) {
+        Stønadstype.FLYTTING_TSO -> FlyttingRegel()
+        Stønadstype.FLYTTING_TSR -> FlyttingTsrRegel()
+        else -> feil("Stønadstype=$stønadstype har ikke flyttevilkår")
+    }

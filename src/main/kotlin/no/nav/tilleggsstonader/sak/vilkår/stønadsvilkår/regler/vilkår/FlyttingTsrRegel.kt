@@ -12,10 +12,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
-/**
- * Flytting for tiltaksenheten gjelder alltid flytting i forbindelse med arbeid,
- * så spørsmålet om flytteforbindelse fra [FlyttingRegel] er ikke med her.
- */
 class FlyttingTsrRegel :
     Vilkårsregel(
         vilkårType = VilkårType.FLYTTING_TSR,

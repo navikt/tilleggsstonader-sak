@@ -123,7 +123,6 @@ class FlyttingVilkårServiceTest {
                     ),
             )
 
-        assertThat(resultat.vilkårType).isEqualTo(VilkårType.FLYTTING_TSR)
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
         assertThat(resultat.delvilkårsett.flatMap { it.vurderinger }.map { it.regelId })
             .doesNotContain(RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER)

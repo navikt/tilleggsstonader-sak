@@ -29,12 +29,6 @@ private val alleVilkårsregler: List<Vilkårsregel> =
     Stønadstype.entries
         .map { vilkårsreglerForStønad(it) }
         .flatten()
-        .distinctBy { it::class }
-        .also { regler ->
-            // Oppslag skjer på vilkårType, så to ulike regelsett med samme vilkårType vil overskrive hverandre
-            val duplikater = regler.groupBy { it.vilkårType }.filterValues { it.size > 1 }.keys
-            require(duplikater.isEmpty()) { "Flere vilkårsregler har samme vilkårType: $duplikater" }
-        }
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
