@@ -23,7 +23,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilS
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ROAHReiseVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
@@ -104,21 +103,19 @@ data class OppsummertVilkår(
     val resultat: Vilkårsresultat,
     val utgift: Int?,
     val typeFakta: TypeVilkårFakta?,
-    val globalId: VilkårGlobalId?,
-    val parentVilkår: VilkårGlobalId?,
     val typeReiseformål: TypeReiseformål?,
+    val childVilkår: List<OppsummertVilkår>,
 )
 
-fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
+fun Vilkår.tilOppsummertVilkår(childVilkår: List<Vilkår> = emptyList()): OppsummertVilkår =
     OppsummertVilkår(
         id = this.id,
         fom = this.fom,
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
-        globalId = this.globalId,
-        parentVilkår = this.parentVilkår,
         typeReiseformål = (this.fakta as? ROAHReiseVilkårFakta)?.typeReiseformål,
+        childVilkår = childVilkår.sortedBy { it.fom }.map { it.tilOppsummertVilkår() },
         typeFakta =
             when (this.fakta) {
                 is FaktaFlyttebyrå -> TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ

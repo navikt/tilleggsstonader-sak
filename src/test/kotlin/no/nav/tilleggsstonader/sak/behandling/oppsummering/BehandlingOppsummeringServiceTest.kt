@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.opphørVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
@@ -91,13 +92,27 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
         }
 
         @Test
-        fun `skal beholde reiser separat med reiseformål og paraplyvilkår`() {
+        fun `skal oppsummere reiser som barn av paraplyvilkåret`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
             val parentVilkår = VilkårGlobalId.random()
             val typeReiseformål = TypeReiseformål.entries.first()
 
             vilkårRepository.insertAll(
                 listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                        fom = 1 januar 2025,
+                        tom = 31 januar 2025,
+                    ).copy(
+                        globalId = parentVilkår,
+                        fakta =
+                            FaktaROAHMidlertidigBosted(
+                                aktivitetId = VilkårperiodeGlobalId.random(),
+                                fraAdresse = "Adresse fra",
+                                tilAdresse = "Adresse til",
+                            ),
+                    ),
                     vilkår(
                         behandlingId = behandling.id,
                         type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
@@ -132,13 +147,17 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            val oppsummerteReiser = oppsummering.vilkår.single().vilkår
+            assertThat(oppsummering.vilkår).hasSize(1)
+            val oppsummertParaplyvilkår =
+                oppsummering.vilkår
+                    .single()
+                    .vilkår
+                    .single()
+            val oppsummerteReiser = oppsummertParaplyvilkår.childVilkår
 
             assertThat(oppsummerteReiser).hasSize(2)
             assertThat(oppsummerteReiser.map { it.fom }).containsExactly(1 januar 2025, 16 januar 2025)
-            assertThat(oppsummerteReiser.map { it.parentVilkår }).containsOnly(parentVilkår)
             assertThat(oppsummerteReiser.map { it.typeReiseformål }).containsOnly(typeReiseformål)
-            assertThat(oppsummerteReiser.map { it.globalId }).doesNotContainNull()
         }
     }
 
