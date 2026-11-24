@@ -222,7 +222,7 @@ class InterntVedtakGenereringTest {
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
             InterntVedtakTestdata.Flytting.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.Flytting.vilkår
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.Flytting.vilkår(stønadstype)
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Flytting.vedtak(stønadstype)
     }
 

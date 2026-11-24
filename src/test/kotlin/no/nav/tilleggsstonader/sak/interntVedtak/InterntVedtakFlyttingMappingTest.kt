@@ -193,7 +193,7 @@ class InterntVedtakFlyttingMappingTest {
                 listOf(
                     vilkår(
                         behandlingId = behandlingId,
-                        type = VilkårType.FLYTTING,
+                        type = VilkårType.FLYTTING_TSO,
                         resultat = Vilkårsresultat.OPPFYLT,
                         fom = dato,
                         tom = dato,

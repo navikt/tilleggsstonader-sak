@@ -69,7 +69,7 @@ class FlyttingVilkårServiceTest {
     private val eksisterendeVilkår =
         VilkårFlytting(
             behandlingId = BehandlingId.random(),
-            vilkårType = VilkårType.FLYTTING,
+            vilkårType = VilkårType.FLYTTING_TSO,
             flyttedato = 1 januar 2026,
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             status = VilkårStatus.NY,

@@ -38,11 +38,11 @@ data class VilkårFlytting(
     override val tom = flyttedato
 }
 
-val vilkårTyperFlytting = setOf(VilkårType.FLYTTING, VilkårType.FLYTTING_TSR)
+val vilkårTyperFlytting = setOf(VilkårType.FLYTTING_TSO, VilkårType.FLYTTING_TSR)
 
 fun vilkårTypeFlytting(stønadstype: Stønadstype): VilkårType =
     when (stønadstype) {
-        Stønadstype.FLYTTING_TSO -> VilkårType.FLYTTING
+        Stønadstype.FLYTTING_TSO -> VilkårType.FLYTTING_TSO
         Stønadstype.FLYTTING_TSR -> VilkårType.FLYTTING_TSR
         else -> feil("Stønadstype=$stønadstype har ikke flyttevilkår")
     }

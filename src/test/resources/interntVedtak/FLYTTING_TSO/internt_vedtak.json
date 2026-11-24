@@ -155,7 +155,7 @@
     "resultat": "OPPFYLT",
     "slettetKommentar": null,
     "tom": "2025-01-15",
-    "type": "FLYTTING",
+    "type": "FLYTTING_TSO",
     "utgift": null
   }, {
     "delvilkår": [ {
@@ -202,7 +202,7 @@
     "resultat": "OPPFYLT",
     "slettetKommentar": null,
     "tom": "2025-01-15",
-    "type": "FLYTTING",
+    "type": "FLYTTING_TSO",
     "utgift": null
   }, {
     "delvilkår": [ {
@@ -230,7 +230,7 @@
     "resultat": "IKKE_OPPFYLT",
     "slettetKommentar": null,
     "tom": "2025-01-15",
-    "type": "FLYTTING",
+    "type": "FLYTTING_TSO",
     "utgift": null
   } ]
 }

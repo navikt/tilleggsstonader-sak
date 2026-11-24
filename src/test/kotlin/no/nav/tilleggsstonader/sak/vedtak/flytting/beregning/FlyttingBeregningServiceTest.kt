@@ -572,7 +572,7 @@ class FlyttingBeregningServiceTest {
     ) = VilkårFlytting(
         id = VilkårId.random(),
         behandlingId = behandlingId,
-        vilkårType = VilkårType.FLYTTING,
+        vilkårType = VilkårType.FLYTTING_TSO,
         flyttedato = flyttedato,
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,

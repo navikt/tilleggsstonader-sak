@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
 class FlyttingRegel :
     Vilkårsregel(
-        vilkårType = VilkårType.FLYTTING,
+        vilkårType = VilkårType.FLYTTING_TSO,
         regler =
             setOf(
                 HAR_UTGIFTER_TIL_FLYTTING,

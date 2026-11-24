@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 class VilkårFlyttingMapperTest {
     private val lagret =
         vilkår(
-            type = VilkårType.FLYTTING,
+            type = VilkårType.FLYTTING_TSO,
             fom = 1 januar 2026,
             tom = 1 januar 2026,
             utgift = null,

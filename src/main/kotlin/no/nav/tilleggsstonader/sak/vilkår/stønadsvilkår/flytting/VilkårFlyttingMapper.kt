@@ -56,6 +56,7 @@ object VilkårFlyttingMapper {
     fun VilkårFlytting.tilVilkårFlyttingDto(): VilkårFlyttingDto =
         VilkårFlyttingDto(
             id = id,
+            vilkårType = vilkårType,
             flyttedato = flyttedato,
             resultat = resultat,
             status = status,
