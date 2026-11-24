@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import org.springframework.stereotype.Service
@@ -65,19 +65,9 @@ class BehandlingOppsummeringService(
                 type = it.key.first,
                 barnId = it.key.second,
                 vilkår =
-                    (
-                        if (it.key.first in
-                            setOf(
-                                VilkårType.ROAH_OPPSTART_AVSLUTNING,
-                                VilkårType.ROAH_HJEMREISE,
-                                VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
-                            )
-                        ) {
-                            it.value.sortedBy { vilkår -> vilkår.fom }
-                        } else {
-                            it.value.slåSammenSammenhengende()
-                        }
-                    ).map { it.tilOppsummertVilkår() },
+                    it.value
+                        .slåSammenSammenhengende()
+                        .map { it.tilOppsummertVilkår() },
             )
         }
     }
