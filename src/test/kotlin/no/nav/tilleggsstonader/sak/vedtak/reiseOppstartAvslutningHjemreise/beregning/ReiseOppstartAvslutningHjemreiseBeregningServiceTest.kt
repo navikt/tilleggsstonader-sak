@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -114,6 +115,63 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
         assertThat(offentligTransport).hasSize(2)
         assertThat(offentligTransport[0].aktivitetId).isEqualTo(aktivitetId1)
         assertThat(offentligTransport[1].aktivitetId).isEqualTo(aktivitetId2)
+    }
+
+    @Test
+    fun `beregner begge reiser med riktig beløp når reisene overlapper`() {
+        val aktivitetId = VilkårperiodeGlobalId.random()
+        val reiseId1 = ReiseId.random()
+        val reiseId2 = ReiseId.random()
+        every { vilkårService.hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandling.id) } returns
+            listOf(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    parentVilkår = VilkårGlobalId.random(),
+                    fom = 1 januar 2025,
+                    tom = 20 januar 2025,
+                    fakta =
+                        FaktaROAHOffentligTransport(
+                            reiseId = reiseId1,
+                            typeReiseformål = TypeReiseformål.OPPSTART,
+                            nødvendigUtgift = nødvendigUtgift,
+                            utgifterOffentligTransport = 500.toBigDecimal(),
+                            aktivitetId = aktivitetId,
+                            begrunnelse = null,
+                        ),
+                ),
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    parentVilkår = VilkårGlobalId.random(),
+                    fom = 10 januar 2025,
+                    tom = 31 januar 2025,
+                    fakta =
+                        FaktaROAHOffentligTransport(
+                            reiseId = reiseId2,
+                            typeReiseformål = TypeReiseformål.AVSLUTNING,
+                            nødvendigUtgift = nødvendigUtgift,
+                            utgifterOffentligTransport = 200.toBigDecimal(),
+                            aktivitetId = aktivitetId,
+                            begrunnelse = null,
+                        ),
+                ),
+            )
+
+        val result =
+            beregningService.beregn(
+                behandling,
+                vedtaksperioder,
+                TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+            )
+
+        assertThat(result.offentligTransport.map { it.reiseId to it.beløp })
+            .containsExactlyInAnyOrder(reiseId1 to 500.toBigDecimal(), reiseId2 to 200.toBigDecimal())
     }
 
     @Test
