@@ -62,7 +62,6 @@ object VilkårROAHDtoMapper {
             tom = this.tom,
             reiseId = this.reiseId,
             aktivitetId = this.aktivitetId,
-            typeReiseformål = this.typeReiseformål,
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
@@ -75,11 +74,12 @@ object VilkårROAHDtoMapper {
         when (this) {
             is FaktaOffentligTransport -> this.tilDto()
             is FaktaPrivatBil -> this.tilDto()
-            is FaktaUbestemtType -> FaktaROAHUbestemtDto
+            is FaktaUbestemtType -> FaktaROAHUbestemtDto(typeReiseformål = typeReiseformål)
         }
 
     private fun FaktaOffentligTransport.tilDto() =
         FaktaROAHOffentligTransportDto(
+            typeReiseformål = this.typeReiseformål,
             nødvendigUtgift = nødvendigUtgift.tilDto(),
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
@@ -87,6 +87,7 @@ object VilkårROAHDtoMapper {
 
     private fun FaktaPrivatBil.tilDto() =
         FaktaROAHPrivatBilDto(
+            typeReiseformål = this.typeReiseformål,
             nødvendigUtgift = nødvendigUtgift.tilDto(),
             reiseavstand = this.reiseavstand,
             bompenger = this.bompenger,

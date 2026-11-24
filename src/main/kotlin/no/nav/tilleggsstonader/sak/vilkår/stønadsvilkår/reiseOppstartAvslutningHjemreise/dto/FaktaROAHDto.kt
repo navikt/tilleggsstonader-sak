@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import java.math.BigDecimal
 
 enum class TypeFaktaROAH {
@@ -34,10 +35,13 @@ sealed interface FaktaROAHDto {
 }
 
 sealed interface FaktaROAHReiseDto : FaktaROAHDto {
+    val typeReiseformål: TypeReiseformål
+
     fun mapTilFakta(): FaktaReiseROAH
 }
 
 data class FaktaROAHOffentligTransportDto(
+    override val typeReiseformål: TypeReiseformål,
     val nødvendigUtgift: NødvendigUtgiftDto,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
@@ -46,6 +50,7 @@ data class FaktaROAHOffentligTransportDto(
 
     override fun mapTilFakta() =
         FaktaOffentligTransport(
+            typeReiseformål = typeReiseformål,
             nødvendigUtgift = nødvendigUtgift.tilDomene(),
             utgifterOffentligTransport = utgifterOffentligTransport,
             begrunnelse = begrunnelse,
@@ -53,6 +58,7 @@ data class FaktaROAHOffentligTransportDto(
 }
 
 data class FaktaROAHPrivatBilDto(
+    override val typeReiseformål: TypeReiseformål,
     val nødvendigUtgift: NødvendigUtgiftDto,
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal? = null,
@@ -65,6 +71,7 @@ data class FaktaROAHPrivatBilDto(
 
     override fun mapTilFakta() =
         FaktaPrivatBil(
+            typeReiseformål = typeReiseformål,
             nødvendigUtgift = nødvendigUtgift.tilDomene(),
             reiseavstand = reiseavstand,
             bompenger = bompenger,
@@ -75,10 +82,12 @@ data class FaktaROAHPrivatBilDto(
         )
 }
 
-data object FaktaROAHUbestemtDto : FaktaROAHReiseDto {
+data class FaktaROAHUbestemtDto(
+    override val typeReiseformål: TypeReiseformål,
+) : FaktaROAHReiseDto {
     override val type = TypeFaktaROAH.UBESTEMT
 
-    override fun mapTilFakta() = FaktaUbestemtType
+    override fun mapTilFakta() = FaktaUbestemtType(typeReiseformål = typeReiseformål)
 }
 
 data class FaktaMidlertidigBostedDto(

@@ -280,7 +280,6 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 tom = null,
                 reiseId = dummyReiseId,
                 aktivitetId = aktivitet.globalId,
-                typeReiseformål = TypeReiseformål.OPPSTART,
                 svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
                 fakta = offentligTransport(BigDecimal.valueOf(100)),
                 parentVilkår = paraply.globalId!!,
@@ -408,7 +407,6 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
         tom = null,
         reiseId = ReiseId.random(),
         aktivitetId = aktivitetId,
-        typeReiseformål = TypeReiseformål.OPPSTART,
         svar = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
         fakta = offentligTransport(BigDecimal.valueOf(100)),
         parentVilkår = parentVilkår ?: VilkårGlobalId.random(),
@@ -466,6 +464,7 @@ class ROAHVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     private fun offentligTransport(utgift: BigDecimal) =
         FaktaROAHOffentligTransportDto(
+            typeReiseformål = TypeReiseformål.OPPSTART,
             begrunnelse = "buss",
             nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
             utgifterOffentligTransport = utgift,

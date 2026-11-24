@@ -54,7 +54,6 @@ data class VilkårReise(
     override val behandlingId: BehandlingId,
     override val aktivitetId: VilkårperiodeGlobalId,
     val reiseId: ReiseId,
-    val typeReiseformål: TypeReiseformål,
     override val fom: LocalDate,
     override val tom: LocalDate,
     override val resultat: Vilkårsresultat,

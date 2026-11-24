@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.tilVilkårType
 
 object VilkårROAHMapper {
     fun Vilkår.mapTilVilkårROAH(): VilkårROAH =
@@ -39,7 +38,6 @@ object VilkårROAHMapper {
             tom = this.tom ?: error("Forventer at tom er satt"),
             aktivitetId = fakta.aktivitetId,
             reiseId = fakta.reiseId,
-            typeReiseformål = fakta.typeReiseformål,
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
@@ -80,12 +78,11 @@ object VilkårROAHMapper {
 
     private fun VilkårReise.mapTilVilkår() =
         tilVilkår(
-            type = this.typeReiseformål.tilVilkårType(),
+            type = this.fakta.vilkårType,
             fakta =
                 this.fakta.mapTilVilkårFakta(
                     reiseId = this.reiseId,
                     aktivitetId = this.aktivitetId,
-                    typeReiseformål = this.typeReiseformål,
                 ),
             parentVilkår = this.parentVilkår,
         )
@@ -130,6 +127,7 @@ object VilkårROAHMapper {
 
     private fun FaktaROAHOffentligTransport.mapTilFakta() =
         FaktaOffentligTransport(
+            typeReiseformål = this.typeReiseformål,
             nødvendigUtgift = this.nødvendigUtgift,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
@@ -137,6 +135,7 @@ object VilkårROAHMapper {
 
     private fun FaktaROAHPrivatBil.mapTilFakta() =
         FaktaPrivatBil(
+            typeReiseformål = this.typeReiseformål,
             nødvendigUtgift = this.nødvendigUtgift,
             reiseavstand = this.reiseavstand,
             bompenger = this.bompenger,
@@ -152,5 +151,5 @@ object VilkårROAHMapper {
             tilAdresse = this.tilAdresse,
         )
 
-    private fun FaktaROAHUbestemt.mapTilFakta() = FaktaUbestemtType
+    private fun FaktaROAHUbestemt.mapTilFakta() = FaktaUbestemtType(typeReiseformål = this.typeReiseformål)
 }

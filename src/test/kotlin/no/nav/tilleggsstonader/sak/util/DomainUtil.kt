@@ -864,6 +864,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     svar: Map<RegelId, SvarOgBegrunnelseDto> = ROAHTestUtil.oppfylteSvarOppstartAvslutningOffentligTransportDto(),
     fakta: FaktaROAHReiseDto =
         FaktaROAHOffentligTransportDto(
+            typeReiseformål = typeReiseformål,
             nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
             utgifterOffentligTransport = utgifterOffentligTransport,
         ),
@@ -873,7 +874,6 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     tom = tom,
     reiseId = reiseId,
     aktivitetId = aktivitetId,
-    typeReiseformål = typeReiseformål,
     svar = svar,
     fakta = fakta,
     parentVilkår = parentVilkår,

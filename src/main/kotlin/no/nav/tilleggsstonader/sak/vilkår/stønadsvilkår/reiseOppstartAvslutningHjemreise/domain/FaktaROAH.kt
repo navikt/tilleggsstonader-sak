@@ -12,18 +12,21 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeG
 import java.math.BigDecimal
 
 sealed interface FaktaReiseROAH {
+    val typeReiseformål: TypeReiseformål
+    val vilkårType get() = typeReiseformål.tilVilkårType()
+
     fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
-        typeReiseformål: TypeReiseformål,
     ): VilkårFakta
 }
 
-data object FaktaUbestemtType : FaktaReiseROAH {
+data class FaktaUbestemtType(
+    override val typeReiseformål: TypeReiseformål,
+) : FaktaReiseROAH {
     override fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
-        typeReiseformål: TypeReiseformål,
     ) = FaktaROAHUbestemt(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
@@ -32,6 +35,7 @@ data object FaktaUbestemtType : FaktaReiseROAH {
 }
 
 data class FaktaOffentligTransport(
+    override val typeReiseformål: TypeReiseformål,
     val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
@@ -43,7 +47,6 @@ data class FaktaOffentligTransport(
     override fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
-        typeReiseformål: TypeReiseformål,
     ) = FaktaROAHOffentligTransport(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
@@ -61,6 +64,7 @@ data class FaktaOffentligTransport(
 }
 
 data class FaktaPrivatBil(
+    override val typeReiseformål: TypeReiseformål,
     val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal? = null,
@@ -77,7 +81,6 @@ data class FaktaPrivatBil(
     override fun mapTilVilkårFakta(
         reiseId: ReiseId,
         aktivitetId: VilkårperiodeGlobalId,
-        typeReiseformål: TypeReiseformål,
     ) = FaktaROAHPrivatBil(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
