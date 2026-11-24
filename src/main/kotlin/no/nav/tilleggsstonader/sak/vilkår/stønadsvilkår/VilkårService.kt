@@ -148,7 +148,7 @@ class VilkårService(
         brukerfeilHvis(bolig.utgiftHjemsted < 0 || bolig.utgiftAktivitetssted < 0) {
             "Boligutgiftene må være null eller høyere"
         }
-        val merutgift = (bolig.utgiftAktivitetssted - bolig.utgiftHjemsted).coerceAtLeast(0)
+        val merutgift = maxOf(0, (bolig.utgiftAktivitetssted - bolig.utgiftHjemsted))
         brukerfeilHvis(oppdatering.utgift != null && oppdatering.utgift != merutgift) {
             "Merutgiften må tilsvare forskjellen mellom boligutgiftene"
         }
