@@ -331,7 +331,7 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `kaster brukerfeil når ingen vedtaksperiode inneholder flyttedato`() {
+    fun `kaster brukerfeil når det ikke finnes vilkår for hele vedtaksperiode`() {
         every {
             flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id)
         } returns
