@@ -54,9 +54,15 @@ class FlyttingBeregningService(
         val resultater =
             when (omfang) {
                 Beregningsomfang.ALLE_PERIODER -> {
-                    oppfylteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
-                }
+                    val relevanteVilkår =
+                        oppfylteVilkår
+                            .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
 
+                    if (oppfylteVilkår.isNotEmpty() && relevanteVilkår.isEmpty()) {
+                        brukerfeil("Det er ikke lagt inn noen oppfylte utgiftsperioder")
+                    }
+                    relevanteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
+                }
                 Beregningsomfang.FRA_DATO -> {
                     val nyeBeregningsresultat =
                         oppfylteVilkår
@@ -95,9 +101,7 @@ class FlyttingBeregningService(
     private fun finnTilhørendeVedtaksperiode(
         vilkår: VilkårFlytting,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): Vedtaksperiode =
-        vedtaksperioder.singleOrNull { it.inneholder(vilkår.flyttedato) }
-            ?: brukerfeil("Det er ikke lagt inn noen oppfylte utgiftsperioder")
+    ): Vedtaksperiode = vedtaksperioder.single { it.inneholder(vilkår.flyttedato) }
 
     private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
