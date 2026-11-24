@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -100,8 +101,8 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
                     vilkår(
                         behandlingId = behandling.id,
                         type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 15),
+                        fom = 1 januar 2025,
+                        tom = 15 januar 2025,
                     ).copy(
                         globalId = VilkårGlobalId.random(),
                         parentVilkår = parentVilkår,
@@ -115,8 +116,8 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
                     vilkår(
                         behandlingId = behandling.id,
                         type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
-                        fom = LocalDate.of(2025, 1, 16),
-                        tom = LocalDate.of(2025, 1, 31),
+                        fom = 16 januar 2025,
+                        tom = 31 januar 2025,
                     ).copy(
                         globalId = VilkårGlobalId.random(),
                         parentVilkår = parentVilkår,
@@ -134,7 +135,7 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             val oppsummerteReiser = oppsummering.vilkår.single().vilkår
 
             assertThat(oppsummerteReiser).hasSize(2)
-            assertThat(oppsummerteReiser.map { it.fom }).containsExactly(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 16))
+            assertThat(oppsummerteReiser.map { it.fom }).containsExactly(1 januar 2025, 16 januar 2025)
             assertThat(oppsummerteReiser.map { it.parentVilkår }).containsOnly(parentVilkår)
             assertThat(oppsummerteReiser.map { it.typeReiseformål }).containsOnly(typeReiseformål)
             assertThat(oppsummerteReiser.map { it.globalId }).doesNotContainNull()
