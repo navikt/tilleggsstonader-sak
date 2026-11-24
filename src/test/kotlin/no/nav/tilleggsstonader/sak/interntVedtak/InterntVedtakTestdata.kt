@@ -134,7 +134,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerFlyttingTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ArbeidssøkerFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
@@ -1330,11 +1330,11 @@ object InterntVedtakTestdata {
         val grunnlagsdata =
             lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
 
-        val vilkår =
+        fun vilkår(stønadstype: Stønadstype) =
             listOf(
                 vilkår(
                     behandlingId = behandlingId,
-                    type = VilkårType.FLYTTING,
+                    type = if (stønadstype == Stønadstype.FLYTTING_TSO) VilkårType.FLYTTING_TSO else VilkårType.FLYTTING_TSR,
                     resultat = Vilkårsresultat.OPPFYLT,
                     delvilkår = oppfylteDelvilkårFlyttebyrå(),
                     fom = flyttedato,
@@ -1355,7 +1355,7 @@ object InterntVedtakTestdata {
                 ),
                 vilkår(
                     behandlingId = behandlingId,
-                    type = VilkårType.FLYTTING,
+                    type = if (stønadstype == Stønadstype.FLYTTING_TSO) VilkårType.FLYTTING_TSO else VilkårType.FLYTTING_TSR,
                     resultat = Vilkårsresultat.OPPFYLT,
                     delvilkår = oppfylteDelvilkårFlytteSelv(),
                     fom = flyttedato,
@@ -1377,7 +1377,7 @@ object InterntVedtakTestdata {
                 ),
                 vilkår(
                     behandlingId = behandlingId,
-                    type = VilkårType.FLYTTING,
+                    type = if (stønadstype == Stønadstype.FLYTTING_TSO) VilkårType.FLYTTING_TSO else VilkårType.FLYTTING_TSR,
                     resultat = Vilkårsresultat.IKKE_OPPFYLT,
                     delvilkår = ikkeOppfylteDelvilkårFlytting(),
                     fom = flyttedato,
@@ -1410,7 +1410,7 @@ object InterntVedtakTestdata {
                                             ),
                                     )
                                 } else {
-                                    DagpengerFlyttingTsr()
+                                    ArbeidssøkerFlyttingTsr()
                                 },
                         ),
                     ),

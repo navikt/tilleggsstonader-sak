@@ -369,9 +369,9 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     @Test
     fun `skal hente alle regler som tilhører flytting`() {
-        val resultat = kall.vilkårFlytting.regler()
+        val resultat = kall.vilkårFlytting.regler(Stønadstype.FLYTTING_TSO)
 
-        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/FLYTTING.json", resultat)
+        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/FLYTTING_TSO.json", resultat)
     }
 
     @Test
@@ -438,7 +438,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
         val lagret = vilkårRepository.findById(resultat.id).orElseThrow()
         assertThat(lagret.behandlingId).isEqualTo(behandlingId)
-        assertThat(lagret.type).isEqualTo(VilkårType.FLYTTING)
+        assertThat(lagret.type).isEqualTo(VilkårType.FLYTTING_TSO)
         assertThat(lagret.fom).isEqualTo(request.flyttedato)
         assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomene())
         assertThat(lagret.status).isEqualTo(resultat.status)

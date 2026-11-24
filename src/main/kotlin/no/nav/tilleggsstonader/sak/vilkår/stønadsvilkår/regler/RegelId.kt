@@ -68,4 +68,5 @@ enum class RegelId(
     FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET("Må bruker flytte i forbindelse med arbeid etter gjennomført tiltak eller utdanning?"),
     MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID("Må bruker flytte fra hjemstedet for å starte i arbeid på et annet sted?"),
     HVORDAN_SKAL_BRUKER_FLYTTE("Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?"),
+    SØKER_FØR_FLYTTING_ER_GJENNOMFØRT("Søker bruker om støtte før flyttingen er gjennomført?"),
 }

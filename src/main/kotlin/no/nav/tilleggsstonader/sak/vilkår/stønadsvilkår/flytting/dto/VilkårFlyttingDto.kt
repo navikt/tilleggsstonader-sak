@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto
 
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import java.time.LocalDate
 
 data class VilkårFlyttingDto(
     val id: VilkårId,
+    val vilkårType: VilkårType,
     val flyttedato: LocalDate,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,

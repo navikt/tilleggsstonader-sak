@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
@@ -571,6 +572,7 @@ class FlyttingBeregningServiceTest {
     ) = VilkårFlytting(
         id = VilkårId.random(),
         behandlingId = behandlingId,
+        vilkårType = VilkårType.FLYTTING_TSO,
         flyttedato = flyttedato,
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,

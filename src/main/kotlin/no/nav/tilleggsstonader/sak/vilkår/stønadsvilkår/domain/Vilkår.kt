@@ -110,7 +110,9 @@ data class Vilkår(
                 // Dette er kun for tester foreløpig
             }
 
-            VilkårType.FLYTTING -> Unit
+            VilkårType.FLYTTING_TSO,
+            VilkårType.FLYTTING_TSR,
+            -> Unit
 
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
@@ -305,9 +307,13 @@ enum class VilkårType(
     ),
 
     // Flytting
-    FLYTTING(
-        "Flytting",
-        listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR),
+    FLYTTING_TSO(
+        "Flytting for TSO",
+        listOf(Stønadstype.FLYTTING_TSO),
+    ),
+    FLYTTING_TSR(
+        "Flytting for TSR",
+        listOf(Stønadstype.FLYTTING_TSR),
     ),
     ;
 

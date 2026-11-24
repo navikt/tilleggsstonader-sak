@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
@@ -68,6 +69,7 @@ class FlyttingVilkårServiceTest {
     private val eksisterendeVilkår =
         VilkårFlytting(
             behandlingId = BehandlingId.random(),
+            vilkårType = VilkårType.FLYTTING_TSO,
             flyttedato = 1 januar 2026,
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             status = VilkårStatus.NY,
@@ -96,6 +98,34 @@ class FlyttingVilkårServiceTest {
         assertThat(resultat.flyttedato).isEqualTo(nyttVilkår.flyttedato)
         assertThat(resultat.fakta.adresse).isEqualTo(nyttVilkår.fakta.adresse)
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal bruke eget regelsett for flytting TSR`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSR))
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        every { vilkårRepository.findByBehandlingId(behandling.id) } returns emptyList()
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val resultat =
+            flyttingVilkårService.opprettVilkår(
+                behandlingId = behandling.id,
+                innsendt =
+                    nyttVilkår.copy(
+                        svar =
+                            mapOf(
+                                RegelId.HAR_UTGIFTER_TIL_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
+                                RegelId.SØKER_FØR_FLYTTING_ER_GJENNOMFØRT to
+                                    SvarOgBegrunnelse(SvarId.NEI, begrunnelse = "Har allerede flyttet"),
+                            ),
+                    ),
+            )
+
+        assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertThat(resultat.delvilkårsett.flatMap { it.vurderinger }.map { it.regelId })
+            .doesNotContain(RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER)
     }
 
     @Test

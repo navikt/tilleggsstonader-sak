@@ -24,9 +24,10 @@ class MålgruppeTypeTest {
                 Stønadstype.DAGLIG_REISE_TSR,
                 Stønadstype.REISE_TIL_SAMLING_TSR,
                 Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-                Stønadstype.FLYTTING_TSR,
             ),
         ).allMatch { MålgruppeType.UNGDOMSPROGRAMMET.kanBrukesForStønad(it) }
+
+        assertThat(MålgruppeType.UNGDOMSPROGRAMMET.kanBrukesForStønad(Stønadstype.FLYTTING_TSR)).isFalse
 
         assertThat(MålgruppeType.UNGDOMSPROGRAMMET.kanBrukesForStønad(Stønadstype.BARNETILSYN)).isFalse
         assertThat(MålgruppeType.UNGDOMSPROGRAMMET.kanBrukesForStønad(Stønadstype.REISE_TIL_SAMLING_TSO)).isFalse

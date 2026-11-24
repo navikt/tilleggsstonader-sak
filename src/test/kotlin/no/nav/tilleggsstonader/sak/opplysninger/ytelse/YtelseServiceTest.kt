@@ -127,16 +127,7 @@ class YtelseServiceTest {
             listOf(
                 Arguments.of(
                     Stønadstype.FLYTTING_TSR,
-                    listOf(
-                        TypeYtelsePeriode.AAP,
-                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                        TypeYtelsePeriode.OMSTILLINGSSTØNAD,
-                        TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
-                        TypeYtelsePeriode.TILTAKSPENGER_ARENA,
-                        TypeYtelsePeriode.DAGPENGER,
-                        TypeYtelsePeriode.AKTIVITETSPENGER,
-                        TypeYtelsePeriode.ARBEIDSSØKER,
-                    ),
+                    listOf(TypeYtelsePeriode.ARBEIDSSØKER),
                 ),
                 Arguments.of(
                     Stønadstype.FLYTTING_TSO,

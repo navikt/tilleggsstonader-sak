@@ -18,45 +18,10 @@ data object IngenMålgruppeFlyttingTsr : MålgruppeFlyttingTsr {
     override val fakta: IngenFakta = IngenFakta
 }
 
-data class DagpengerFlyttingTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
-) : MålgruppeFlyttingTsr {
-    override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.DAGPENGER_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-}
-
 data class ArbeidssøkerFlyttingTsr(
     override val vurderinger: IngenVurderinger = IngenVurderinger,
 ) : MålgruppeFlyttingTsr {
     override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.ARBEIDSSØKER_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data class TiltakspengerFlyttingTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
-) : MålgruppeFlyttingTsr {
-    override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.TILTAKSPENGER_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data class UngdomsprogrammetFlyttingTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
-) : MålgruppeFlyttingTsr {
-    override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.UNGDOMSPROGRAMMET_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data class KvalifiseringsstønadFlyttingTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
-) : MålgruppeFlyttingTsr {
-    override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.KVALIFISERINGSSTØNAD_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data class InnsattIFengselFlyttingTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
-) : MålgruppeFlyttingTsr {
-    override val type: MålgruppeFlyttingTsrType = MålgruppeFlyttingTsrType.INNSATT_I_FENGSEL_FLYTTING_TSR
     override val fakta: IngenFakta = IngenFakta
 }
 
@@ -67,10 +32,5 @@ enum class MålgruppeFlyttingTsrType(
 ) : TypeMålgruppeOgVurdering,
     TypeFaktaOgVurderingFlyttingTsr {
     INGEN_MÅLGRUPPE_FLYTTING_TSR(MålgruppeType.INGEN_MÅLGRUPPE),
-    DAGPENGER_FLYTTING_TSR(MålgruppeType.DAGPENGER),
     ARBEIDSSØKER_FLYTTING_TSR(MålgruppeType.ARBEIDSSØKER),
-    TILTAKSPENGER_FLYTTING_TSR(MålgruppeType.TILTAKSPENGER),
-    UNGDOMSPROGRAMMET_FLYTTING_TSR(MålgruppeType.UNGDOMSPROGRAMMET),
-    KVALIFISERINGSSTØNAD_FLYTTING_TSR(MålgruppeType.KVALIFISERINGSSTØNAD),
-    INNSATT_I_FENGSEL_FLYTTING_TSR(MålgruppeType.INNSATT_I_FENGSEL),
 }

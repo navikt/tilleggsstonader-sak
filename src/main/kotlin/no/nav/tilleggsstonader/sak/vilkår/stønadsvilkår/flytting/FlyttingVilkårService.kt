@@ -15,18 +15,19 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResulta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.flyttingRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.vilkårTypeFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.vilkårTyperFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -44,7 +45,7 @@ class FlyttingVilkårService(
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårFlytting> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
-            .filter { it.type == VilkårType.FLYTTING }
+            .filter { it.type in vilkårTyperFlytting }
             .map { it.mapTilVilkårFlytting() }
             .sortedBy { it.flyttedato }
 
@@ -60,7 +61,7 @@ class FlyttingVilkårService(
         validerBehandling(behandling)
         validerFaktaOgSvar(innsendt)
         validerMålgruppeOgFlyttesvar(behandlingId, innsendt)
-        val vilkår = byggVilkår(behandlingId, innsendt)
+        val vilkår = byggVilkår(behandling, innsendt)
         validerIngenOverlapp(behandlingId, vilkår)
         return vilkårRepository.insert(vilkår.mapTilVilkår()).mapTilVilkårFlytting()
     }
@@ -77,7 +78,7 @@ class FlyttingVilkårService(
         validerMålgruppeOgFlyttesvar(behandlingId, innsendt)
         val eksisterende = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårFlytting()
         validerEierskapOgStatus(eksisterende, behandlingId)
-        val oppdatert = byggVilkår(behandlingId, innsendt, eksisterende)
+        val oppdatert = byggVilkår(behandling, innsendt, eksisterende)
         validerIngenOverlapp(behandlingId, oppdatert, vilkårId)
         return vilkårRepository.update(oppdatert.mapTilVilkår()).mapTilVilkårFlytting()
     }
@@ -97,13 +98,14 @@ class FlyttingVilkårService(
         )
 
     private fun byggVilkår(
-        behandlingId: BehandlingId,
+        behandling: Saksbehandling,
         innsendt: LagreVilkårFlytting,
         eksisterende: VilkårFlytting? = null,
     ): VilkårFlytting {
+        val behandlingId = behandling.id
         val delvilkår =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = FlyttingRegel(),
+                vilkårsregel = flyttingRegel(behandling.stønadstype),
                 svar = innsendt.svar.mapValues { it.value },
             )
         val fakta = innsendt.fakta
@@ -122,6 +124,7 @@ class FlyttingVilkårService(
             fakta = fakta,
         ) ?: VilkårFlytting(
             behandlingId = behandlingId,
+            vilkårType = vilkårTypeFlytting(behandling.stønadstype),
             resultat = samletResultat,
             status = VilkårStatus.NY,
             flyttedato = innsendt.flyttedato,
@@ -173,7 +176,7 @@ class FlyttingVilkårService(
             vilkårRepository
                 .findByBehandlingId(behandlingId)
                 .filter {
-                    it.type == VilkårType.FLYTTING &&
+                    it.type in vilkårTyperFlytting &&
                         it.status != VilkårStatus.SLETTET &&
                         it.id != unntattVilkårId
                 }.any { nyttVilkår.flyttedato == it.mapTilVilkårFlytting().flyttedato }

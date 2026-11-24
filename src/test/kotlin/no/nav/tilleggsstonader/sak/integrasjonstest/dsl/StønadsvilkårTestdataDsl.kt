@@ -73,11 +73,12 @@ class StønadsvilkårTestdataDsl {
         flyttedato: LocalDate,
         tilbudPriser: List<Int>,
         erUtgifterDokumentert: Boolean,
+        svar: Map<RegelId, SvarOgBegrunnelseDto> = oppfylteSvarFlyttebyråDto(),
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
                 flyttedato = flyttedato,
-                svar = oppfylteSvarFlyttebyråDto(),
+                svar = svar,
                 fakta =
                     FaktaFlyttebyråDto(
                         tilbud =
@@ -107,11 +108,12 @@ class StønadsvilkårTestdataDsl {
         parkering: Int? = null,
         annet: Int? = null,
         erUtgifterDokumentert: Boolean = true,
+        svar: Map<RegelId, SvarOgBegrunnelseDto> = oppfylteSvarFlytteSelvDto(),
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
                 flyttedato = flyttedato,
-                svar = oppfylteSvarFlytteSelvDto(),
+                svar = svar,
                 fakta =
                     FaktaFlytteSelvDto(
                         dokumenterteUtgifter =

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
@@ -31,7 +32,7 @@ class VilkårFlyttingKall(
         dto: SlettVilkårFlyttingRequestDto,
     ): SlettVilkårFlyttingResultatDto = apiRespons.slettVilkår(behandlingId, vilkårId, dto).expectOkWithBody()
 
-    fun regler(): RegelstrukturDto = apiRespons.regler().expectOkWithBody()
+    fun regler(stønadstype: Stønadstype): RegelstrukturDto = apiRespons.regler(stønadstype).expectOkWithBody()
 
     val apiRespons = VilkårFlyttingApi()
 
@@ -55,6 +56,6 @@ class VilkårFlyttingKall(
             dto: SlettVilkårFlyttingRequestDto,
         ) = testklient.delete("/api/vilkar/flytting/$behandlingId/$vilkårId", dto)
 
-        fun regler() = testklient.get("/api/vilkar/flytting/regler")
+        fun regler(stønadstype: Stønadstype) = testklient.get("/api/vilkar/flytting/regler?stonadstype=$stønadstype")
     }
 }

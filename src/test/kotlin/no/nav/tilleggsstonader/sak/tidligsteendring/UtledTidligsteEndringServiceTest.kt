@@ -281,7 +281,7 @@ class UtledTidligsteEndringServiceTest {
             vilkår(
                 fom = fom,
                 tom = tom,
-                type = VilkårType.FLYTTING,
+                type = VilkårType.FLYTTING_TSO,
                 resultat = Vilkårsresultat.OPPFYLT,
                 fakta = fakta,
             )
@@ -340,7 +340,7 @@ class UtledTidligsteEndringServiceTest {
                 "Syntetisk adresse",
                 dokumenterteUtgifter = DokumenterteUtgifter(SvarJaNei.JA, "Kvittering fra flyttebyrå"),
             )
-        val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING, fakta = fakta)
+        val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING_TSO, fakta = fakta)
         val utleder =
             TidligsteEndringIBehandlingUtleder(
                 vilkår = listOf(original),
