@@ -50,14 +50,13 @@ class FlyttingBeregningService(
         )
 
         val oppfylteVilkår = flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id)
+        val relevanteVilkår =
+            oppfylteVilkår
+                .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
 
         val resultater =
             when (omfang) {
                 Beregningsomfang.ALLE_PERIODER -> {
-                    val relevanteVilkår =
-                        oppfylteVilkår
-                            .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
-
                     if (oppfylteVilkår.isNotEmpty() && relevanteVilkår.isEmpty()) {
                         brukerfeil("Det er ikke lagt inn noen oppfylte utgiftsperioder")
                     }
@@ -65,9 +64,7 @@ class FlyttingBeregningService(
                 }
                 Beregningsomfang.FRA_DATO -> {
                     val nyeBeregningsresultat =
-                        oppfylteVilkår
-                            .filter { vilkår -> vedtaksperioder.any { it.inneholder(vilkår.flyttedato) } }
-                            .map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
+                        relevanteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
                     val forrigeBeregningsresultat = hentForrigeIverksatteVedtak(behandling).beregningsresultat.resultater
                     val beregnFraDato = beregningsplan.beregnFra() ?: feil("Forventer beregn-fra dato")
                     slåSammenNyeOgGamleBeregningsresultatFraDato(forrigeBeregningsresultat, nyeBeregningsresultat, beregnFraDato)
