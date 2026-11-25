@@ -53,13 +53,13 @@ class BehandlingOppsummeringService(
             vilkår.filter { tomLikEllerEtterDatoForTidligsteEndring(tidligsteEndring = tidligsteEndring, tom = it.tom) }
 
         val relevanteVilkårMedPeriode = relevanteVilkårIRevurdering.filter { it.fom != null && it.tom != null }
-        val (barneVilkår, vilkårUtenForelder) = relevanteVilkårMedPeriode.partition { it.parentVilkår != null }
-        val barnPerParent = barneVilkår.groupBy { it.parentVilkår!! }
+        val (childVilkår, vilkårUtenParent) = relevanteVilkårMedPeriode.partition { it.parentVilkår != null }
+        val childVilkårPerParent = childVilkår.groupBy { it.parentVilkår }
 
         // Lager en map per type slik at sammenhendende vilkår kan slås sammen ved like verdier
         // Grupperes også på barnId slik at PASS_BARN vilkår ikke slås sammen på tvers av barn.
         val mapPerTypeOgBarnId =
-            vilkårUtenForelder
+            vilkårUtenParent
                 .groupBy { it.type to it.barnId }
 
         return mapPerTypeOgBarnId.map {
@@ -69,7 +69,9 @@ class BehandlingOppsummeringService(
                 vilkår =
                     it.value
                         .slåSammenSammenhengende()
-                        .map { vilkår -> vilkår.tilOppsummertVilkår(barnPerParent[vilkår.globalId].orEmpty()) },
+                        .map { vilkår ->
+                            vilkår.tilOppsummertVilkår(childVilkår = childVilkårPerParent[vilkår.globalId].orEmpty())
+                        },
             )
         }
     }
