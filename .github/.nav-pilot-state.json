@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.11.22-213601-500cc6a",
-  "source_sha": "c9a073f63ddcf5a7378f856223f64bf92285176a",
+  "version": "2026.11.24-172607-3910d46",
+  "source_sha": "d19dcf129be6e8e026ee15296ba413c8d3603fb1",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -135,7 +135,8 @@
     },
     {
       "path": ".github/instructions/output-style.instructions.md",
-      "hash": "919ebcfd22f06b2e"
+      "hash": "cd7eac017f0d4d2a",
+      "revision": "d19dcf129be6e8e026ee15296ba413c8d3603fb1"
     },
     {
       "path": ".github/instructions/performance.instructions.md",
@@ -234,8 +235,8 @@
     },
     {
       "path": ".github/skills/klarsprak/",
-      "hash": "0c29527df9da7db7",
-      "revision": "4367eed5851934ae958123e4710cc79c2e7b76db"
+      "hash": "9f7800ba6bd013c1",
+      "revision": "d19dcf129be6e8e026ee15296ba413c8d3603fb1"
     },
     {
       "path": ".github/skills/kotlin-app-config/",
