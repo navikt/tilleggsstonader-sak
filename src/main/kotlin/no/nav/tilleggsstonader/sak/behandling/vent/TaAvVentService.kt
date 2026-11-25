@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.NullstillBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Ja.PåkrevdHandling
@@ -61,6 +63,11 @@ class TaAvVentService(
                     PåkrevdHandling.Ingen -> Unit
                     PåkrevdHandling.MåHåndtereNyttVedtakPåFagsaken ->
                         håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(oppdatertBehandling)
+                    PåkrevdHandling.MåOppdatereBehandlingstype ->
+                        behandlingService.oppdaterReferanseTilForrigeIverksatteBehandlingOgOppdaterType(
+                            oppdatertBehandling,
+                            oppdatertBehandling.forrigeIverksatteBehandlingId,
+                        )
                 }
             }
         }
@@ -98,20 +105,21 @@ class TaAvVentService(
             return KanTaAvVent.Nei(årsak = Årsak.AnnenAktivBehandlingPåFagsaken)
         }
 
-        return if (detHarBlittFattetVedtakPåFagsakenIMellomtiden(behandling)) {
-            KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.MåHåndtereNyttVedtakPåFagsaken)
-        } else {
-            KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.Ingen)
+        val sisteIverksatteBehandlingId = behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)?.id
+        return when {
+            sisteIverksatteBehandlingId != behandling.forrigeIverksatteBehandlingId ->
+                KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.MåHåndtereNyttVedtakPåFagsaken)
+            måOppdatereBehandlingstype(behandling) ->
+                KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.MåOppdatereBehandlingstype)
+            else -> KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.Ingen)
         }
     }
 
     /**
-     * Dersom behandling A har ligger på vent, og en annen behandling på fagsaken har fått et vedtak i mellomtiden, så
-     * må behandling A nullstilles før den kan settes av vent, ettersom både vilkår og annen historikk kan ha endret
-     * seg.
+     * Endret iverksettingsreferanse krever nullstilling og gjenbruk av oppdatert grunnlag.
+     * Et førstegangsavslag uten endret referanse krever bare typeendring, som håndteres separat.
      *
-     * For tilsyn barn må vi også sørge for at barna fra forrige behandling blir med over i den nullstilte behandlingen, ellers blir det
-     * kluss når stønadsvilkårene gjenbrukes.
+     * For tilsyn barn må også manglende barn fra forrige behandling kopieres når stønadsvilkårene gjenbrukes.
      */
     private fun håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(behandlingSomTasAvVent: Behandling) {
         val sisteIverksatteBehandlingId = behandlingService.finnSisteIverksatteBehandling(behandlingSomTasAvVent.fagsakId)
@@ -159,16 +167,18 @@ class TaAvVentService(
             .filter { it.id != behandling.id }
             .any { it.erAktiv() }
 
-    private fun detHarBlittFattetVedtakPåFagsakenIMellomtiden(behandling: Behandling): Boolean {
-        val sisteVedtakstidspunktPåFagsaken =
-            behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(behandling.fagsakId)?.vedtakstidspunkt
-                ?: return false
-        val tidspunktBehandlingenSistBleSattPåVent = hentAktivSettPåVent(behandling.id).sporbar.opprettetTid
-        return sisteVedtakstidspunktPåFagsaken.isAfter(tidspunktBehandlingenSistBleSattPåVent)
-    }
+    private fun måOppdatereBehandlingstype(behandling: Behandling): Boolean {
+        if (behandling.type != BehandlingType.FØRSTEGANGSBEHANDLING) {
+            return false
+        }
 
-    private fun hentAktivSettPåVent(behandlingId: BehandlingId) =
-        finnAktivSettPåVent(behandlingId) ?: error("Finner ikke settPåVent for behandling=$behandlingId")
+        return behandlingService.hentBehandlinger(behandling.fagsakId).any {
+            it.id != behandling.id &&
+                it.type == BehandlingType.FØRSTEGANGSBEHANDLING &&
+                it.status == BehandlingStatus.FERDIGSTILT &&
+                it.resultat == BehandlingResultat.AVSLÅTT
+        }
+    }
 
     private fun finnAktivSettPåVent(behandlingId: BehandlingId) = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
 }
@@ -181,6 +191,8 @@ sealed class KanTaAvVent {
             data object Ingen : PåkrevdHandling()
 
             data object MåHåndtereNyttVedtakPåFagsaken : PåkrevdHandling()
+
+            data object MåOppdatereBehandlingstype : PåkrevdHandling()
         }
     }
 

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -13,6 +14,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -73,6 +76,21 @@ class SettPåVentControllerTest : CleanDatabaseIntegrationTest() {
 
             val res = medBrukercontext(bruker = dummySaksbehandler) { kall.settPaVent.kanTaAvVent(behandling.id) }
             assertThat(res).isEqualTo(KanTaAvVentDto(resultat = KanTaAvVentStatus.MÅ_NULLSTILLE_BEHANDLING))
+        }
+
+        @Test
+        fun `returnerer OK til frontend for førstegangsbehandling etter avslag`() {
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.AVSLÅTT,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    vedtakstidspunkt = LocalDateTime.now().plusDays(1),
+                ),
+            )
+
+            val res = medBrukercontext(bruker = dummySaksbehandler) { kall.settPaVent.kanTaAvVent(behandling.id) }
+            assertThat(res).isEqualTo(KanTaAvVentDto(resultat = KanTaAvVentStatus.OK))
         }
 
         @Test
