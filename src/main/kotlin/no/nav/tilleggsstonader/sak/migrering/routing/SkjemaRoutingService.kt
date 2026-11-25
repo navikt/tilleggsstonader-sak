@@ -70,8 +70,8 @@ class SkjemaRoutingService(
                     sendBrukerUtenGradertAdresseTilNyLøsning(ident)
                 }
 
-                is RoutingStrategi.FlyttingOgROAH -> {
-                    skalBrukerRoutesTilNyLøsningFlyttingOgROAH(ident, skjematype, routingStrategi)
+                is RoutingStrategi.ROAH -> {
+                    skalBrukerRoutesTilNyLøsningROAH(ident, skjematype, routingStrategi)
                 }
             }.also { loggRoutingResultatet(skjematype, it) }
         }
@@ -117,10 +117,10 @@ class SkjemaRoutingService(
         return SkjemaRoutingAksjon.NY_LØSNING
     }
 
-    private fun skalBrukerRoutesTilNyLøsningFlyttingOgROAH(
+    private fun skalBrukerRoutesTilNyLøsningROAH(
         ident: String,
         skjematype: Skjematype,
-        kontekst: RoutingStrategi.FlyttingOgROAH,
+        kontekst: RoutingStrategi.ROAH,
     ): SkjemaRoutingAksjon {
         if (!unleashService.isEnabled(kontekst.featureToggle)) {
             return SkjemaRoutingAksjon.GAMMEL_LØSNING

@@ -303,7 +303,7 @@ class SkjemaRoutingIntegrationTest(
     }
 
     @Nested
-    inner class FlyttingOgROAH {
+    inner class ROAH {
         @Test
         fun `skal route ROAH til gammel løsning hvis bruker har flere barn og ett har fortrolig adresse`() {
             val skjematype = Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE
@@ -342,7 +342,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal route til gammel løsning hvis toggle er av`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = false)
             mockAktivitetspenger(harAktivitetspenger = true)
@@ -354,7 +354,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal lagre routing og svare ny løsning hvis bruker har aktivitetspenger`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = true)
             mockAktivitetspenger(harAktivitetspenger = true)
@@ -366,7 +366,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal svare avsjekk hvis bruker ikke har aktivitetspenger eller behandling`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = true)
             mockAktivitetspenger(harAktivitetspenger = false)
@@ -378,7 +378,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal svare avsjekk hvis henting av aktivitetspenger feiler`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = true)
             every { ytelseClient.hentYtelser(any()) } returns
@@ -393,7 +393,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal svare avsjekk hvis kallet for å hente aktivitetspenger kaster feil`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = true)
             every { ytelseClient.hentYtelser(any()) } throws RuntimeException("ung-sak er nede")
@@ -404,7 +404,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal ikke svare ny løsning kun fordi routing er lagret tidligere`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = true)
             mockAktivitetspenger(harAktivitetspenger = false)
@@ -418,7 +418,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @ParameterizedTest
-        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
         fun `skal svare ny løsning flere ganger uten å feile på lagring av routing`(skjematype: Skjematype) {
             mockToggle(skjematype, skruddPå = true)
             mockAktivitetspenger(harAktivitetspenger = true)
@@ -429,26 +429,11 @@ class SkjemaRoutingIntegrationTest(
             assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         }
 
-        @Test
-        fun `skal lagre routing og svare ny løsning hvis det finnes en flytting-behandling på personen`() {
-            val skjematype = Skjematype.SØKNAD_FLYTTING
-            mockToggle(skjematype, skruddPå = true)
-            mockAktivitetspenger(harAktivitetspenger = false)
-            val fagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = Stønadstype.FLYTTING_TSO)
-            testoppsettService.lagreFagsak(fagsak)
-            testoppsettService.lagre(behandling = behandling(fagsak), opprettGrunnlagsdata = false)
-
-            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
-
-            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-            assertThat(routingHarBlittLagret(skjematype)).isTrue()
-        }
-
         private fun mockToggle(
             skjematype: Skjematype,
             skruddPå: Boolean,
         ) {
-            val routingStrategi = bestemRoutingStrategi(skjematype) as RoutingStrategi.FlyttingOgROAH
+            val routingStrategi = bestemRoutingStrategi(skjematype) as RoutingStrategi.ROAH
             unleashService.mockIsEnabled(routingStrategi.featureToggle as Toggle, skruddPå)
         }
 
