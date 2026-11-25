@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -31,6 +32,7 @@ data class VilkårDto(
     val delvilkårsett: List<DelvilkårDto> = emptyList(),
     val opphavsvilkår: OpphavsvilkårDto?,
     val slettetKommentar: String?,
+    val boutgifterEnBolig: BoutgifterEnBoligDto? = null,
 )
 
 data class OpphavsvilkårDto(
@@ -94,6 +96,13 @@ fun Vilkår.tilDto() =
                 .map { it.tilDto() },
         opphavsvilkår = this.opphavsvilkår?.let { OpphavsvilkårDto(it.behandlingId, it.vurderingstidspunkt) },
         slettetKommentar = this.slettetKommentar,
+        boutgifterEnBolig =
+            (this.fakta as? FaktaLøpendeUtgifterEnBolig)?.let {
+                BoutgifterEnBoligDto(
+                    utgiftHjemsted = it.utgiftHjemsted,
+                    utgiftAktivitetssted = it.utgiftAktivitetssted,
+                )
+            },
     )
 
 fun DelvilkårDto.svarTilDomene() = this.vurderinger.map { it.tilDomene() }

@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Slett
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.BoutgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
@@ -421,6 +422,7 @@ class OpprettStønadsvilkårDsl {
                 utgift = utgift,
                 erFremtidigUtgift = false,
                 offentligTransport = null,
+                boutgifterEnBolig = BoutgifterEnBoligDto(utgiftHjemsted = 0, utgiftAktivitetssted = utgift),
             )
         }
     }

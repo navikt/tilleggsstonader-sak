@@ -1,10 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
@@ -16,7 +19,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -44,6 +49,7 @@ class VilkårService(
     private val behandlingService: BehandlingService,
     private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
+    private val unleashService: UnleashService,
 ) {
     @Transactional
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): Vilkår {
@@ -78,7 +84,7 @@ class VilkårService(
                 vilkårsregel = relevanteRegler,
                 barnId = opprettVilkårDto.barnId,
             )
-        val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
+        val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto, erNyttVilkår = true)
 
         return vilkårRepository.insert(oppdatertVilkår)
     }
@@ -86,19 +92,70 @@ class VilkårService(
     private fun flettVilkårOgVurderResultat(
         vilkår: Vilkår,
         lagreVilkårDto: LagreVilkårDto,
+        erNyttVilkår: Boolean = false,
     ): Vilkår {
+        val oppdatering = mapTilOppdateringHvisFaktaBoutgifter(vilkår, lagreVilkårDto, erNyttVilkår)
         val vurderingsresultat =
             OppdaterVilkår.validerVilkårOgBeregnResultat(
                 vilkår = vilkår,
-                oppdatering = lagreVilkårDto,
+                oppdatering = oppdatering,
             )
         val oppdatertVilkår =
             OppdaterVilkår.oppdaterVilkår(
                 vilkår = vilkår,
-                oppdatering = lagreVilkårDto,
+                oppdatering = oppdatering,
                 vilkårsresultat = vurderingsresultat,
             )
-        return oppdatertVilkår
+        return oppdatertVilkår.copy(
+            fakta =
+                oppdatering.boutgifterEnBolig?.let {
+                    FaktaLøpendeUtgifterEnBolig(it.utgiftHjemsted, it.utgiftAktivitetssted)
+                } ?: vilkår.fakta,
+        )
+    }
+
+    private fun mapTilOppdateringHvisFaktaBoutgifter(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+        erNyttVilkår: Boolean,
+    ): LagreVilkårDto {
+        val fakta = oppdatering.boutgifterEnBolig
+        if (vilkår.type != VilkårType.LØPENDE_UTGIFTER_EN_BOLIG) {
+            brukerfeilHvis(fakta != null) { "Boligopplysningene kan bare brukes for løpende utgifter til én bolig" }
+            return oppdatering
+        }
+
+        val skalHaFakta =
+            if (erNyttVilkår) {
+                unleashService.isEnabled(Toggle.BOUTGIFTER_EN_BOLIG_MERUTGIFTER_FAKTA)
+            } else {
+                vilkår.fakta is FaktaLøpendeUtgifterEnBolig
+            }
+        if (!skalHaFakta) {
+            feilHvis(fakta != null) {
+                "Vilkåret skal ikke ha fakta"
+            }
+            return oppdatering
+        }
+
+        val bolig = fakta ?: brukerfeil("Du må fylle ut boligutgift på tidligere hjemsted og aktivitetssted")
+        brukerfeilHvis(oppdatering.erFremtidigUtgift == true) {
+            "Løpende utgifter til én bolig kan ikke registreres som fremtidig utgift"
+        }
+        brukerfeilHvis(oppdatering.offentligTransport != null) {
+            "Transportopplysninger kan ikke brukes for løpende utgifter til én bolig"
+        }
+        brukerfeilHvis(bolig.utgiftHjemsted < 0 || bolig.utgiftAktivitetssted < 0) {
+            "Boligutgiftene må være null eller høyere"
+        }
+        val merutgift = maxOf(0, (bolig.utgiftAktivitetssted - bolig.utgiftHjemsted))
+        brukerfeilHvis(oppdatering.utgift != null && oppdatering.utgift != merutgift) {
+            "Merutgiften må tilsvare forskjellen mellom boligutgiftene"
+        }
+        return when (oppdatering) {
+            is OpprettVilkårDto -> oppdatering.copy(utgift = merutgift)
+            is SvarPåVilkårDto -> oppdatering.copy(utgift = merutgift)
+        }
     }
 
     /** Bare disse stønadene sletter vilkår via det felles slette-endepunktet. De andre har egne endepunkter. */
@@ -130,7 +187,7 @@ class VilkårService(
             )
         } else {
             val slettetKommentar = slettVilkårRequest.kommentar
-            require(slettetKommentar != null && slettetKommentar.isNotBlank()) {
+            require(!slettetKommentar.isNullOrBlank()) {
                 "Kommentar er påkrevd for å slettemarkere vilkår"
             }
             val oppdatertVilkår = vilkårRepository.update(vilkår.markerSlettet(slettetKommentar = slettetKommentar))

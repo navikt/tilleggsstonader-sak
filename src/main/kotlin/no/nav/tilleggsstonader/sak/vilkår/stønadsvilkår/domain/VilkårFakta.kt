@@ -16,6 +16,7 @@ import java.time.LocalDate
     property = "type",
 )
 @JsonSubTypes(
+    JsonSubTypes.Type(FaktaLøpendeUtgifterEnBolig::class, name = "LØPENDE_UTGIFTER_EN_BOLIG"),
     JsonSubTypes.Type(FaktaDagligReiseOffentligTransport::class, name = "DAGLIG_REISE_OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DAGLIG_REISE_PRIVAT_BIL"),
     JsonSubTypes.Type(FaktaDagligReiseUbestemt::class, name = "DAGLIG_REISE_UBESTEMT"),
@@ -45,6 +46,11 @@ import java.time.LocalDate
     failOnRepeatedNames = true,
 )
 sealed interface VilkårFakta
+
+data class FaktaLøpendeUtgifterEnBolig(
+    val utgiftHjemsted: Int,
+    val utgiftAktivitetssted: Int,
+) : VilkårFakta
 
 /**
  * Fakta som refererer til en aktivitet. Aktiviteten kan ikke slettes eller settes til ikke oppfylt
@@ -224,6 +230,7 @@ data class FaktaDelperiodePrivatBil(
 }
 
 enum class TypeVilkårFakta {
+    LØPENDE_UTGIFTER_EN_BOLIG,
     FLYTTING_FLYTTEBYRÅ,
     FLYTTING_FLYTTE_SELV,
     FLYTTING_UBESTEMT,

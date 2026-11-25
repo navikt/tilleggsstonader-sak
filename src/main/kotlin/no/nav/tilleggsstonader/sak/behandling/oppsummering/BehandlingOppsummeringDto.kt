@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHPrivatBil
@@ -112,6 +113,7 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         utgift = this.utgift,
         typeFakta =
             when (this.fakta) {
+                is FaktaLøpendeUtgifterEnBolig -> TypeVilkårFakta.LØPENDE_UTGIFTER_EN_BOLIG
                 is FaktaFlyttebyrå -> TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ
                 is FaktaFlytteSelv -> TypeVilkårFakta.FLYTTING_FLYTTE_SELV
                 is FaktaFlyttingUbestemt -> TypeVilkårFakta.FLYTTING_UBESTEMT
