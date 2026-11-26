@@ -47,36 +47,75 @@
         }
       }
     },
-    "ROAH_HJEMREISE_BEHOV_FLERE_REISER": {
-      "erHovedregel": false,
-      "regelId": "ROAH_HJEMREISE_BEHOV_FLERE_REISER",
+    "ROAH_HJEMREISE_HAR_REISER_IGJEN_AV_KVOTE": {
+      "erHovedregel": true,
+      "regelId": "ROAH_HJEMREISE_HAR_REISER_IGJEN_AV_KVOTE",
       "svarMapping": {
-        "NEI": {
-          "begrunnelseType": "PÅKREVD",
-          "regelId": "SLUTT_NODE",
-          "tilhørendeFaktaType": null
-        },
-        "ROAH_HAR_BARN_IKKE_FERDIG_MED_FJERDE_SKOLEÅR": {
+        "JA": {
           "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_INNENFOR_KVOTE"
+        },
+        "NEI": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_UTENFOR_KVOTE"
+        }
+      }
+    },
+    "ROAH_HJEMREISE_SÆRLIG_BEHOV_DOKUMENTERT_INNENFOR_KVOTE": {
+      "erHovedregel": false,
+      "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_DOKUMENTERT_INNENFOR_KVOTE",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
           "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
         },
-        "ROAH_HAR_DOKUMENTERTE_ANDRE_SÆRSKILTE_BEHOV": {
-          "begrunnelseType": "PÅKREVD",
+        "NEI": {
+          "begrunnelseType": "VALGFRI",
           "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
         }
       }
     },
-    "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL": {
-      "erHovedregel": true,
-      "regelId": "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL",
+    "ROAH_HJEMREISE_SÆRLIG_BEHOV_DOKUMENTERT_UTENFOR_KVOTE": {
+      "erHovedregel": false,
+      "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_DOKUMENTERT_UTENFOR_KVOTE",
       "svarMapping": {
         "JA": {
-          "begrunnelseType": "VALGFRI",
+          "begrunnelseType": "PÅKREVD",
           "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
         },
         "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
+    "ROAH_HJEMREISE_SÆRLIG_BEHOV_INNENFOR_KVOTE": {
+      "erHovedregel": false,
+      "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_INNENFOR_KVOTE",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_DOKUMENTERT_INNENFOR_KVOTE"
+        },
+        "NEI": {
           "begrunnelseType": "VALGFRI",
-          "regelId": "ROAH_HJEMREISE_BEHOV_FLERE_REISER"
+          "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
+        }
+      }
+    },
+    "ROAH_HJEMREISE_SÆRLIG_BEHOV_UTENFOR_KVOTE": {
+      "erHovedregel": false,
+      "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_UTENFOR_KVOTE",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ROAH_HJEMREISE_SÆRLIG_BEHOV_DOKUMENTERT_UTENFOR_KVOTE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
