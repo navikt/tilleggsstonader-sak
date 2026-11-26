@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -14,10 +15,16 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.opphørVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHMidlertidigBosted
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAHUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -82,6 +89,75 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].barnId).isEqualTo(barn1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(1)
+        }
+
+        @Test
+        fun `skal oppsummere reiser som barn av paraplyvilkåret`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+            val parentVilkår = VilkårGlobalId.random()
+            val typeReiseformål = TypeReiseformål.entries.first()
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_MIDLERTIDIG_BOSTED_PERIODE,
+                        fom = 1 januar 2025,
+                        tom = 31 januar 2025,
+                    ).copy(
+                        globalId = parentVilkår,
+                        fakta =
+                            FaktaROAHMidlertidigBosted(
+                                aktivitetId = VilkårperiodeGlobalId.random(),
+                                fraAdresse = "Adresse fra",
+                                tilAdresse = "Adresse til",
+                            ),
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                        fom = 1 januar 2025,
+                        tom = 15 januar 2025,
+                    ).copy(
+                        globalId = VilkårGlobalId.random(),
+                        parentVilkår = parentVilkår,
+                        fakta =
+                            FaktaROAHUbestemt(
+                                reiseId = ReiseId.random(),
+                                aktivitetId = VilkårperiodeGlobalId.random(),
+                                typeReiseformål = typeReiseformål,
+                            ),
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.ROAH_OPPSTART_AVSLUTNING,
+                        fom = 16 januar 2025,
+                        tom = 31 januar 2025,
+                    ).copy(
+                        globalId = VilkårGlobalId.random(),
+                        parentVilkår = parentVilkår,
+                        fakta =
+                            FaktaROAHUbestemt(
+                                reiseId = ReiseId.random(),
+                                aktivitetId = VilkårperiodeGlobalId.random(),
+                                typeReiseformål = typeReiseformål,
+                            ),
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            assertThat(oppsummering.vilkår).hasSize(1)
+            val oppsummertParaplyvilkår =
+                oppsummering.vilkår
+                    .single()
+                    .vilkår
+                    .single()
+            val oppsummerteReiser = oppsummertParaplyvilkår.undervilkår
+
+            assertThat(oppsummerteReiser).hasSize(2)
+            assertThat(oppsummerteReiser.map { it.fom }).containsExactly(1 januar 2025, 16 januar 2025)
+            assertThat(oppsummerteReiser.map { it.typeReiseformål }).containsOnly(typeReiseformål)
         }
     }
 

@@ -21,10 +21,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilS
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ROAHReiseVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -102,15 +104,19 @@ data class OppsummertVilkår(
     val resultat: Vilkårsresultat,
     val utgift: Int?,
     val typeFakta: TypeVilkårFakta?,
+    val typeReiseformål: TypeReiseformål?,
+    val undervilkår: List<OppsummertVilkår>,
 )
 
-fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
+fun Vilkår.tilOppsummertVilkår(undervilkår: List<Vilkår> = emptyList()): OppsummertVilkår =
     OppsummertVilkår(
         id = this.id,
         fom = this.fom,
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
+        typeReiseformål = (this.fakta as? ROAHReiseVilkårFakta)?.typeReiseformål,
+        undervilkår = undervilkår.sortedBy { it.fom }.map { it.tilOppsummertVilkår() },
         typeFakta =
             when (this.fakta) {
                 is FaktaLøpendeUtgifterEnBolig -> TypeVilkårFakta.LØPENDE_UTGIFTER_EN_BOLIG
