@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.11.24-172607-3910d46",
-  "source_sha": "d19dcf129be6e8e026ee15296ba413c8d3603fb1",
+  "version": "2026.11.26-005613-670bcd9",
+  "source_sha": "670bcd9a64fd02328a9e5e631da5c7cb198ddf92",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -248,8 +248,8 @@
     },
     {
       "path": ".github/skills/mcp-server-authoring/",
-      "hash": "4ec45295bc50f87f",
-      "revision": "c9a073f63ddcf5a7378f856223f64bf92285176a"
+      "hash": "8b05d3e8aa2e35b7",
+      "revision": "670bcd9a64fd02328a9e5e631da5c7cb198ddf92"
     },
     {
       "path": ".github/skills/nais/",
