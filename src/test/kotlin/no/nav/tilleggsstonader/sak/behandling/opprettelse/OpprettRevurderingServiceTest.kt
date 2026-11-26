@@ -97,16 +97,18 @@ class OpprettRevurderingServiceTest {
     fun `manuell behandling settes på vent hvis det finnes en åpen vanlig behandling`() {
         val fagsakId = FagsakId.random()
         every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
-        every { behandlingService.hentBehandlinger(fagsakId) } returns listOf(
-            behandling(status = BehandlingStatus.OPPRETTET)
-        )
-
-        val resultat = service.opprettRevurdering(
-            opprettRevurdering(fagsakId = fagsakId).copy(
-                behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
-                skalTillateFlereÅpneBehandlinger = false
+        every { behandlingService.hentBehandlinger(fagsakId) } returns
+            listOf(
+                behandling(status = BehandlingStatus.OPPRETTET),
             )
-        )
+
+        val resultat =
+            service.opprettRevurdering(
+                opprettRevurdering(fagsakId = fagsakId).copy(
+                    behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
+                    skalTillateFlereÅpneBehandlinger = false,
+                ),
+            )
 
         assertThat(resultat).isEqualTo(OpprettRevurderingResultat.ÅpneBehandlingerFunnet)
         verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
@@ -116,18 +118,20 @@ class OpprettRevurderingServiceTest {
     fun `manuell behandling settes på vent hvis det finnes en åpen kjøreliste behandling`() {
         val fagsakId = FagsakId.random()
         every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
-        every { fagsakService.hentFagsak(fagsakId) } returns fagsak(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            id = fagsakId,
-        )
+        every { fagsakService.hentFagsak(fagsakId) } returns
+            fagsak(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                id = fagsakId,
+            )
         every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
-        val resultat = service.opprettRevurdering(
-            opprettRevurdering(fagsakId = fagsakId).copy(
-                behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
-                skalTillateFlereÅpneBehandlinger = false
+        val resultat =
+            service.opprettRevurdering(
+                opprettRevurdering(fagsakId = fagsakId).copy(
+                    behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
+                    skalTillateFlereÅpneBehandlinger = false,
+                ),
             )
-        )
 
         assertThat(resultat).isEqualTo(OpprettRevurderingResultat.ÅpneBehandlingerFunnet)
         verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
