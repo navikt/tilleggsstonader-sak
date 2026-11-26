@@ -20,8 +20,6 @@ enum class Toggle(
 
     KAN_AUTOMATISK_BEHANDLE_KJØRELISTE("sak.automatisk-behandling-kjoreliste"),
 
-    SØKNAD_ROUTING_FLYTTING("sak.soknad-routing.flytting"),
-
     SØKNAD_ROUTING_ROAH(
         "sak.soknad-routing.reise-oppstart-avslutning-hjemreise",
     ),
