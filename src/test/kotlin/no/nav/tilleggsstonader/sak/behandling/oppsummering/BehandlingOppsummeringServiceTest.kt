@@ -153,7 +153,7 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
                     .single()
                     .vilkår
                     .single()
-            val oppsummerteReiser = oppsummertParaplyvilkår.childVilkår
+            val oppsummerteReiser = oppsummertParaplyvilkår.undervilkår
 
             assertThat(oppsummerteReiser).hasSize(2)
             assertThat(oppsummerteReiser.map { it.fom }).containsExactly(1 januar 2025, 16 januar 2025)

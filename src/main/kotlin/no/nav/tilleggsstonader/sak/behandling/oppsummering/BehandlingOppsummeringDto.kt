@@ -104,10 +104,10 @@ data class OppsummertVilkår(
     val utgift: Int?,
     val typeFakta: TypeVilkårFakta?,
     val typeReiseformål: TypeReiseformål?,
-    val childVilkår: List<OppsummertVilkår>,
+    val undervilkår: List<OppsummertVilkår>,
 )
 
-fun Vilkår.tilOppsummertVilkår(childVilkår: List<Vilkår> = emptyList()): OppsummertVilkår =
+fun Vilkår.tilOppsummertVilkår(undervilkår: List<Vilkår> = emptyList()): OppsummertVilkår =
     OppsummertVilkår(
         id = this.id,
         fom = this.fom,
@@ -115,7 +115,7 @@ fun Vilkår.tilOppsummertVilkår(childVilkår: List<Vilkår> = emptyList()): Opp
         resultat = this.resultat,
         utgift = this.utgift,
         typeReiseformål = (this.fakta as? ROAHReiseVilkårFakta)?.typeReiseformål,
-        childVilkår = childVilkår.sortedBy { it.fom }.map { it.tilOppsummertVilkår() },
+        undervilkår = undervilkår.sortedBy { it.fom }.map { it.tilOppsummertVilkår() },
         typeFakta =
             when (this.fakta) {
                 is FaktaFlyttebyrå -> TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ
