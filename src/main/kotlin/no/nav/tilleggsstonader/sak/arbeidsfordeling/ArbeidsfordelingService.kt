@@ -34,6 +34,7 @@ class ArbeidsfordelingService(
     companion object {
         const val MASKINELL_JOURNALFOERENDE_ENHET = "9999"
         const val GEOGRAFISK_TILKNYTTING_OSLO = "0301"
+        const val GEOGRAFISK_TILKNYTTING_UTLAND = "UTLAND"
     }
 
     fun hentNavEnhetId(
@@ -128,7 +129,7 @@ class ArbeidsfordelingService(
             when (it.gtType) {
                 GeografiskTilknytningType.BYDEL -> it.gtBydel
                 GeografiskTilknytningType.KOMMUNE -> it.gtKommune
-                GeografiskTilknytningType.UTLAND,
+                GeografiskTilknytningType.UTLAND -> GEOGRAFISK_TILKNYTTING_UTLAND
                 GeografiskTilknytningType.UDEFINERT,
                 -> {
                     secureLogger.info("Geografisk tilknytting=${it.gtType}")
