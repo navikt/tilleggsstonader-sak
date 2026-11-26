@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class OpprettRevurderingServiceTest {
@@ -68,15 +67,13 @@ class OpprettRevurderingServiceTest {
             )
         every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
-        assertThatThrownBy {
-            service.opprettRevurdering(
-                opprettRevurdering(
-                    fagsakId = fagsakId,
-                ),
-            )
-        }.hasMessageContaining("Det finnes en åpen kjørelistebehandling")
+        service.opprettRevurdering(
+            opprettRevurdering(
+                fagsakId = fagsakId,
+            ),
+        )
 
-        verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
+        verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
     }
 
     @Test
@@ -94,6 +91,54 @@ class OpprettRevurderingServiceTest {
 
         verify(exactly = 0) { behandlingService.harÅpenKjørelisteBehandling(any()) }
         verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
+    }
+
+    @Test
+    fun `manuell behandling settes på vent hvis det finnes en åpen vanlig behandling`() {
+        val fagsakId = FagsakId.random()
+        every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
+        every { behandlingService.hentBehandlinger(fagsakId) } returns
+            listOf(
+                behandling(status = BehandlingStatus.OPPRETTET),
+            )
+
+        val resultat =
+            service.opprettRevurdering(
+                opprettRevurdering(fagsakId = fagsakId).copy(
+                    behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
+                    skalTillateFlereÅpneBehandlinger = false,
+                ),
+            )
+
+        assertThat(resultat).isEqualTo(OpprettRevurderingResultat.ÅpneBehandlingerFunnet)
+        verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
+    }
+
+    @Test
+    fun `manuell behandling settes på vent hvis det finnes en åpen kjøreliste behandling`() {
+        val fagsakId = FagsakId.random()
+        every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
+        every { fagsakService.hentFagsak(fagsakId) } returns
+            fagsak(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                id = fagsakId,
+            )
+        every { behandlingService.hentBehandlinger(fagsakId) } returns
+            listOf(
+                behandling(status = BehandlingStatus.OPPRETTET),
+            )
+        every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
+
+        val resultat =
+            service.opprettRevurdering(
+                opprettRevurdering(fagsakId = fagsakId).copy(
+                    behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
+                    skalTillateFlereÅpneBehandlinger = false,
+                ),
+            )
+
+        assertThat(resultat).isEqualTo(OpprettRevurderingResultat.ÅpneBehandlingerFunnet)
+        verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
     }
 
     private fun opprettRevurdering(
