@@ -123,6 +123,10 @@ class OpprettRevurderingServiceTest {
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 id = fagsakId,
             )
+        every { behandlingService.hentBehandlinger(fagsakId) } returns
+            listOf(
+                behandling(status = BehandlingStatus.OPPRETTET),
+            )
         every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
         val resultat =
