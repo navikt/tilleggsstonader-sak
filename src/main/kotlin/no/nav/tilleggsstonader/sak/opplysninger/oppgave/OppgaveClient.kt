@@ -104,14 +104,19 @@ class OppgaveClient(
                 uriVariables = uriVariables,
             )
         } catch (e: ProblemDetailException) {
-            if (e.detail.detail?.contains("har ikke tilgang til") == true) {
-                brukerfeil("Bruker har ikke tilgang til enhet", HttpStatus.BAD_REQUEST)
-            } else if (e.detail.detail?.contains("allerede er ferdigstilt") == true) {
-                brukerfeil(
-                    "Oppgaven med id=$oppgaveId er allerede ferdigstilt. Prøv å hente oppgaver på nytt.",
-                    HttpStatus.BAD_REQUEST,
-                )
+            val problemDetail = e.detail.detail
+
+            brukerfeilHvis(
+                e.httpStatus == HttpStatus.FORBIDDEN || problemDetail?.contains("har ikke tilgang til", ignoreCase = true) == true,
+                HttpStatus.FORBIDDEN,
+            ) {
+                "Bruker har ikke tilgang til enhet"
             }
+
+            brukerfeilHvis(problemDetail?.contains("allerede er ferdigstilt", ignoreCase = true) == true) {
+                "Oppgaven med id=$oppgaveId er allerede ferdigstilt. Prøv å hente oppgaver på nytt."
+            }
+
             sjekkOgHåndtertConflict(e)
             throw e
         }
