@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.DrivstoffType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.ArbeidssøkerAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttebyråTilbud
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
@@ -44,6 +45,10 @@ object SøknadFlyttingUtil {
                         HovedytelseAvsnitt(
                             hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
                             arbeidOgOpphold = null,
+                        ),
+                    arbeidssøker =
+                        ArbeidssøkerAvsnitt(
+                            erRegistrertSomArbeidssøker = EnumFelt(label = "", JaNei.NEI, svarTekst = "Nei", emptyList()),
                         ),
                     flyttingDetaljer =
                         FlyttingDetaljerAvsnitt(
