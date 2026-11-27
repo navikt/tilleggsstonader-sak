@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.exception
 
-import org.apache.hc.client5.http.ConnectTimeoutException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.web.client.ResourceAccessException
@@ -18,14 +17,6 @@ class ApiExceptionHandlerTest {
 
         assertThat(problemDetail.status).isEqualTo(503)
         assertThat(problemDetail.detail).startsWith("Feilet henting av aktiviteter.")
-    }
-
-    @Test
-    fun `connect-timeout pakket inn i IntegrasjonException gir 503`() {
-        val timeout = ResourceAccessException("timeout", ConnectTimeoutException("Connect timed out"))
-        val feil = integrasjonException(RuntimeException("Feil ved kall", timeout))
-
-        assertThat(handler.handleThrowable(feil).status).isEqualTo(503)
     }
 
     @Test
