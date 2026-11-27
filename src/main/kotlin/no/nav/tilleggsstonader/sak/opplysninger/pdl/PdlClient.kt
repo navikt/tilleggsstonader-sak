@@ -30,11 +30,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
-/**
- * Ved connect-timeout har forespørselen ikke nådd PDL, så det er trygt å prøve på nytt.
- */
 @Service
-@Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
 class PdlClient(
     @Value("\${clients.pdl.uri}") private val pdlUrl: URI,
     @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
@@ -93,8 +89,11 @@ class PdlClient(
      * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
      * @return liste med personidenter (Folkeregisterident, aktørid eller npid)
      */
+    // Ved connect-timeout har forespørselen ikke nådd PDL, så det er trygt å prøve på nytt.
+    @Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
     fun hentPersonidenterMedSystemContext(ident: String) = hentPersonidenter(ident, restTemplate)
 
+    @Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
     fun hentPersonidenterMedSluttbrukerSinContext(ident: String) = hentPersonidenter(ident, restTemplateTokenX)
 
     private fun hentPersonidenter(

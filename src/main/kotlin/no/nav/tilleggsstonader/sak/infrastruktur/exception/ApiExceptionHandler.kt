@@ -48,9 +48,10 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
 
         val metodeSomFeiler = finnMetodeSomFeiler(throwable)
 
-        if (erTimeout(throwable)) {
+        val mostSpecificCause = throwable.getMostSpecificCause()
+        if (mostSpecificCause is SocketTimeoutException || mostSpecificCause is TimeoutException) {
             secureLogger.warn(
-                "Timeout feil: ${throwable.getMostSpecificCause().message}, $metodeSomFeiler ${rootCause(throwable)}",
+                "Timeout feil: ${mostSpecificCause.message}, $metodeSomFeiler ${rootCause(throwable)}",
                 throwable,
             )
             logger.warn("Timeout feil: $metodeSomFeiler ${rootCause(throwable)} ")
@@ -107,25 +108,15 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(IntegrasjonException::class)
     fun handleThrowable(feil: IntegrasjonException): ProblemDetail {
-        val detail = "Feilet ${feil.hendelse}. Prøv på nytt, og hvis problemet vedvarer kontakt utviklingsteamet."
-        if (erTimeout(feil)) {
-            secureLogger.warn("Timeout feil: ${feil.message}${feil.uri?.let { " uri=$it" }}", feil)
-            logger.warn("Timeout feil: ${feil.message} exception=${rootCause(feil)}")
-            return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, detail)
-        }
         secureLogger.error("${feil.message}${feil.uri?.let { " uri=$it" }}", feil)
         logger.error("${feil.message} exception=${rootCause(feil)}")
+        val detail = "Feilet ${feil.hendelse}. Prøv på nytt, og hvis problemet vedvarer kontakt utviklingsteamet."
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, detail)
-    }
-
-    private fun erTimeout(throwable: Throwable): Boolean {
-        val mostSpecificCause = throwable.getMostSpecificCause()
-        return mostSpecificCause is SocketTimeoutException || mostSpecificCause is TimeoutException
     }
 
     private fun lagTimeoutfeilRessurs(): ProblemDetail =
         ProblemDetail.forStatusAndDetail(
-            HttpStatus.SERVICE_UNAVAILABLE,
+            HttpStatus.INTERNAL_SERVER_ERROR,
             "Kommunikasjonsproblemer med andre systemer - prøv igjen",
         )
 
