@@ -116,7 +116,7 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
 
     private fun lagTimeoutfeilRessurs(): ProblemDetail =
         ProblemDetail.forStatusAndDetail(
-            HttpStatus.INTERNAL_SERVER_ERROR,
+            HttpStatus.SERVICE_UNAVAILABLE,
             "Kommunikasjonsproblemer med andre systemer - prøv igjen",
         )
 

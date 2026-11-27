@@ -21,9 +21,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonRequestVariable
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøkerData
+import org.apache.hc.client5.http.ConnectTimeoutException
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.NestedExceptionUtils
 import org.springframework.stereotype.Service
+import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -100,7 +104,10 @@ class PdlClient(
                 variables = PdlIdentRequestVariables(ident = ident, historikk = true),
                 query = PdlConfig.hentIdentQuery,
             )
-        val pdlResponse = restTemplate.postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse =
+            medEttNyttForsøkVedConnectTimeout {
+                restTemplate.postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
+            }
 
         val pdlIdenter = feilsjekkOgReturnerData(ident, pdlResponse) { it.hentIdenter }
 
@@ -122,3 +129,17 @@ class PdlClient(
         return feilsjekkOgReturnerData(ident, response) { it.hentGeografiskTilknytning }
     }
 }
+
+private val retryLogger = LoggerFactory.getLogger(PdlClient::class.java)
+
+/**
+ * Ved connect-timeout har forespørselen ikke nådd PDL, så det er trygt å prøve på nytt.
+ */
+internal fun <T> medEttNyttForsøkVedConnectTimeout(kall: () -> T): T =
+    try {
+        kall()
+    } catch (e: ResourceAccessException) {
+        if (NestedExceptionUtils.getMostSpecificCause(e) !is ConnectTimeoutException) throw e
+        retryLogger.warn("Connect-timeout mot PDL, prøver på nytt")
+        kall()
+    }
