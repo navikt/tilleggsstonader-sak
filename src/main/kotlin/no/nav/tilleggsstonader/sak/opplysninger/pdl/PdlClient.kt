@@ -22,10 +22,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøkerData
 import org.apache.hc.client5.http.ConnectTimeoutException
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.NestedExceptionUtils
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
@@ -90,8 +89,10 @@ class PdlClient(
      * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
      * @return liste med personidenter (Folkeregisterident, aktørid eller npid)
      */
+    @Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
     fun hentPersonidenterMedSystemContext(ident: String) = hentPersonidenter(ident, restTemplate)
 
+    @Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
     fun hentPersonidenterMedSluttbrukerSinContext(ident: String) = hentPersonidenter(ident, restTemplateTokenX)
 
     private fun hentPersonidenter(
@@ -103,10 +104,7 @@ class PdlClient(
                 variables = PdlIdentRequestVariables(ident = ident, historikk = true),
                 query = PdlConfig.hentIdentQuery,
             )
-        val pdlResponse =
-            medEttNyttForsøkVedConnectTimeout {
-                restTemplate.postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
-            }
+        val pdlResponse = restTemplate.postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
 
         val pdlIdenter = feilsjekkOgReturnerData(ident, pdlResponse) { it.hentIdenter }
 
@@ -128,18 +126,3 @@ class PdlClient(
         return feilsjekkOgReturnerData(ident, response) { it.hentGeografiskTilknytning }
     }
 }
-
-private val retryLogger = LoggerFactory.getLogger(PdlClient::class.java)
-
-/**
- * Ved connect-timeout har forespørselen ikke nådd PDL, så det er trygt å prøve på nytt.
- * postForEntity fra libs pakker ResourceAccessException inn i en RuntimeException, så vi ser på rotårsaken.
- */
-internal fun <T> medEttNyttForsøkVedConnectTimeout(kall: () -> T): T =
-    try {
-        kall()
-    } catch (e: RuntimeException) {
-        if (NestedExceptionUtils.getMostSpecificCause(e) !is ConnectTimeoutException) throw e
-        retryLogger.warn("Connect-timeout mot PDL, prøver på nytt")
-        kall()
-    }

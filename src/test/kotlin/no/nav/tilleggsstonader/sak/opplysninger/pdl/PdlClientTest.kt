@@ -15,9 +15,11 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.support.DefaultListableBeanFactory
 import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
+import org.springframework.resilience.annotation.RetryAnnotationBeanPostProcessor
 import org.springframework.web.client.RestTemplate
 import java.net.URI
 import java.time.LocalDate
@@ -133,10 +135,12 @@ class PdlClientTest {
                     },
                 ).build()
         val pdlClient =
-            PdlClient(
-                URI.create(wiremockServerItem.baseUrl()),
-                restTemplateMedConnectTimeoutFørsteGang,
-                restTemplateMedConnectTimeoutFørsteGang,
+            medRetry(
+                PdlClient(
+                    URI.create(wiremockServerItem.baseUrl()),
+                    restTemplateMedConnectTimeoutFørsteGang,
+                    restTemplateMedConnectTimeoutFørsteGang,
+                ),
             )
 
         val response = pdlClient.hentPersonidenterMedSystemContext("12345")
@@ -187,5 +191,14 @@ class PdlClientTest {
         assertThat(Assertions.catchThrowable { pdlClient.hentBarn(listOf("")) })
             .hasMessageStartingWith("Data er null fra PDL")
             .isInstanceOf(PdlRequestException::class.java)
+    }
+
+    /**
+     * Lager samme proxy som Spring gjør med @EnableResilientMethods, slik at @Retryable virker.
+     */
+    private fun medRetry(pdlClient: PdlClient): PdlClient {
+        val postProcessor = RetryAnnotationBeanPostProcessor()
+        postProcessor.setBeanFactory(DefaultListableBeanFactory())
+        return postProcessor.postProcessAfterInitialization(pdlClient, "pdlClient") as PdlClient
     }
 }
