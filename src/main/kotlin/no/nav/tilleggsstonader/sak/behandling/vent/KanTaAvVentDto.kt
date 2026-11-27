@@ -14,7 +14,9 @@ data class KanTaAvVentDto(
                         is KanTaAvVent.Ja -> {
                             when (kanTaAvVent.påkrevdHandling) {
                                 PåkrevdHandling.MåHåndtereNyttVedtakPåFagsaken -> KanTaAvVentStatus.MÅ_NULLSTILLE_BEHANDLING
-                                PåkrevdHandling.Ingen -> KanTaAvVentStatus.OK
+                                PåkrevdHandling.Ingen,
+                                PåkrevdHandling.MåOppdatereBehandlingstype,
+                                -> KanTaAvVentStatus.OK
                             }
                         }
 

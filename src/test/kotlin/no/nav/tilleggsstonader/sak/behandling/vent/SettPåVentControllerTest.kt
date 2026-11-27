@@ -76,6 +76,21 @@ class SettPåVentControllerTest : CleanDatabaseIntegrationTest() {
         }
 
         @Test
+        fun `returnerer OK til frontend for førstegangsbehandling etter avslag`() {
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.AVSLÅTT,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    vedtakstidspunkt = LocalDateTime.now().plusDays(1),
+                ),
+            )
+
+            val res = medBrukercontext(bruker = dummySaksbehandler) { kall.settPaVent.kanTaAvVent(behandling.id) }
+            assertThat(res).isEqualTo(KanTaAvVentDto(resultat = KanTaAvVentStatus.OK))
+        }
+
+        @Test
         fun `retunerer ANNEN_AKTIV_BEHANDLING_PÅ_FAGSAGKEN når det er annen aktiv behandling på fagsaken`() {
             val aktivBehandling =
                 behandling(fagsak = fagsak, status = BehandlingStatus.UTREDES)

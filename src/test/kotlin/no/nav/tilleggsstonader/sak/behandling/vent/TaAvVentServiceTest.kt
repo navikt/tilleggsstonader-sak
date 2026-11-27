@@ -6,10 +6,12 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaPassAvBarnDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
@@ -18,6 +20,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
@@ -25,6 +28,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -181,7 +186,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal nullstille behandling hvis en annen behandling på fagsaken har blitt iverksatt i mellomtiden`() {
+    fun `skal nullstille ved endret iverksettingsreferanse selv om vedtaket ble fattet før ventetidspunktet`() {
         testWithBrukerContext(dummySaksbehandler) {
             // Lagre informasjon på behandlingen som skal nullstilles
             taAvVentService.taAvVent(behandling.id, TaAvVentDto())
@@ -199,11 +204,22 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
                     fagsak = fagsak,
                     status = BehandlingStatus.UTREDES,
                     resultat = BehandlingResultat.INNVILGET,
-                    vedtakstidspunkt = LocalDateTime.now().plusDays(2),
+                    vedtakstidspunkt = LocalDateTime.now().minusDays(1),
                 )
             testoppsettService.lagre(behandlingSomSniker)
             vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = behandlingSomSniker.id))
-            testoppsettService.ferdigstillBehandling(behandlingSomSniker)
+            testoppsettService.oppdater(behandlingSomSniker.copy(status = BehandlingStatus.IVERKSETTER_VEDTAK))
+
+            assertThat(taAvVentService.kanTaAvVent(behandling.id).resultat)
+                .isEqualTo(KanTaAvVentStatus.ANNEN_AKTIV_BEHANDLING_PÅ_FAGSAKEN)
+            assertThatThrownBy {
+                taAvVentService.taAvVent(behandling.id, TaAvVentDto())
+            }.hasMessageContaining("Det finnes allerede en aktiv behandling på denne fagsaken")
+
+            testoppsettService.oppdater(behandlingSomSniker.copy(status = BehandlingStatus.FERDIGSTILT))
+
+            assertThat(taAvVentService.kanTaAvVent(behandling.id).resultat)
+                .isEqualTo(KanTaAvVentStatus.MÅ_NULLSTILLE_BEHANDLING)
 
             // Ta den første behandlingen av vent og sjekk at den blir nullstilt og får ny forrigeIverksatteBehandlingId
             taAvVentService.taAvVent(behandling.id, TaAvVentDto())
@@ -214,6 +230,115 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
             assertThat(nullstilteVilkår.målgrupper).isEmpty()
             assertThat(nullstilteVilkår.aktiviteter).isNotEmpty()
         }
+    }
+
+    @Test
+    fun `skal gjøre om førstegangsbehandling til revurdering etter avslag uten å nullstille`() {
+        testWithBrukerContext(dummySaksbehandler) {
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeMålgruppe(behandlingId = behandling.id))
+            testoppsettService.oppdater(testoppsettService.hentBehandling(behandling.id).copy(steg = StegType.VILKÅR))
+            settPåVentService.settPåVent(
+                behandling.id,
+                settBehandlingPåVent.copy(
+                    oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                ),
+            )
+
+            val avslåttBehandling =
+                behandling(
+                    fagsak = fagsak,
+                    status = BehandlingStatus.UTREDES,
+                    resultat = BehandlingResultat.AVSLÅTT,
+                    vedtakstidspunkt = LocalDateTime.now().minusDays(1),
+                )
+            testoppsettService.lagre(avslåttBehandling)
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = avslåttBehandling.id))
+            testoppsettService.oppdater(avslåttBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
+
+            val vilkårFør = vilkårperiodeService.hentVilkårperioder(behandling.id)
+            assertThat(taAvVentService.kanTaAvVent(behandling.id).resultat).isEqualTo(KanTaAvVentStatus.OK)
+            assertThat(testoppsettService.hentBehandling(behandling.id).type).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
+
+            val oppdatertBehandling = testoppsettService.hentBehandling(behandling.id)
+            assertThat(oppdatertBehandling.type).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(oppdatertBehandling.forrigeIverksatteBehandlingId).isNull()
+            assertThat(oppdatertBehandling.steg).isEqualTo(StegType.VILKÅR)
+            assertThat(vilkårperiodeService.hentVilkårperioder(behandling.id)).isEqualTo(vilkårFør)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [false, true])
+    fun `skal beholde revurderingens arbeidsdata etter nytt avslag når iverksettingsreferansen er uendret`(
+        harIverksattBehandling: Boolean,
+    ) {
+        testWithBrukerContext(dummySaksbehandler) {
+            val iverksattBehandling =
+                if (harIverksattBehandling) {
+                    testoppsettService.lagre(
+                        behandling(
+                            fagsak = fagsak,
+                            status = BehandlingStatus.FERDIGSTILT,
+                            resultat = BehandlingResultat.INNVILGET,
+                            vedtakstidspunkt = LocalDateTime.now().minusDays(2),
+                        ),
+                    )
+                } else {
+                    null
+                }
+            testoppsettService.oppdater(
+                testoppsettService.hentBehandling(behandling.id).copy(
+                    type = BehandlingType.REVURDERING,
+                    forrigeIverksatteBehandlingId = iverksattBehandling?.id,
+                ),
+            )
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeMålgruppe(behandlingId = behandling.id))
+            testoppsettService.oppdater(testoppsettService.hentBehandling(behandling.id).copy(steg = StegType.VILKÅR))
+            settPåVentService.settPåVent(
+                behandling.id,
+                settBehandlingPåVent.copy(
+                    oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                ),
+            )
+
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    type = BehandlingType.REVURDERING,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    resultat = BehandlingResultat.AVSLÅTT,
+                    forrigeIverksatteBehandlingId = iverksattBehandling?.id,
+                    vedtakstidspunkt = LocalDateTime.now().plusDays(1),
+                ),
+            )
+
+            val vilkårFør = vilkårperiodeService.hentVilkårperioder(behandling.id)
+            assertThat(taAvVentService.kanTaAvVent(behandling.id).resultat).isEqualTo(KanTaAvVentStatus.OK)
+
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
+
+            val oppdatertBehandling = testoppsettService.hentBehandling(behandling.id)
+            assertThat(oppdatertBehandling.type).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(oppdatertBehandling.forrigeIverksatteBehandlingId).isEqualTo(iverksattBehandling?.id)
+            assertThat(oppdatertBehandling.steg).isEqualTo(StegType.VILKÅR)
+            assertThat(vilkårperiodeService.hentVilkårperioder(behandling.id)).isEqualTo(vilkårFør)
+        }
+    }
+
+    @Test
+    fun `skal beholde førstegangsbehandling når en annen førstegangsbehandling er henlagt`() {
+        testoppsettService.lagre(henlagtBehandling(fagsak = fagsak))
+
+        testWithBrukerContext(dummySaksbehandler) {
+            assertThat(taAvVentService.kanTaAvVent(behandling.id).resultat).isEqualTo(KanTaAvVentStatus.OK)
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
+        }
+
+        assertThat(testoppsettService.hentBehandling(behandling.id).type).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
     }
 
     @Test
