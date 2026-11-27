@@ -21,8 +21,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonRequestVariable
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøkerData
+import org.apache.hc.client5.http.ConnectTimeoutException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
@@ -87,8 +89,10 @@ class PdlClient(
      * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
      * @return liste med personidenter (Folkeregisterident, aktørid eller npid)
      */
+    @Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
     fun hentPersonidenterMedSystemContext(ident: String) = hentPersonidenter(ident, restTemplate)
 
+    @Retryable(includes = [ConnectTimeoutException::class], maxRetries = 1, delay = 0)
     fun hentPersonidenterMedSluttbrukerSinContext(ident: String) = hentPersonidenter(ident, restTemplateTokenX)
 
     private fun hentPersonidenter(

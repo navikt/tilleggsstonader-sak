@@ -8,14 +8,18 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
+import org.apache.hc.client5.http.ConnectTimeoutException
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.support.DefaultListableBeanFactory
 import org.springframework.boot.restclient.RestTemplateBuilder
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
+import org.springframework.resilience.annotation.RetryAnnotationBeanPostProcessor
 import org.springframework.web.client.RestTemplate
 import java.net.URI
 import java.time.LocalDate
@@ -114,6 +118,38 @@ class PdlClientTest {
     }
 
     @Test
+    fun `identoppslag prøves på nytt ved connect-timeout`() {
+        wiremockServerItem.stubFor(
+            post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
+                .willReturn(okJson(readFile("pdl/hent_identer.json"))),
+        )
+        var antallKall = 0
+        val restTemplateMedConnectTimeoutFørsteGang =
+            RestTemplateBuilder()
+                .messageConverters(JacksonJsonHttpMessageConverter(jsonMapper))
+                .additionalInterceptors(
+                    ClientHttpRequestInterceptor { request, body, execution ->
+                        antallKall++
+                        if (antallKall == 1) throw ConnectTimeoutException("Connect timed out")
+                        execution.execute(request, body)
+                    },
+                ).build()
+        val pdlClient =
+            medRetry(
+                PdlClient(
+                    URI.create(wiremockServerItem.baseUrl()),
+                    restTemplateMedConnectTimeoutFørsteGang,
+                    restTemplateMedConnectTimeoutFørsteGang,
+                ),
+            )
+
+        val response = pdlClient.hentPersonidenterMedSystemContext("12345")
+
+        assertThat(antallKall).isEqualTo(2)
+        assertThat(response.identer).hasSize(2)
+    }
+
+    @Test
     fun `pdlClient håndterer response for søker-query mot pdl-tjenesten der person i data er null`() {
         wiremockServerItem.stubFor(
             post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
@@ -155,5 +191,14 @@ class PdlClientTest {
         assertThat(Assertions.catchThrowable { pdlClient.hentBarn(listOf("")) })
             .hasMessageStartingWith("Data er null fra PDL")
             .isInstanceOf(PdlRequestException::class.java)
+    }
+
+    /**
+     * Lager samme proxy som Spring gjør med @EnableResilientMethods, slik at @Retryable virker.
+     */
+    private fun medRetry(pdlClient: PdlClient): PdlClient {
+        val postProcessor = RetryAnnotationBeanPostProcessor()
+        postProcessor.setBeanFactory(DefaultListableBeanFactory())
+        return postProcessor.postProcessAfterInitialization(pdlClient, "pdlClient") as PdlClient
     }
 }

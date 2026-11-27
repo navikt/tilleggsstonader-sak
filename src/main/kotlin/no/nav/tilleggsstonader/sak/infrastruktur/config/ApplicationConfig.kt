@@ -18,6 +18,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootConfiguration
@@ -30,6 +31,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
     UnleashConfiguration::class,
 )
 @EnableScheduling
+@EnableResilientMethods
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class ApplicationConfig {
     private val logger = LoggerFactory.getLogger(javaClass)
