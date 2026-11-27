@@ -221,6 +221,7 @@ class BehandlingFaktaService(
                 },
             arena = arenaFakta(grunnlagsdata),
             flyttingDetaljer = søknad?.data?.flyttingDetaljer?.let { mapFlyttingDetaljer(it) },
+            erRegistrertSomArbeidssøker = søknad?.data?.arbeidssøker?.erRegistrertSomArbeidssøker,
         )
     }
 

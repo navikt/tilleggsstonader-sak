@@ -155,6 +155,7 @@ data class BehandlingFaktaFlyttingDto(
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
     val flyttingDetaljer: FaktaFlyttingDetaljer? = null,
+    val erRegistrertSomArbeidssøker: JaNei? = null,
 ) : BehandlingFaktaDto
 
 data class FaktaFlyttingDetaljer(

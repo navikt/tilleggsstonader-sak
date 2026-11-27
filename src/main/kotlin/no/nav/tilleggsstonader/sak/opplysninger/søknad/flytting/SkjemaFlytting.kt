@@ -14,9 +14,14 @@ import java.time.LocalDate
 
 data class SkjemaFlytting(
     override val hovedytelse: HovedytelseAvsnitt,
+    val arbeidssøker: ArbeidssøkerAvsnitt,
     val flyttingDetaljer: FlyttingDetaljer?,
     val dokumentasjon: List<Dokumentasjon>,
 ) : Søknadsdata
+
+data class ArbeidssøkerAvsnitt(
+    val erRegistrertSomArbeidssøker: JaNei,
+)
 
 data class FlyttingDetaljer(
     val årsak: Flytteårsak,

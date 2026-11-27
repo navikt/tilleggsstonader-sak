@@ -35,6 +35,7 @@ object SøknadsskjemaFlyttingMapper {
                         ),
                     flyttingDetaljer = skjema.flyttingDetaljer?.let { mapFlyttingDetaljer(it) },
                     dokumentasjon = mapDokumentasjon(skjema, journalpost),
+                    arbeidssøker = ArbeidssøkerAvsnitt(skjema.arbeidssøker.erRegistrertSomArbeidssøker.verdi),
                 ),
         )
 
