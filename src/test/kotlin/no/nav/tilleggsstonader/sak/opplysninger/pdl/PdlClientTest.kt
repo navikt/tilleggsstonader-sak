@@ -8,6 +8,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
+import org.apache.hc.client5.http.ConnectTimeoutException
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.springframework.boot.restclient.RestTemplateBuilder
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
 import java.net.URI
@@ -111,6 +113,36 @@ class PdlClientTest {
             PdlIdent("10987654321", false, "FOLKEREGISTERIDENT"),
             PdlIdent("12345678901", false, "AKTORID"),
         )
+    }
+
+    @Test
+    fun `identoppslag prøves på nytt ved connect-timeout`() {
+        wiremockServerItem.stubFor(
+            post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
+                .willReturn(okJson(readFile("pdl/hent_identer.json"))),
+        )
+        var antallKall = 0
+        val restTemplateMedConnectTimeoutFørsteGang =
+            RestTemplateBuilder()
+                .messageConverters(JacksonJsonHttpMessageConverter(jsonMapper))
+                .additionalInterceptors(
+                    ClientHttpRequestInterceptor { request, body, execution ->
+                        antallKall++
+                        if (antallKall == 1) throw ConnectTimeoutException("Connect timed out")
+                        execution.execute(request, body)
+                    },
+                ).build()
+        val pdlClient =
+            PdlClient(
+                URI.create(wiremockServerItem.baseUrl()),
+                restTemplateMedConnectTimeoutFørsteGang,
+                restTemplateMedConnectTimeoutFørsteGang,
+            )
+
+        val response = pdlClient.hentPersonidenterMedSystemContext("12345")
+
+        assertThat(antallKall).isEqualTo(2)
+        assertThat(response.identer).hasSize(2)
     }
 
     @Test

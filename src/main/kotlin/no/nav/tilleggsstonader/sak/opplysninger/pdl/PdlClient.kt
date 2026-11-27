@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
 import org.springframework.stereotype.Service
-import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -134,11 +133,12 @@ private val retryLogger = LoggerFactory.getLogger(PdlClient::class.java)
 
 /**
  * Ved connect-timeout har forespørselen ikke nådd PDL, så det er trygt å prøve på nytt.
+ * postForEntity fra libs pakker ResourceAccessException inn i en RuntimeException, så vi ser på rotårsaken.
  */
 internal fun <T> medEttNyttForsøkVedConnectTimeout(kall: () -> T): T =
     try {
         kall()
-    } catch (e: ResourceAccessException) {
+    } catch (e: RuntimeException) {
         if (NestedExceptionUtils.getMostSpecificCause(e) !is ConnectTimeoutException) throw e
         retryLogger.warn("Connect-timeout mot PDL, prøver på nytt")
         kall()

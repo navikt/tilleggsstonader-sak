@@ -27,6 +27,21 @@ class MedEttNyttForsøkVedConnectTimeoutTest {
     }
 
     @Test
+    fun `prøver på nytt når connect-timeout er pakket inn i RuntimeException`() {
+        var antallKall = 0
+
+        val resultat =
+            medEttNyttForsøkVedConnectTimeout {
+                antallKall++
+                if (antallKall == 1) throw RuntimeException("Feil ved kall", connectTimeout)
+                "ok"
+            }
+
+        assertThat(resultat).isEqualTo("ok")
+        assertThat(antallKall).isEqualTo(2)
+    }
+
+    @Test
     fun `kaster videre hvis andre forsøk også feiler`() {
         var antallKall = 0
 
