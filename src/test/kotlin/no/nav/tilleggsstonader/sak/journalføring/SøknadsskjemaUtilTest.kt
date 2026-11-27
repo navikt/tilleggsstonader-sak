@@ -4,12 +4,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
+import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaFlytting
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaROAH
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.ArbeidssøkerAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHAdresseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.roah.ROAHAktivitetAvsnitt
@@ -209,6 +212,7 @@ class SøknadsskjemaUtilTest {
                                             ),
                                         arbeidOgOpphold = null,
                                     ),
+                                arbeidssøker = ArbeidssøkerAvsnitt(EnumFelt("", JaNei.NEI, "", emptyList())),
                                 flyttingDetaljer = null,
                                 dokumentasjon = emptyList(),
                             ),

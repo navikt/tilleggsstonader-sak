@@ -12,6 +12,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flyttemåte
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.UtgifterDekketPåAnnenMåte
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -25,7 +28,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.ArbeidssøkerAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.FlyttingDetaljer
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
@@ -172,6 +179,68 @@ class HåndterSøknadServiceTest {
         assertThat(tomSlot.captured).isEqualTo(senesteTom)
     }
 
+    @Test
+    fun `flytting - svar om registrert arbeidssøker legges til målgruppene fra søknaden`() {
+        val flyttedato = 15 januar 2026
+        val journalpost = strukturertJournalpost(DokumentBrevkode.FLYTTING)
+        val søknad =
+            søknadFlytting(
+                hovedytelse = listOf(Hovedytelse.AAP),
+                flyttedato = flyttedato,
+                erRegistrertSomArbeidssøker = JaNei.JA,
+            )
+        mockBestemStønadstypeForFlytting(journalpost, søknad)
+
+        service.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost, filtrerStønadstyperSomIkkeErAktivert = false)
+
+        verify(exactly = 1) {
+            bestemTemaForJournalpostService.bestemStønadstype(
+                journalpost = journalpost,
+                stønadstypeTso = Stønadstype.FLYTTING_TSO,
+                stønadstypeTsr = Stønadstype.FLYTTING_TSR,
+                fom = flyttedato,
+                tom = flyttedato,
+                målgrupperFraSøknad = setOf(MålgruppeType.AAP, MålgruppeType.ARBEIDSSØKER),
+            )
+        }
+    }
+
+    @Test
+    fun `flytting - skal ikke legge til arbeidssøker når bruker svarer nei`() {
+        val journalpost = strukturertJournalpost(DokumentBrevkode.FLYTTING)
+        val søknad =
+            søknadFlytting(
+                hovedytelse = listOf(Hovedytelse.AAP),
+                flyttedato = 15 januar 2026,
+                erRegistrertSomArbeidssøker = JaNei.NEI,
+            )
+        mockBestemStønadstypeForFlytting(journalpost, søknad)
+
+        service.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost, filtrerStønadstyperSomIkkeErAktivert = false)
+
+        verify {
+            bestemTemaForJournalpostService.bestemStønadstype(
+                journalpost = journalpost,
+                stønadstypeTso = any(),
+                stønadstypeTsr = any(),
+                fom = any(),
+                tom = any(),
+                målgrupperFraSøknad = setOf(MålgruppeType.AAP),
+            )
+        }
+    }
+
+    private fun mockBestemStønadstypeForFlytting(
+        journalpost: no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost,
+        søknad: SøknadFlytting,
+    ) {
+        every { journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.FLYTTING_TSO) } returns mockk()
+        every { søknadService.mapSøknad(any(), journalpost) } returns søknad
+        every {
+            bestemTemaForJournalpostService.bestemStønadstype(any(), any(), any(), any(), any(), any())
+        } returns Stønadstype.FLYTTING_TSR
+    }
+
     private fun ustrukturertJournalpost(
         brevkode: DokumentBrevkode,
         tema: Tema,
@@ -263,4 +332,35 @@ class HåndterSøknadServiceTest {
         adresse = Adresse(gyldigFraOgMed = null, adresse = null, postnummer = null, poststed = null, landkode = null),
         antallKilometerEnVei = "10",
     )
+
+    private fun søknadFlytting(
+        hovedytelse: List<Hovedytelse>,
+        flyttedato: LocalDate,
+        erRegistrertSomArbeidssøker: JaNei,
+    ): SøknadFlytting {
+        val adresse = Adresse(gyldigFraOgMed = null, adresse = null, postnummer = null, poststed = null, landkode = null)
+        return SøknadFlytting(
+            journalpostId = "1",
+            mottattTidspunkt = java.time.LocalDateTime.now(),
+            språk = no.nav.tilleggsstonader.kontrakter.felles.Språkkode.NB,
+            data =
+                SkjemaFlytting(
+                    hovedytelse = HovedytelseAvsnitt(hovedytelse = hovedytelse, harNedsattArbeidsevne = null, arbeidOgOpphold = null),
+                    flyttingDetaljer =
+                        FlyttingDetaljer(
+                            årsak = Flytteårsak.AKTIVITET,
+                            flyttedato = flyttedato,
+                            adresse = adresse,
+                            flyttemåte = Flyttemåte.FLYTTER_SELV,
+                            utgifterDekketPåAnnenMåte = UtgifterDekketPåAnnenMåte.NEI,
+                            utgifterEgenFlytting = null,
+                            flyttetilbud = null,
+                            skalFlytteFraFolkeregistrertAdresse = JaNei.JA,
+                            adresseDetSkalFlyttesFra = adresse,
+                        ),
+                    dokumentasjon = emptyList(),
+                    arbeidssøker = ArbeidssøkerAvsnitt(erRegistrertSomArbeidssøker = erRegistrertSomArbeidssøker),
+                ),
+        )
+    }
 }

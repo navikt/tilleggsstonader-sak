@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.ArbeidssøkerAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.Flyttetilbud
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.FlyttingDetaljer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
@@ -748,6 +749,7 @@ internal class BehandlingFaktaServiceTest {
                                 harNedsattArbeidsevne = null,
                                 arbeidOgOpphold = null,
                             ),
+                        arbeidssøker = ArbeidssøkerAvsnitt(JaNei.NEI),
                         flyttingDetaljer = flyttingDetaljer,
                         dokumentasjon =
                             listOf(

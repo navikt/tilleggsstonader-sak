@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningH
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
@@ -33,6 +34,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadROAH
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.roah.ROAHReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -210,11 +212,22 @@ class HåndterSøknadService(
             stønadstypeTsr = StønadstypeTsr,
             fom = periode.fom,
             tom = periode.tom,
-            målgrupperFraSøknad =
-                søknad.data.hovedytelse.hovedytelse
-                    .map { it.tilMålgruppeType() }
-                    .toSet(),
+            målgrupperFraSøknad = finnMålgrupperFraSøknad(søknad),
         )
+    }
+
+    private fun finnMålgrupperFraSøknad(søknad: Søknad<*>): Set<MålgruppeType> {
+        val målgrupperFraHovedytelse =
+            søknad.data.hovedytelse.hovedytelse
+                .map { it.tilMålgruppeType() }
+        val erRegistrertSomArbeidssøker =
+            søknad is SøknadFlytting && søknad.data.arbeidssøker.erRegistrertSomArbeidssøker == JaNei.JA
+
+        if (erRegistrertSomArbeidssøker) {
+            return (målgrupperFraHovedytelse + MålgruppeType.ARBEIDSSØKER).toSet()
+        }
+
+        return målgrupperFraHovedytelse.toSet()
     }
 
     private fun finnPeriodeDetSkalSjekkesMotYtelser(søknad: Søknad<*>) =
